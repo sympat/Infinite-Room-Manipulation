@@ -41,16 +41,16 @@ public class GainRedirector : MonoBehaviour
         float degree = 0;
         GainType type = GainType.Undefined;
 
-        // if (user.DeltaPosition.magnitude > MOVEMENT_THRESHOLD && user.DeltaPosition.magnitude >= Mathf.Abs(user.DeltaRotation)) // Translation
-        // {
-        //     degree = user.DeltaPosition.magnitude * (MAX_TRANSLATION_GAIN);
-        //     type = GainType.Translation;
-        // }
-        if(virtualUser.DeltaPosition.magnitude > 0.2f && virtualUser.DeltaPosition.magnitude >= Mathf.Abs(virtualUser.DeltaRotation)) // Curvature
+        if (virtualUser.DeltaPosition.magnitude > MOVEMENT_THRESHOLD && virtualUser.DeltaPosition.magnitude >= Mathf.Abs(virtualUser.DeltaRotation)) // Translation
         {
-            degree = Mathf.Rad2Deg * virtualUser.DeltaPosition.magnitude * (HODGSON_MAX_CURVATURE_GAIN);
-            type = GainType.Curvature;
+            degree = virtualUser.DeltaPosition.magnitude * (MAX_TRANSLATION_GAIN);
+            type = GainType.Translation;
         }
+        // if(virtualUser.DeltaPosition.magnitude > 0.2f && virtualUser.DeltaPosition.magnitude >= Mathf.Abs(virtualUser.DeltaRotation)) // Curvature
+        // {
+        //     degree = Mathf.Rad2Deg * virtualUser.DeltaPosition.magnitude * (HODGSON_MAX_CURVATURE_GAIN);
+        //     type = GainType.Curvature;
+        // }
         else if (Mathf.Abs(virtualUser.DeltaRotation) > ROTATION_THRESHOLD && virtualUser.DeltaPosition.magnitude < Mathf.Abs(virtualUser.DeltaRotation)) // Rotation
         {
             degree = virtualUser.DeltaRotation * (MIN_ROTATION_GAIN);

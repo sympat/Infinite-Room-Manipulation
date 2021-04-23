@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class Bound2D : Transform2D
 {
-    public bool useScaleAsSize = true;
     public Vector2 initSize;
     public float height;
 
@@ -90,26 +89,30 @@ public class Bound2D : Transform2D
         // Debug.Log("Initialzing room base");
         id = totalID++;
 
-        box = GetComponent<BoxCollider>();
-        if(box == null) box = this.gameObject.AddComponent<BoxCollider>();
-
         ApplySize();
     }
 
-    protected void ApplySize() {
-        if(useScaleAsSize) {
-            box.size = Vector3.Scale(box.size, transform.localScale);
-            originScale= transform.localScale;
-            transform.localScale = Vector3.one;
-            this.Size = CastVector3Dto2D(box.size);
-            this.Height = box.size.y;
-        }
-        else {
-            originScale= transform.localScale;
-            transform.localScale = Vector3.one;
-            this.Size = initSize;
-            this.Height = height;
-        }
+    public void ApplySize() {
+        box = GetComponent<BoxCollider>();
+        if(box == null) box = this.gameObject.AddComponent<BoxCollider>();
+
+        originScale= transform.localScale;
+        transform.localScale = Vector3.one;
+        this.Size = initSize;
+        this.Height = height;
+        // if(useScaleAsSize) {
+        //     box.size = Vector3.Scale(box.size, transform.localScale);
+        //     originScale= transform.localScale;
+        //     transform.localScale = Vector3.one;
+        //     this.Size = CastVector3Dto2D(box.size);
+        //     this.Height = box.size.y;
+        // }
+        // else {
+        //     originScale= transform.localScale;
+        //     transform.localScale = Vector3.one;
+        //     this.Size = initSize;
+        //     this.Height = height;
+        // }
     }
 
     protected virtual void UpdateBox(Vector2 size, float height) {

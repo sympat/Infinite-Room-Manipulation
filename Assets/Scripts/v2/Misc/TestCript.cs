@@ -4,14 +4,19 @@ using UnityEngine;
 
 public class TestCript : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-        Transform2D tf = GetComponent<Transform2D>();
+    BoxCollider box;
 
-        // tf.Rotate(30);
-        tf.RotateAround(tf.Position + tf.Right * 5, 30);
+    private void Start() {
+        // box = GetComponent<BoxCollider>().bounds;
+        GetComponent<BoxCollider>().enabled = true;
+        box = GetComponent<BoxCollider>();
+        
     }
 
-    // Update is called once per fra
+    private void Update() {
+        Debug.Log($"box.size {box.size}");
+        Debug.Log($"box.center {this.transform.TransformPoint(box.center)}");
+        Debug.Log($"box.max {this.transform.TransformPoint(box.center + box.size / 2)}");
+        Debug.Log($"box.min {this.transform.TransformPoint(box.center - box.size / 2)}");
+    }
 }

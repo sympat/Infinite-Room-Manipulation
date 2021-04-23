@@ -94,7 +94,7 @@ public class Door : Transform2D
 
         GameObject doorMain = Utility.GetChildWithLayer(this.gameObject, "Door Main");
         doorMain.GetComponent<BoxCollider>().enabled = true;
-        Bounds box = doorMain.GetComponent<BoxCollider>().bounds;
+        BoxCollider box = doorMain.GetComponent<BoxCollider>();
         doorMain.GetComponent<BoxCollider>().enabled = false;
 
         GameObject grabble = Utility.GetChildWithLayer(doorMain, "Grabble");
@@ -103,19 +103,34 @@ public class Door : Transform2D
         List<GameObject> knob = Utility.GetChildrenWithLayer(doorMain, "Knob");
         knob.ForEach(x => x.GetComponent<MeshCollider>().enabled = false);
 
-        // Debug.Log(new Vector4(box.min.x - box.center.x, box.min.y - box.center.y, box.min.z - box.center.z, 0));
-        // Debug.Log(new Vector4(box.max.x - box.center.x, box.max.y - box.center.y, box.max.z - box.center.z, 0));
+        // Debug.Log(new Vector4(box.min.x, box.min.y, box.min.z, 0));
+        // Debug.Log(new Vector4(box.max.x, box.max.y, box.max.z, 0));
         // Debug.Log(new Vector4(box.min.x - room1.Position.x, box.min.y, box.min.z - room1.Position.y, 0));
         // Debug.Log(new Vector4(box.max.x - room1.Position.x, box.max.y, box.max.z - room1.Position.y, 0));
 
         if(room1 != null) {
-            room1.GetComponent<MeshRenderer>().material.SetVector("_DoorMin", new Vector4(box.min.x - room1.Position.x, box.min.y, box.min.z - room1.Position.y, 0));
-            room1.GetComponent<MeshRenderer>().material.SetVector("_DoorMax", new Vector4(box.max.x - room1.Position.x, box.max.y, box.max.z - room1.Position.y, 0));
+            Vector3 doorMin = room1.transform.InverseTransformPoint(doorMain.transform.TransformPoint(box.center - (box.size / 2)));
+            Vector3 doorMax = room1.transform.InverseTransformPoint(doorMain.transform.TransformPoint(box.center + (box.size / 2)));
+
+            Debug.Log($"box.center (local) {box.center}");
+            Debug.Log($"box.size {box.size}");
+            Debug.Log($"box.center (world) {doorMain.transform.TransformPoint(box.center)}");
+            Debug.Log($"box.min (local) {box.center - (box.size / 2)}");
+            Debug.Log($"box.max (local) {box.center + (box.size / 2)}");
+            Debug.Log($"box.min (world) {doorMain.transform.TransformPoint(box.center - (box.size / 2))}");
+            Debug.Log($"box.max (world) {doorMain.transform.TransformPoint(box.center + (box.size / 2))}");
+            Debug.Log($"doorMin {room1.transform.InverseTransformPoint(doorMain.transform.TransformPoint(box.center - (box.size / 2)))}");
+            Debug.Log($"doorMax {room1.transform.InverseTransformPoint(doorMain.transform.TransformPoint(box.center + (box.size / 2)))}");
+
+            room1.GetComponent<MeshRenderer>().material.SetVector("_DoorMin", new Vector4(doorMin.x, doorMin.y, doorMin.z, 0));
+            room1.GetComponent<MeshRenderer>().material.SetVector("_DoorMax", new Vector4(doorMax.x, doorMax.y, doorMax.z, 0));
         }
 
         if(room2 != null) {
-            room2.GetComponent<MeshRenderer>().material.SetVector("_DoorMin", new Vector4(box.min.x - room2.Position.x, box.min.y, box.min.z - room2.Position.y, 0));
-            room2.GetComponent<MeshRenderer>().material.SetVector("_DoorMax", new Vector4(box.max.x - room2.Position.x, box.max.y, box.max.z - room2.Position.y, 0));
+            Vector3 doorMin = room2.transform.InverseTransformPoint(doorMain.transform.TransformPoint(box.center - box.size / 2));
+            Vector3 doorMax = room2.transform.InverseTransformPoint(doorMain.transform.TransformPoint(box.center + box.size / 2));
+            room2.GetComponent<MeshRenderer>().material.SetVector("_DoorMin", new Vector4(doorMin.x, doorMin.y, doorMin.z, 0));
+            room2.GetComponent<MeshRenderer>().material.SetVector("_DoorMax", new Vector4(doorMax.x, doorMax.y, doorMax.z, 0));
         }
 
         isOpened = true;

@@ -20,7 +20,7 @@ public class SteerToTargetRedirector : GainRedirector
 
     public override (GainType, float) ApplyRedirection()
     {
-        Debug.Log("SteerToTargetRedirector");
+        // Debug.Log("SteerToTargetRedirector");
         
         // define some variables for redirection
         realUser = realSpace.GetComponentInChildren<Transform2D>();
