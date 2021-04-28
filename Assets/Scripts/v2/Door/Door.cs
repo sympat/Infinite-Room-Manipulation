@@ -3,17 +3,21 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-public class Door : Transform2D
+public enum Direction {X, Y};
+
+public class Door : Bound2D
 {
     public Room room1, room2;
-    private static int totalID = 0;
-    private int id;
+    private static int doorTotalID = 0;
+    private int doorID;
     private RoomWrapper source, target;
     private bool isOpened = false;
 
     public override void Initializing()
     {
-        id = totalID++;
+        base.Initializing();
+
+        doorID = doorTotalID++;
         // Debug.Log("Initialzing door " + this.gameObject.name);
 
         int wall = -1;
@@ -28,21 +32,20 @@ public class Door : Transform2D
     }
 
     public int GetContactWall(Room room) {
-        if(room.Min.x < this.Position.x && this.Position.x < room.Max.x) {
-            if(this.Position.y > room.Position.y)
+        Room v = GetThisRoom(room);
+
+        if(this.Rotation == 0) {
+            if(this.Position.y > v.Position.y)
                 return 0;
             else
                 return 2;
         }
-
-        if(room.Min.y < this.Position.y && this.Position.y < room.Max.y) {
-            if(this.Position.x > room.Position.x)
+        else {
+            if(this.Position.x > v.Position.x)
                 return 3;
             else
                 return 1;
         }
-
-        throw new System.Exception("Invalid door position");
     }
     
     public Room GetConnectedRoom(Room currentRoom = null) {
@@ -88,6 +91,17 @@ public class Door : Transform2D
     //     }
     // }
 
+    // private void Start() {
+    //     Debug.Log(GetDoorSize());
+    // }
+
+    public Vector2 GetDoorSize() {
+        GameObject doorFrame = Utility.GetChildWithLayer(this.gameObject, "Door Frame");
+        BoxCollider box = doorFrame.GetComponent<BoxCollider>();
+
+        return CastVector3Dto2D(box.size);
+    }
+
     public void OpenDoor()
     {
         Debug.Log("OpenDoor");
@@ -103,34 +117,20 @@ public class Door : Transform2D
         List<GameObject> knob = Utility.GetChildrenWithLayer(doorMain, "Knob");
         knob.ForEach(x => x.GetComponent<MeshCollider>().enabled = false);
 
-        // Debug.Log(new Vector4(box.min.x, box.min.y, box.min.z, 0));
-        // Debug.Log(new Vector4(box.max.x, box.max.y, box.max.z, 0));
-        // Debug.Log(new Vector4(box.min.x - room1.Position.x, box.min.y, box.min.z - room1.Position.y, 0));
-        // Debug.Log(new Vector4(box.max.x - room1.Position.x, box.max.y, box.max.z - room1.Position.y, 0));
-
         if(room1 != null) {
             Vector3 doorMin = room1.transform.InverseTransformPoint(doorMain.transform.TransformPoint(box.center - (box.size / 2)));
             Vector3 doorMax = room1.transform.InverseTransformPoint(doorMain.transform.TransformPoint(box.center + (box.size / 2)));
 
-            Debug.Log($"box.center (local) {box.center}");
-            Debug.Log($"box.size {box.size}");
-            Debug.Log($"box.center (world) {doorMain.transform.TransformPoint(box.center)}");
-            Debug.Log($"box.min (local) {box.center - (box.size / 2)}");
-            Debug.Log($"box.max (local) {box.center + (box.size / 2)}");
-            Debug.Log($"box.min (world) {doorMain.transform.TransformPoint(box.center - (box.size / 2))}");
-            Debug.Log($"box.max (world) {doorMain.transform.TransformPoint(box.center + (box.size / 2))}");
-            Debug.Log($"doorMin {room1.transform.InverseTransformPoint(doorMain.transform.TransformPoint(box.center - (box.size / 2)))}");
-            Debug.Log($"doorMax {room1.transform.InverseTransformPoint(doorMain.transform.TransformPoint(box.center + (box.size / 2)))}");
-
-            room1.GetComponent<MeshRenderer>().material.SetVector("_DoorMin", new Vector4(doorMin.x, doorMin.y, doorMin.z, 0));
-            room1.GetComponent<MeshRenderer>().material.SetVector("_DoorMax", new Vector4(doorMax.x, doorMax.y, doorMax.z, 0));
+            room1.GetComponent<MeshRenderer>().material.SetVector("DigonalPos1", new Vector4(doorMin.x, doorMin.y, doorMin.z, 0));
+            room1.GetComponent<MeshRenderer>().material.SetVector("DigonalPos2", new Vector4(doorMax.x, doorMax.y, doorMax.z, 0));
         }
 
         if(room2 != null) {
             Vector3 doorMin = room2.transform.InverseTransformPoint(doorMain.transform.TransformPoint(box.center - box.size / 2));
             Vector3 doorMax = room2.transform.InverseTransformPoint(doorMain.transform.TransformPoint(box.center + box.size / 2));
-            room2.GetComponent<MeshRenderer>().material.SetVector("_DoorMin", new Vector4(doorMin.x, doorMin.y, doorMin.z, 0));
-            room2.GetComponent<MeshRenderer>().material.SetVector("_DoorMax", new Vector4(doorMax.x, doorMax.y, doorMax.z, 0));
+
+            room2.GetComponent<MeshRenderer>().material.SetVector("DigonalPos1", new Vector4(doorMin.x, doorMin.y, doorMin.z, 0));
+            room2.GetComponent<MeshRenderer>().material.SetVector("DigonalPos2", new Vector4(doorMax.x, doorMax.y, doorMax.z, 0));
         }
 
         isOpened = true;
@@ -203,18 +203,18 @@ public class Door : Transform2D
     public bool Equals(Door v)
     {
         if (v == null) return false;
-        else return (this.id == v.id);
+        else return (this.doorID == v.doorID);
     }
 
         public override int GetHashCode()
     {
-        return this.id;
+        return this.doorID;
     }
 
     public override string ToString()
     {
         string result = "";
-        result += string.Format("ID: {0}", id);
+        result += string.Format("ID: {0}", doorID);
         result += string.Format(", ObjName: {0}", this.gameObject.name);
         result += "\n" + source;
         result += "\n" + target;
@@ -278,12 +278,12 @@ public class Door : Transform2D
         GetThisRoomWrapper(currentRoom).weight = newWeight;
     }
 
-    public bool CheckWallDirection()
+    public Direction CheckWallDirection()
     {
         if (source.wall % 2 == 0 && target.wall % 2 == 0) // true - y
-            return true;
+            return Direction.Y;
         else if (source.wall % 2 != 0 && target.wall % 2 != 0) // false - x
-            return false;
+            return Direction.X;
         else
             throw new System.Exception("Invalid wall");
     }
@@ -292,7 +292,7 @@ public class Door : Transform2D
     {
         Room u = GetConnectedRoomWrapper(v).room;
 
-        if (CheckWallDirection()) // y축으로 서로 연결된 경우
+        if (CheckWallDirection() == Direction.Y) // y축으로 서로 연결된 경우
         {
             if (moveAlongWall)
             {

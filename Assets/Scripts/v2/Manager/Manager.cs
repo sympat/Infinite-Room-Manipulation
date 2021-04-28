@@ -9,7 +9,7 @@ public class Manager : MonoBehaviour
     protected RealSpace realSpace;
 
     // Start is called before the first frame update
-    public virtual void Start()
+    public virtual void Awake()
     {
         foreach(Transform child in transform) {
             Transform2D tf = child.GetComponent<Transform2D>();

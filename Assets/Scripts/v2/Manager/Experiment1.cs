@@ -36,8 +36,8 @@ public class Experiment1 : Manager
     Queue<int> distSample;
     Queue<int>[] gainSample;
 
-    public override void Start() {
-        base.Start();
+    public override void Awake() {
+        base.Awake();
 
         UserBody userBody = user.GetTrackedUserBody();
         currentRoom = virtualEnvironment.CurrentRoom;

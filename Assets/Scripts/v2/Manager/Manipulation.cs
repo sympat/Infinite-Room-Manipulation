@@ -1,42 +1,21 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System;
 using UnityEngine;
 using UnityEngine.Events;
+using System.Linq;
 
-public class Manipulation : MonoBehaviour
+public class Manipulation : Experiment2
 {
-    private static float DT = 0.1f;
-    private static float doorDT = 0.01f;
+    private float DT = 1.1f;
+    private Vector2 minSize = 2.0f * Vector2.one;
 
-    private UnityEvent onStart = new UnityEvent();
-    private UnityEvent onEnd = new UnityEvent();
+    // public VirtualEnvironment VE;
+    // public RealSpace realSpace;
 
-    public VirtualEnvironment VE;
-    public Bound2D realSpace;
-    public CoinTask coinTask;
-
-    public bool[] CheckWallMovable(VirtualEnvironment virtualEnvironment, Room currentRoom, UserBody userBody, float[] translate) // translate은 xx,y 좌표계 기준으로 부호가 결정
-    {
-        bool[] isMovable = new bool[4];
+    public bool[] CheckWallVisibleToUser(Room currentRoom, UserBody userBody) {
+        bool[] isVisibleToUser = new bool[4];
         for (int i = 0; i < 4; i++)
-        {
-            isMovable[i] = true; // i와 i+1 사이 wall
-        }
-
-        // 벽이 사용자와 충분히 멀리 있는지를 판단
-        for (int i = 0; i < 4; i++)
-        {
-            Vector2 wallPosition = currentRoom.GetEdge2D(i, Space.World);
-
-            if (i % 2 == 0 && Mathf.Abs(wallPosition.y - userBody.Position.y) < 0.4f) // 현재 벽 i가 0, 2번 벽이고 user와 너무 가까운 경우, 0.1f는 여유 boundary , user.Size.y / 2
-            {
-                isMovable[i] = false;
-            }
-            else if (i % 2 != 0 && Mathf.Abs(wallPosition.x - userBody.Position.x) < 0.4f) // user.Size.x / 2
-            {
-                isMovable[i] = false;
-            }
-        }
+            isVisibleToUser[i] = false;
 
         // 벽이 사용자 시야에 있는지를 판단
         for (int i = 0; i < 4; i++)
@@ -46,18 +25,62 @@ public class Manipulation : MonoBehaviour
 
             if (userBody.IsTargetInUserFov(vertexPosition))
             {
-                isMovable[Utility.mod(i, 4)] = false;
-                isMovable[Utility.mod(i - 1, 4)] = false;
+                isVisibleToUser[Utility.mod(i, 4)] = true;
+                isVisibleToUser[Utility.mod(i - 1, 4)] = true;
             }
 
             if(userBody.IsTargetInUserFov(wallPosition))
             {
-                isMovable[Utility.mod(i, 4)] = false;
+                isVisibleToUser[Utility.mod(i, 4)] = true;
             }
         }
 
-        return isMovable;
+        return isVisibleToUser;
     }
+
+    // public bool[] CheckWallMovable(VirtualEnvironment virtualEnvironment, Room currentRoom, UserBody userBody) // translate은 xx,y 좌표계 기준으로 부호가 결정
+    // {
+    //     bool[] isMovable = new bool[4];
+    //     for (int i = 0; i < 4; i++)
+    //     {
+    //         isMovable[i] = true; // i와 i+1 사이 wall
+    //     }
+
+    //     // 벽이 사용자와 충분히 멀리 있는지를 판단
+    //     for (int i = 0; i < 4; i++)
+    //     {
+    //         Vector2 wallPosition = currentRoom.GetEdge2D(i, Space.World);
+
+    //         if (i % 2 == 0 && Mathf.Abs(wallPosition.y - userBody.Position.y) < 0.4f) // 현재 벽 i가 0, 2번 벽이고 user와 너무 가까운 경우, 0.1f는 여유 boundary , user.Size.y / 2
+    //         {
+    //             isMovable[i] = false;
+    //         }
+    //         else if (i % 2 != 0 && Mathf.Abs(wallPosition.x - userBody.Position.x) < 0.4f) // user.Size.x / 2
+    //         {
+    //             isMovable[i] = false;
+    //         }
+    //     }
+
+    //     // 벽이 사용자 시야에 있는지를 판단
+    //     for (int i = 0; i < 4; i++)
+    //     {
+    //         Vector2 vertexPosition = currentRoom.GetVertex2D(i, Space.World);
+    //         Vector2 wallPosition = currentRoom.GetEdge2D(i, Space.World);
+
+    //         if (userBody.IsTargetInUserFov(vertexPosition))
+    //         {
+    //             isMovable[Utility.mod(i, 4)] = false;
+    //             isMovable[Utility.mod(i - 1, 4)] = false;
+    //         }
+
+    //         if(userBody.IsTargetInUserFov(wallPosition))
+    //         {
+    //             isMovable[Utility.mod(i, 4)] = false;
+    //         }
+    //     }
+
+    //     return isMovable;
+    // }
 
     public Tuple<Vector2, Vector2> GetScaleTranlslate(Room currentRoom, Bound2D realSpace) // v is currentRoom
     {
@@ -68,28 +91,48 @@ public class Manipulation : MonoBehaviour
         return new Tuple<Vector2, Vector2>(Scale, Translate);
     }
 
+    private bool[] isWallMoveDone = new bool[4];
+
     public void Restore(VirtualEnvironment virtualEnvironment, Room currentRoom, UserBody user, Vector2 scale, Vector2 translate)
     {
-        Room v = currentRoom;
+        float[] DistWalltoDest = new float[4];
+        DistWalltoDest[0] = (scale.y - 1) * currentRoom.Size.y / 2 + translate.y;
+        DistWalltoDest[1] = (1 - scale.x) * currentRoom.Size.x / 2 + translate.x;
+        DistWalltoDest[2] = (1 - scale.y) * currentRoom.Size.y / 2 + translate.y;
+        DistWalltoDest[3] = (scale.x - 1) * currentRoom.Size.x / 2 + translate.x;
 
-        float[] wallMovement = new float[4]; // Sign을 결정하는 역할만 함
-        wallMovement[0] = (scale.y - 1) * v.Size.y / 2 + translate.y;
-        wallMovement[1] = (1 - scale.x) * v.Size.x / 2 + translate.x;
-        wallMovement[2] = (1 - scale.y) * v.Size.y / 2 + translate.y;
-        wallMovement[3] = (scale.x - 1) * v.Size.x / 2 + translate.x;
+        float[] DistWalltoUser = new float[4];
+        DistWalltoUser[0] = (user.Position.y + 0.4f) - currentRoom.GetEdge2D(0, Space.World).y;
+        DistWalltoUser[1] = (user.Position.x - 0.4f) - currentRoom.GetEdge2D(1, Space.World).x;
+        DistWalltoUser[2] = (user.Position.y - 0.4f) - currentRoom.GetEdge2D(2, Space.World).y;
+        DistWalltoUser[3] = (user.Position.x + 0.4f) - currentRoom.GetEdge2D(3, Space.World).x;
 
-        bool[] isWallMovable = CheckWallMovable(virtualEnvironment, currentRoom, user, wallMovement);
+        float[] DistgainApplied = new float[4];
+        DistgainApplied[0] = Mathf.Sign(DistWalltoDest[0]) * (DT - 1) * currentRoom.Size.y;
+        DistgainApplied[1] = Mathf.Sign(DistWalltoDest[1]) * (DT - 1) * currentRoom.Size.x;
+        DistgainApplied[2] = Mathf.Sign(DistWalltoDest[2]) * (DT - 1) * currentRoom.Size.y;
+        DistgainApplied[3] = Mathf.Sign(DistWalltoDest[3]) * (DT - 1) * currentRoom.Size.x;
 
-        //wall을 이동 시키는 로직 start
+        bool[] isVisible = CheckWallVisibleToUser(currentRoom, user);
         for (int i = 0; i < 4; i++)
         {
-            if (isWallMovable[i])
-            {
-                float translation = Mathf.Sign(wallMovement[i]) * DT * Time.deltaTime;
-                virtualEnvironment.MoveWall(v, i, translation);
+            if(!isVisible[i] && !isWallMoveDone[i]) {
+
+                float finalTranslate = 0;
+                if(DistWalltoDest[i] * DistWalltoUser[i] < 0) { 
+                    finalTranslate = Mathf.Sign(DistWalltoDest[i]) * Mathf.Min(Mathf.Abs(DistgainApplied[i]), Mathf.Abs(DistWalltoDest[i]));
+                }
+                else {
+                    finalTranslate = Mathf.Sign(DistWalltoDest[i]) * Mathf.Min(Mathf.Abs(DistgainApplied[i]), Mathf.Abs(DistWalltoDest[i]), Mathf.Abs(DistWalltoUser[i]));
+                }
+
+                virtualEnvironment.MoveWall(currentRoom, i, finalTranslate);
+                isWallMoveDone[i] = true;
+            }
+            else if(isVisible[i] && isWallMoveDone[i]) {
+                isWallMoveDone[i] = false;
             }
         }
-        // end
     }
 
     public void Reduce(VirtualEnvironment virtualEnvironment, Room targetRoom, Room currentRoom, Bound2D realSpace)
@@ -117,9 +160,32 @@ public class Manipulation : MonoBehaviour
             virtualEnvironment.MoveWall(targetRoom, 0, yMaxDist, currentRoom);
         }
 
+        targetRoom.previousRoom = currentRoom;
     }
 
-    static bool NeedAdjust(VirtualEnvironment virtualEnvironment, Room currentRoom)
+    public void ResizeRoom(Room room) {
+        Debug.Log("ResizeRoom");
+
+        int wall = virtualEnvironment.GetDoor(room, room.previousRoom).GetContactWall(room);
+
+        if(wall % 2 != 0 && room.Size.x < minSize.x) {
+            Debug.Log("Resize X");
+            float magnitude = minSize.x - room.Size.x;
+            float outDirection = (wall == 3) ? 1 : -1;
+
+            virtualEnvironment.MoveWall(room, wall, magnitude * outDirection);
+        }
+        else if(wall % 2 == 0 && room.Size.y < minSize.y) {
+            Debug.Log("Resize Y");
+
+            float magnitude = minSize.y - room.Size.y;
+            float outDirection = (wall == 0) ? 1 : -1;
+
+            virtualEnvironment.MoveWall(room, wall, magnitude * outDirection);
+        }
+    }
+
+    bool NeedAdjust(VirtualEnvironment virtualEnvironment, Room currentRoom)
     {
         List<Door> connectedDoors = virtualEnvironment.GetConnectedDoors(currentRoom);
 
@@ -145,15 +211,18 @@ public class Manipulation : MonoBehaviour
         this.enabled = !this.enabled;
     }
 
-    private void Awake() {
-        VE.userBody.AddEnterNewRoomEvent(SwitchEnable);
+    public override void Awake() {
+        base.Awake();
+        UserBody userBody = user.GetTrackedUserBody();
+
+        userBody.AddEnterNewRoomEvent(SwitchEnable);
+        userBody.AddEnterNewRoomEvent(ResizeRoom);
     }
 
     private void FixedUpdate() 
     {
-        VirtualEnvironment virtualEnvironment = VE;
-        Room currentRoom = VE.CurrentRoom;
-        UserBody user = VE.userBody;
+        Room currentRoom = virtualEnvironment.CurrentRoom;
+        UserBody user = virtualEnvironment.userBody;
 
         // 알고리즘 시작
         Tuple<Vector2, Vector2> st = GetScaleTranlslate(currentRoom, realSpace); 
@@ -161,7 +230,7 @@ public class Manipulation : MonoBehaviour
 
         if ((scale - Vector2.one).magnitude > 0.01f || (translate - Vector2.zero).magnitude > 0.01f) // 복원 연산
         {
-            Debug.Log("Restore");
+            // Debug.Log("Restore");
             Restore(virtualEnvironment, currentRoom, user, scale, translate);
         }
         else if(NeedAdjust(virtualEnvironment, currentRoom)) // 조정 연산
