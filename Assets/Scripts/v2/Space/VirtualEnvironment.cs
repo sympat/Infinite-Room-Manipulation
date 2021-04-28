@@ -240,6 +240,60 @@ public class VirtualEnvironment : Transform2D
         return result;
     }
 
+    // type 방향에 있는 문들 중에서 Max 값을 반환
+    public Vector2? GetMaxDoorInDirection(Room v, Direction type) { //TODO : align 된 좌표계에서만 통용
+        List<Door> doors = GetDoorsInDirection(v, type);
+        float result = float.MinValue;
+
+        if(doors.Count == 0) return null;
+
+        if(type == Direction.Y) {
+            foreach(var door in doors) {
+                if(result < door.Max.x)
+                    result = door.Max.x;
+            }
+
+            return new Vector2(result, 0);
+        }
+        else if(type == Direction.X) {
+            foreach(var door in doors) {
+                if(result < door.Max.y)
+                    result = door.Max.y;
+            }
+
+            return new Vector2(0, result);
+        }
+
+        throw new System.Exception("Invalid parameter");
+    }
+
+    // type 방향에 있는 문들 중에서 Min 값을 반환
+    public Vector2? GetMinDoorInDirection(Room v, Direction type) { //TODO : align 된 좌표계에서만 통용
+        List<Door> doors = GetDoorsInDirection(v, type);
+        float result = float.MaxValue;
+
+        if(doors.Count == 0) return null;
+
+        if(type == Direction.Y) {
+            foreach(var door in doors) {
+                if(result > door.Min.x)
+                    result = door.Min.x;
+            }
+
+            return new Vector2(result, 0);
+        }
+        else if(type == Direction.X) {
+            foreach(var door in doors) {
+                if(result > door.Min.y)
+                    result = door.Min.y;
+            }
+
+            return new Vector2(0, result);
+        }
+
+        throw new System.Exception("Invalid parameter");
+    }
+
     public Room GetRoom(int id) {
         foreach (var kv in adjList)
         {

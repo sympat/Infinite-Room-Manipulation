@@ -23,7 +23,7 @@ public class Bound2D : Transform2D
     {
         get
         {
-            return Utility.CastVector3Dto2D(box.size);
+            return CastVector3Dto2D(box.size);
         }
 
         set
@@ -50,7 +50,7 @@ public class Bound2D : Transform2D
         get
         {
 
-            return Utility.CastVector3Dto2D(box.size / 2) + this.Position;
+            return CastVector3Dto2D(box.size / 2) + this.Position;
         }
     }
 
@@ -58,21 +58,21 @@ public class Bound2D : Transform2D
     {
         get
         {
-            return Utility.CastVector3Dto2D(-box.size / 2) + this.Position;
+            return CastVector3Dto2D(-box.size / 2) + this.Position;
 
         }
     }
 
     public Vector2 Localmax {
         get {
-            return Utility.CastVector3Dto2D(box.center + box.size / 2);
+            return CastVector3Dto2D(box.center + box.size / 2);
         }
     }
 
     public Vector2 Localmin {
         get
         {
-            return Utility.CastVector3Dto2D(box.center - box.size / 2);
+            return CastVector3Dto2D(box.center - box.size / 2);
 
         }
     }
@@ -81,7 +81,7 @@ public class Bound2D : Transform2D
     {
         get
         {
-            return Utility.CastVector3Dto2D(box.size / 2);
+            return CastVector3Dto2D(box.size / 2);
         }
     }
 
@@ -104,6 +104,10 @@ public class Bound2D : Transform2D
             this.Size = initSize;
             this.Height = height;
         }
+        // else {
+        //     this.Size = CastVector3Dto2D(box.size);
+        //     this.Height = box.size.y;
+        // }
 
         // if(useScaleAsSize) {
         //     box.size = Vector3.Scale(box.size, transform.localScale);
@@ -164,7 +168,7 @@ public class Bound2D : Transform2D
 
     public bool IsContain(Vector2 point) // this가 point를 포함하는지 판단하는 함수
     {
-        if (this.box.bounds.Contains(Utility.CastVector2Dto3D(point, this.Height / 2)))
+        if (this.box.bounds.Contains(CastVector2Dto3D(point, this.Height / 2)))
         {
             return true;
         }
