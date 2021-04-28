@@ -137,6 +137,37 @@ public class VirtualEnvironment : Transform2D
         }
     }
 
+    public void MoveWallWithLimit(Room room, int wall, float translate) {
+        if (GetRoom(room) == null) return;
+
+        Door maxDoor = null, minDoor = null;
+        float translate1, translate2;
+
+        maxDoor = GetMaxDoorInDirection(room, Direction.Y);
+        translate1 = 1 / (1 - maxDoor.GetThisRoomWrapper(room).weight) * maxDoor.Size.x + room.Size.x;
+        // if(wall % 2 == 0) {
+        //     maxDoor = GetMaxDoorInDirection(room, Direction.Y);
+        //     translate1 = 1 / (1 - maxDoor.GetThisRoomWrapper(room).weight) * maxDoor.Size.x + room.Size.x;
+
+        //     minDoor = GetMinDoorInDirection(room, Direction.Y);
+        //     translate2 = 1 / (1 - minDoor.GetThisRoomWrapper(room).weight) * minDoor.Size.x + room.Size.x;
+        // }
+        // else {
+        //     maxDoor = GetMaxDoorInDirection(room, Direction.X);
+        //     translate1 = 1 / (1 - maxDoor.GetThisRoomWrapper(room).weight) * maxDoor.Size.x + room.Size.y;
+
+        //     minDoor = GetMinDoorInDirection(room, Direction.X);
+        //     translate2 = 1 / (1 - minDoor.GetThisRoomWrapper(room).weight) * minDoor.Size.x + room.Size.y;
+
+        // }
+
+        Debug.Log(maxDoor.GetThisRoomWrapper(room).weight);
+        Debug.Log(translate1);
+
+        MoveWall(room, wall, translate1);
+    }
+
+
     public void MoveWall(Room room, int wall, float translate, Room rootRoom = null)
     {
         if (GetRoom(room) == null) return;
@@ -241,57 +272,57 @@ public class VirtualEnvironment : Transform2D
     }
 
     // type 방향에 있는 문들 중에서 Max 값을 반환
-    public Vector2? GetMaxDoorInDirection(Room v, Direction type) { //TODO : align 된 좌표계에서만 통용
+    public Door GetMaxDoorInDirection(Room v, Direction type) { //TODO : align 된 좌표계에서만 통용
         List<Door> doors = GetDoorsInDirection(v, type);
-        float result = float.MinValue;
-
-        if(doors.Count == 0) return null;
+        float temp = float.MinValue;
+        Door result = null;
 
         if(type == Direction.Y) {
             foreach(var door in doors) {
-                if(result < door.Max.x)
-                    result = door.Max.x;
+                if(temp < door.Max.x) {
+                    temp = door.Max.x;
+                    result = door;
+                }
             }
-
-            return new Vector2(result, 0);
         }
         else if(type == Direction.X) {
             foreach(var door in doors) {
-                if(result < door.Max.y)
-                    result = door.Max.y;
-            }
+                if(temp < door.Max.y) {
+                    temp = door.Max.y;
+                    result = door;
 
-            return new Vector2(0, result);
+                }
+            }
         }
 
-        throw new System.Exception("Invalid parameter");
+        return result;
     }
 
     // type 방향에 있는 문들 중에서 Min 값을 반환
-    public Vector2? GetMinDoorInDirection(Room v, Direction type) { //TODO : align 된 좌표계에서만 통용
+    public Door GetMinDoorInDirection(Room v, Direction type) { //TODO : align 된 좌표계에서만 통용
         List<Door> doors = GetDoorsInDirection(v, type);
-        float result = float.MaxValue;
-
-        if(doors.Count == 0) return null;
+        float temp = float.MaxValue;
+        Door result = null;
 
         if(type == Direction.Y) {
             foreach(var door in doors) {
-                if(result > door.Min.x)
-                    result = door.Min.x;
+                if(temp > door.Min.x) {
+                    temp = door.Min.x;
+                    result = door;
+                }
             }
-
-            return new Vector2(result, 0);
         }
         else if(type == Direction.X) {
             foreach(var door in doors) {
-                if(result > door.Min.y)
-                    result = door.Min.y;
-            }
+                if(temp > door.Min.y) {
+                    temp = door.Min.y;
+                    result = door;
 
-            return new Vector2(0, result);
+                }
+            }
         }
 
-        throw new System.Exception("Invalid parameter");
+        return result;
     }
 
     public Room GetRoom(int id) {
