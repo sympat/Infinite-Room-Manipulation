@@ -4,11 +4,12 @@ using UnityEngine;
 
 public class Bound2D : Transform2D
 {
+    public bool usePredefinedSize;
     public Vector2 initSize;
     public float height;
 
-    protected static int totalID = 0;
-    protected int id;
+    private static int totalID = 0;
+    private int id;
     protected BoxCollider box;
     protected Vector3 originScale;
 
@@ -94,12 +95,16 @@ public class Bound2D : Transform2D
 
     public void ApplySize() {
         box = GetComponent<BoxCollider>();
-        if(box == null) box = this.gameObject.AddComponent<BoxCollider>();
 
-        originScale= transform.localScale;
-        transform.localScale = Vector3.one;
-        this.Size = initSize;
-        this.Height = height;
+        if(!usePredefinedSize) {
+            if(box == null) box = this.gameObject.AddComponent<BoxCollider>();
+
+            originScale= transform.localScale;
+            transform.localScale = Vector3.one;
+            this.Size = initSize;
+            this.Height = height;
+        }
+
         // if(useScaleAsSize) {
         //     box.size = Vector3.Scale(box.size, transform.localScale);
         //     originScale= transform.localScale;
@@ -261,7 +266,7 @@ public class Bound2D : Transform2D
         Vector2 result;
 
         switch (realIndex)
-        {
+        {   
             case 0:
                 result = (relativeTo == Space.World) ? this.Max : this.Localmax;
                 break;
@@ -305,43 +310,6 @@ public class Bound2D : Transform2D
     public Vector3 DenormalizePosition3D(Vector2 normalizedPos, float height = 0) {
         Vector2 result = DenormalizePosition2D(normalizedPos);
         return Utility.CastVector2Dto3D(result, height);
-    }
-
-    public void MoveEdge(int index, float translate) // box 형태를 유지하기 위해 wall의 1차원 움직임만 허용 (translate 부호 기준은 2차원 좌표계)
-    {
-        int realIndex = Utility.mod(index, 4);
-        float newCenterX = this.Position.x,
-            newCenterY = this.Position.y,
-            newSizeX = this.Size.x,
-            newSizeY = this.Size.y;
-
-        if (realIndex == 0) // N (+y)
-        {
-            newCenterY = this.Position.y + translate / 2;
-            newSizeY = this.Size.y + translate;
-        }
-        else if (realIndex == 1) // W (-x)
-        {
-            newCenterX = this.Position.x + translate / 2;
-            newSizeX = this.Size.x - translate;
-        }
-        else if (realIndex == 2) // S (-y)
-        {
-            newCenterY = this.Position.y + translate / 2;
-            newSizeY = this.Size.y - translate;
-        }
-        else if (realIndex == 3) // E (+x)
-        {
-            newCenterX = this.Position.x + translate / 2;
-            newSizeX = this.Size.x + translate;
-        }
-        else
-        {
-            throw new System.NotImplementedException();
-        }
-
-        this.Position = new Vector2(newCenterX, newCenterY);
-        this.Size = new Vector2(newSizeX, newSizeY);
     }
 
     public override bool Equals(object obj)

@@ -12,7 +12,6 @@ GameObject:
   - component: {fileID: 9142221434337372882}
   - component: {fileID: 9142221434337372884}
   - component: {fileID: 708567150}
-  - component: {fileID: 1459742231}
   m_Layer: 0
   m_Name: Real Space
   m_TagString: Untagged
@@ -77,19 +76,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   initSize: {x: 5, y: 5}
   height: 3
---- !u!114 &1459742231
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 9142221434337372881}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e473df34f81811f4f82206af02053a73, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  trackedObjects: []
 --- !u!1001 &5478563531352489534
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -172,7 +158,9 @@ PrefabInstance:
       propertyPath: trackedObjects.Array.data[1]
       value: 
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 2159070329648523497, guid: c70008dc2e6c1964488e33e0ac57caa9, type: 3}
+    - {fileID: 97374218087912894, guid: c70008dc2e6c1964488e33e0ac57caa9, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: c70008dc2e6c1964488e33e0ac57caa9, type: 3}
 --- !u!4 &543450653549403248 stripped
 Transform:

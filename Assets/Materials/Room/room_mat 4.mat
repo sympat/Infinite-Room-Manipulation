@@ -48,7 +48,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MainTexFloor:
-        m_Texture: {fileID: 2800000, guid: 618c39bcff8576646afd198df266ffa3, type: 3}
+        m_Texture: {fileID: 2800000, guid: d67b633b1efe9724a906f4c15dd1a31f, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MainTexFlr2:
@@ -56,7 +56,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MainTexWall:
-        m_Texture: {fileID: 2800000, guid: 8115401051b3a874b8079b19b05ba431, type: 3}
+        m_Texture: {fileID: 2800000, guid: 384146cabb7d6a44d99c4fa9c847098a, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MainTexWall2:
@@ -100,6 +100,8 @@ Material:
     - _UVSec: 0
     - _ZWrite: 1
     m_Colors:
+    - DigonalPos1: {r: 0, g: 0, b: 0, a: 0}
+    - DigonalPos2: {r: 0, g: 0, b: 0, a: 0}
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _DoorMax: {r: 0, g: 0, b: 0, a: 0}
     - _DoorMin: {r: 0, g: 0, b: 0, a: 0}

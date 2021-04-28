@@ -20,6 +20,7 @@ public class UserBody : Transform2D {
         public UserEventArgs(Transform tf) { target = tf; }
     }
     private static RoomEvent onEnterNewRoom = new RoomEvent();
+    private static RoomEvent onTempEnterNewRoom = new RoomEvent();
     private static RoomEvent onExitRoom = new RoomEvent();
     private static UnityEvent onEnterTarget = new UnityEvent();
     private static UnityEvent onDetachTurnTarget = new UnityEvent();
@@ -43,6 +44,10 @@ public class UserBody : Transform2D {
 
     public Vector2 DeltaPosition {
         get { return deltaPosition; }
+    }
+
+    public void AddTempEnterNewRoomEvent(UnityAction<Room> call) {
+        onTempEnterNewRoom.AddListener(call);
     }
 
     public void AddEnterNewRoomEvent(UnityAction<Room> call) {
@@ -112,13 +117,7 @@ public class UserBody : Transform2D {
             laserPointer.PointerClick += OnClickButton;
         }
 
-        // onExitRoom.AddListener((other) => {Debug.Log("User exited " + other.name);});
-        // onEnterNewRoom.AddListener((other) => {Debug.Log("User entered " + other.name);});
-
         this.gameObject.layer = LayerMask.NameToLayer("Player");
-
-        // ResetCurrentState();
-        // StartCoroutine("UpdateCurrentState");
     }
 
     private void OnEnable() {
@@ -137,6 +136,7 @@ public class UserBody : Transform2D {
             if(other.gameObject.tag != "CurrentRoom") {
                 enteredRoom = room;
                 isEnterNewRoom = true;
+                onTempEnterNewRoom.Invoke(enteredRoom);
             }
         }
         else if(other.gameObject.layer == LayerMask.NameToLayer("Target")) {
@@ -160,11 +160,14 @@ public class UserBody : Transform2D {
                 }
             }
         }
-        else if(other.gameObject.layer == LayerMask.NameToLayer("Real Space")) {
+    }
+
+    public void OnExitTrigger(UserEventArgs e) {
+        if(e.target.gameObject.layer == LayerMask.NameToLayer("Real Space")) {
             Debug.Log("User exited real space");
         }
     }
-
+    
     public void OnDetachFromHand(UserEventArgs e) {
         if(e.target.gameObject.layer == LayerMask.NameToLayer("TurnTarget"))
             onDetachTurnTarget.Invoke();
@@ -183,14 +186,14 @@ public class UserBody : Transform2D {
         }
     }
 
-    public bool IsTargetInUserFov(Vector2 target) // global 좌표계 기준으로 비교
+    public bool IsTargetInUserFov(Vector2 target, float bound = 50.0f) // global 좌표계 기준으로 비교
     {
         Vector2 userToTarget = target - this.Position;
         Vector2 userForward = this.Forward;
 
         float unsignedAngle = Vector2.Angle(userToTarget, userForward);
 
-        if (unsignedAngle - ((this.fov + 50) / 2) < 0.01f)
+        if (unsignedAngle - ((this.fov + bound) / 2) < 0.01f)
             return true;
         else
             return false;

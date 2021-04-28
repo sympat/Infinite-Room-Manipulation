@@ -20,10 +20,6 @@ public class User : Transform2D
         this.gameObject.layer = LayerMask.NameToLayer("Player");
     }
 
-    // private void Update() {
-    //     GetTrackedUserBody();
-    // }
-
     public UserBody GetTrackedUserBody() {
         foreach(var user in trackedUserBodys) {
             if(user.gameObject.activeInHierarchy) {

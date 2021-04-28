@@ -190,18 +190,17 @@ public class VirtualEnvironment : Transform2D
 
                 door.PlaceDoorAndConnectedRoom(u);
 
+                // if(u == currentRoom && userBody.IsTargetInUserFov(door.Position)) {
+                //     door.UpdateDoorWeight(door.Position, u);
+                // }
+                // else {
+                //     door.PlaceDoorAndConnectedRoom(u);
+                // }
+
                 if(w == null) continue;
                 else if (!visited[w])
                 {
                     visited[w] = true;
-                    
-                    // if(u == currentRoom && user.IsTargetInUserFov(door.Position)) {
-                    //     door.UpdateDoorWeight(door.Position, u);
-                    // }
-                    // else {
-                    //     door.PlaceDoorAndConnectedRoom(u);
-                    // }
-
                     q.Enqueue(w);
                 }
             }
@@ -228,6 +227,17 @@ public class VirtualEnvironment : Transform2D
     {
         if (GetRoom(v) == null) return null;
         return adjList[v];
+    }
+
+    public List<Door> GetDoorsInDirection(Room v, Direction type) {
+        List<Door> result = new List<Door>();
+
+        foreach(var door in adjList[v]) {
+            if(door.CheckWallDirection() == type)
+                result.Add(door);
+        }
+
+        return result;
     }
 
     public Room GetRoom(int id) {

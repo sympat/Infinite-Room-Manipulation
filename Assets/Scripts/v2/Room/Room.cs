@@ -5,8 +5,16 @@ using System.Linq;
 
 public class Room : Bound2D
 {
-    private Vector2 originSize;
+    private static int totalID = 0;
+    private int roomID;
 
+    private Vector2 originSize;
+    [HideInInspector]
+    public bool isSmallerInX = false;
+    [HideInInspector]
+    public bool isSmallerInY = false;
+    [HideInInspector]
+    public Room previousRoom;
     public Vector2 OriginSize {
         get {
             return originSize;
@@ -18,7 +26,7 @@ public class Room : Bound2D
         base.Initializing();
         // Debug.Log("Initialzing room " + this.gameObject.name);
 
-        originSize = this.Size; 
+        originSize = this.Size;
 
         this.gameObject.layer = LayerMask.NameToLayer("Room");
 
@@ -143,6 +151,43 @@ public class Room : Bound2D
 
         GetComponent<MeshFilter>().mesh = mesh;
         
+    }
+
+    public void MoveEdge(int index, float translate) // box 형태를 유지하기 위해 wall의 1차원 움직임만 허용 (translate 부호 기준은 2차원 좌표계)
+    {
+        int realIndex = Utility.mod(index, 4);
+        float newCenterX = this.Position.x,
+            newCenterY = this.Position.y,
+            newSizeX = this.Size.x,
+            newSizeY = this.Size.y;
+
+        if (realIndex == 0) // N (+y)
+        {
+            newCenterY = this.Position.y + translate / 2;
+            newSizeY = this.Size.y + translate;
+        }
+        else if (realIndex == 1) // W (-x)
+        {
+            newCenterX = this.Position.x + translate / 2;
+            newSizeX = this.Size.x - translate;
+        }
+        else if (realIndex == 2) // S (-y)
+        {
+            newCenterY = this.Position.y + translate / 2;
+            newSizeY = this.Size.y - translate;
+        }
+        else if (realIndex == 3) // E (+x)
+        {
+            newCenterX = this.Position.x + translate / 2;
+            newSizeX = this.Size.x + translate;
+        }
+        else
+        {
+            throw new System.NotImplementedException();
+        }
+
+        this.Position = new Vector2(newCenterX, newCenterY);
+        this.Size = new Vector2(newSizeX, newSizeY);
     }
 
 }
