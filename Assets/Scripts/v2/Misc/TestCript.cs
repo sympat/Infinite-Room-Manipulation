@@ -4,19 +4,21 @@ using UnityEngine;
 
 public class TestCript : MonoBehaviour
 {
-    BoxCollider box;
+
+    VirtualEnvironment virtualEnvironment;
 
     private void Start() {
-        // box = GetComponent<BoxCollider>().bounds;
-        GetComponent<BoxCollider>().enabled = true;
-        box = GetComponent<BoxCollider>();
-        
-    }
+        virtualEnvironment = GetComponent<VirtualEnvironment>();
+        Room currentRoom = virtualEnvironment.CurrentRoom;
 
-    private void Update() {
-        Debug.Log($"box.size {box.size}");
-        Debug.Log($"box.center {this.transform.TransformPoint(box.center)}");
-        Debug.Log($"box.max {this.transform.TransformPoint(box.center + box.size / 2)}");
-        Debug.Log($"box.min {this.transform.TransformPoint(box.center - box.size / 2)}");
+        // virtualEnvironment.MoveWall(currentRoom, 1, 1.0f);
+
+        virtualEnvironment.MoveWallWithLimit(currentRoom, 1, 0);
+
+        // Debug.Log($"MaxDoor in Y-Align {virtualEnvironment.GetMaxDoorInDirection(currentRoom, Direction.Y)}");
+        // Debug.Log($"MinDoor in Y-Align {virtualEnvironment.GetMinDoorInDirection(currentRoom, Direction.Y)}");
+
+        // Debug.Log($"MaxDoor in X-Align {virtualEnvironment.GetMaxDoorInDirection(currentRoom, Direction.X)}");
+        // Debug.Log($"MinDoor in X-Align {virtualEnvironment.GetMinDoorInDirection(currentRoom, Direction.X)}");
     }
 }

@@ -32,7 +32,7 @@ public class Door : Bound2D
     }
 
     public int GetContactWall(Room room) {
-        Room v = GetThisRoom(room);
+        Room v = room; // TODO : GetThisRoom
 
         if(this.Rotation == 0) {
             if(this.Position.y > v.Position.y)

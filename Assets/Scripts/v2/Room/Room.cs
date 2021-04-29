@@ -40,7 +40,6 @@ public class Room : Bound2D
         transform.GetChild(0).position = new Vector3(transform.GetChild(0).position.x, Height, transform.GetChild(0).position.z); // 전등
         if(transform.childCount > 1) transform.GetChild(1).localScale = Vector3.Scale(transform.GetChild(1).localScale, originScale); // Teleport
 
-
         // update mesh
         UpdateMesh();
     }

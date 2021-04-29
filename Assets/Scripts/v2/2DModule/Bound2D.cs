@@ -23,12 +23,12 @@ public class Bound2D : Transform2D
     {
         get
         {
-            return Utility.CastVector3Dto2D(box.size);
+            return CastVector3Dto2D(box.size);
         }
 
         set
         {
-            UpdateBox(value, Height);
+            UpdateBox(value, this.Height);
         }
     }
 
@@ -41,7 +41,7 @@ public class Bound2D : Transform2D
 
         set
         {
-            UpdateBox(Size, value);
+            UpdateBox(this.Size, value);
         }
     }
 
@@ -49,8 +49,8 @@ public class Bound2D : Transform2D
     {
         get
         {
-
-            return Utility.CastVector3Dto2D(box.size / 2) + this.Position;
+            return TransformPoint(this.Localmax);
+            // return CastVector3Dto2D(box.size / 2) + this.Position;
         }
     }
 
@@ -58,21 +58,23 @@ public class Bound2D : Transform2D
     {
         get
         {
-            return Utility.CastVector3Dto2D(-box.size / 2) + this.Position;
-
+            return TransformPoint(this.Localmin);
+            // return CastVector3Dto2D(-box.size / 2) + this.Position;
         }
     }
 
     public Vector2 Localmax {
         get {
-            return Utility.CastVector3Dto2D(box.center + box.size / 2);
+            return this.Size / 2;
+            // return CastVector3Dto2D(box.center + box.size / 2);
         }
     }
 
     public Vector2 Localmin {
         get
         {
-            return Utility.CastVector3Dto2D(box.center - box.size / 2);
+            return -this.Size / 2;
+            // return CastVector3Dto2D(box.center - box.size / 2);
 
         }
     }
@@ -81,7 +83,8 @@ public class Bound2D : Transform2D
     {
         get
         {
-            return Utility.CastVector3Dto2D(box.size / 2);
+            return this.Size / 2;
+            // return CastVector3Dto2D(box.size / 2);
         }
     }
 
@@ -104,6 +107,10 @@ public class Bound2D : Transform2D
             this.Size = initSize;
             this.Height = height;
         }
+        // else {
+        //     this.Size = CastVector3Dto2D(box.size);
+        //     this.Height = box.size.y;
+        // }
 
         // if(useScaleAsSize) {
         //     box.size = Vector3.Scale(box.size, transform.localScale);
@@ -125,6 +132,9 @@ public class Bound2D : Transform2D
         box.size = CastVector2Dto3D(size, height);
         box.center = new Vector3(box.center.x, height / 2, box.center.z);
     }
+
+    // TODO: 두 개의 bound를 비교할려면 근본적으로 하나의 bound 좌표계로 변환이 필요.
+    // 현재 구현은 두 bound가 항상 axis-aligned 되어있다는 가정하에, global max, min 값을 사용
     public bool IsInsideInXAxis(Bound2D other) // x축 기준으로 this가 other 안에 들어오는지 판단하는 함수
     {
         if ((other.Min.x - this.Min.x <= 0.05f) && (other.Max.x - this.Max.x >= 0.05f))
@@ -164,7 +174,7 @@ public class Bound2D : Transform2D
 
     public bool IsContain(Vector2 point) // this가 point를 포함하는지 판단하는 함수
     {
-        if (this.box.bounds.Contains(Utility.CastVector2Dto3D(point, this.Height / 2)))
+        if (this.box.bounds.Contains(CastVector2Dto3D(point, this.Height / 2)))
         {
             return true;
         }
@@ -238,16 +248,16 @@ public class Bound2D : Transform2D
         switch (realIndex)
         {
             case 0:
-                result = (relativeTo == Space.World) ? new Vector2(0, this.Extents.y) + this.Position : new Vector2(0, this.Extents.y);
+                result = (relativeTo == Space.World) ? TransformPoint(new Vector2(0, this.Extents.y)) : new Vector2(0, this.Extents.y);
                 break;
             case 1:
-                result = (relativeTo == Space.World) ? new Vector2(-this.Extents.x, 0) + this.Position : new Vector2(-this.Extents.x, 0);
+                result = (relativeTo == Space.World) ? TransformPoint(new Vector2(-this.Extents.x, 0)) : new Vector2(-this.Extents.x, 0);
                 break;
             case 2:
-                result = (relativeTo == Space.World) ? new Vector2(0, -this.Extents.y) + this.Position : new Vector2(0, -this.Extents.y);
+                result = (relativeTo == Space.World) ? TransformPoint(new Vector2(0, -this.Extents.y)) : new Vector2(0, -this.Extents.y);
                 break;
             case 3:
-                result = (relativeTo == Space.World) ? new Vector2(this.Extents.x, 0) + this.Position : new Vector2(this.Extents.x, 0);
+                result = (relativeTo == Space.World) ? TransformPoint(new Vector2(this.Extents.x, 0)) : new Vector2(this.Extents.x, 0);
                 break;
             default:
                 throw new System.NotImplementedException();
@@ -271,13 +281,13 @@ public class Bound2D : Transform2D
                 result = (relativeTo == Space.World) ? this.Max : this.Localmax;
                 break;
             case 1:
-                result = (relativeTo == Space.World) ? new Vector2(-this.Extents.x, this.Extents.y) + this.Position : new Vector2(-this.Extents.x, this.Extents.y);
+                result = (relativeTo == Space.World) ? TransformPoint(new Vector2(-this.Extents.x, this.Extents.y)) : new Vector2(-this.Extents.x, this.Extents.y);
                 break;
             case 2:
                 result = (relativeTo == Space.World) ? this.Min : this.Localmin;
                 break;
             case 3:
-                result = (relativeTo == Space.World) ? new Vector2(this.Extents.x, -this.Extents.y) + this.Position : new Vector2(this.Extents.x, -this.Extents.y);
+                result = (relativeTo == Space.World) ? TransformPoint(new Vector2(this.Extents.x, -this.Extents.y)) : new Vector2(this.Extents.x, -this.Extents.y);
                 break;
             default:
                 throw new System.NotImplementedException();
@@ -289,22 +299,30 @@ public class Bound2D : Transform2D
     public Vector3 GetVertex3D(int index, float height = 0, Space relativeTo = Space.Self)
     {
         Vector2 result = GetVertex2D(index, relativeTo);
-        return Utility.CastVector2Dto3D(result, height);
+        return CastVector2Dto3D(result, height);
     }
 
     public Vector2 SamplingPosition(float bound = 0)
     {
-        float xSampling = Random.Range(this.Min.x + bound, this.Max.x - bound);
-        float ySampling = Random.Range(this.Min.y + bound, this.Max.y - bound);
+        // float xSampling = Random.Range(this.Min.x + bound, this.Max.x - bound);
+        // float ySampling = Random.Range(this.Min.y + bound, this.Max.y - bound);
 
-        return new Vector2(xSampling, ySampling);
+        float xSampling = Random.Range(this.Localmin.x + bound, this.Localmax.x - bound);
+        float ySampling = Random.Range(this.Localmin.y + bound, this.Localmax.y - bound);
+
+        // return new Vector2(xSampling, ySampling);
+        return TransformPoint(new Vector2(xSampling, ySampling));
     }
 
     public Vector2 DenormalizePosition2D(Vector2 normalizedPos) {
-        float xPos = (normalizedPos.x + 1) * (Max.x - Min.x) / 2 + Min.x;
-        float yPos = (normalizedPos.y + 1) * (Max.y - Min.y) / 2 + Min.y;
+        // float xPos = (normalizedPos.x + 1) * (Max.x - Min.x) / 2 + Min.x;
+        // float yPos = (normalizedPos.y + 1) * (Max.y - Min.y) / 2 + Min.y;
 
-        return new Vector2(xPos, yPos);
+        float xPos = (normalizedPos.x + 1) * (Localmax.x - Localmin.x) / 2 + Localmin.x;
+        float yPos = (normalizedPos.y + 1) * (Localmax.y - Localmin.y) / 2 + Localmin.y;
+
+        // return new Vector2(xPos, yPos);
+        return TransformPoint(new Vector2(xPos, yPos));
     }
 
     public Vector3 DenormalizePosition3D(Vector2 normalizedPos, float height = 0) {
