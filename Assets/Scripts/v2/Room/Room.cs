@@ -5,48 +5,55 @@ using System.Linq;
 
 public class Room : Bound2D
 {
-    private static int totalID = 0;
-    private int roomID;
 
-    private Vector2 originSize;
-    [HideInInspector]
-    public bool isSmallerInX = false;
-    [HideInInspector]
-    public bool isSmallerInY = false;
     [HideInInspector]
     public Room previousRoom;
-    public Vector2 OriginSize {
-        get {
-            return originSize;
-        }
-    }
+
+    private Vector2 prevPosition;
+    private float prevHeight;
+    private Vector2 prevSize;
 
     public override void Initializing()
     {
         base.Initializing();
-        // Debug.Log("Initialzing room " + this.gameObject.name);
-
-        originSize = this.Size;
-
         this.gameObject.layer = LayerMask.NameToLayer("Room");
-
-        // transform.GetChild(0).position = new Vector3(transform.GetChild(0).position.x, Height, transform.GetChild(0).position.z); // 전등
-        // if(transform.childCount > 1) transform.GetChild(1).localScale = Vector3.Scale(transform.GetChild(1).localScale, originScale); // Teleport
     }
 
     protected override void UpdateBox(Vector2 size, float height) {
+        prevPosition = this.Position;
+        prevSize = this.Size;
+        prevHeight = this.Height;
+
         base.UpdateBox(size, height);
 
-        transform.GetChild(0).position = new Vector3(transform.GetChild(0).position.x, Height, transform.GetChild(0).position.z); // 전등
-        if(transform.childCount > 1) transform.GetChild(1).localScale = Vector3.Scale(transform.GetChild(1).localScale, originScale); // Teleport
+        // update furniture
+        UpdateFurnitures();
 
         // update mesh
         UpdateMesh();
     }
 
+    private void UpdateFurnitures() {
+        foreach(Transform child in transform) {
+
+            Transform2D tf = child.GetComponent<Transform2D>();
+            if(tf is Furniture) {
+                Furniture furniture = tf as Furniture;
+
+                if(furniture.isMovable) {
+                    furniture.LocalPosition = Vector2.Scale(this.Size / prevSize, furniture.LocalPosition) + (this.Position - prevPosition);
+                    if(furniture.allowZAxis) furniture.transform.localPosition = new Vector3(furniture.LocalPosition.x, this.Height / prevHeight * furniture.transform.localPosition.y, furniture.LocalPosition.y);
+                }
+                if(furniture.isScalable) {
+                    furniture.LocalScale = Vector2.Scale(this.Size / prevSize, furniture.LocalScale);
+                    if(furniture.allowZAxis) furniture.transform.localScale = new Vector3(furniture.LocalScale.x, this.Height / prevHeight * furniture.transform.localScale.y, furniture.LocalScale.y);
+                }
+            }
+        }
+    }
+
     private void UpdateMesh() {
 
-        Mesh mesh = new Mesh();
         Vector3[] vertices = new Vector3[24];
         int[,] vertexIndex = new int[,] {
             {0,15,19}, // 0, -
@@ -142,51 +149,49 @@ public class Room : Bound2D
             Vector2.zero, Vector2.right, Vector2.one, Vector2.up,
         };
 
+        Mesh mesh = new Mesh();
         mesh.vertices = vertices;
         mesh.triangles = triangles;
         mesh.normals = normals;
         mesh.uv = uvs;
-        mesh.uv2 = GetComponent<MeshFilter>().sharedMesh.uv2;
+        if(GetComponent<MeshFilter>().sharedMesh != null) mesh.uv2 = GetComponent<MeshFilter>().sharedMesh.uv2; // for lightmap
 
         GetComponent<MeshFilter>().mesh = mesh;
+
         
     }
 
     public void MoveEdge(int index, float translate) // box 형태를 유지하기 위해 wall의 1차원 움직임만 허용 (translate 부호 기준은 2차원 좌표계)
     {
         int realIndex = Utility.mod(index, 4);
-        float newCenterX = this.Position.x,
-            newCenterY = this.Position.y,
-            newSizeX = this.Size.x,
-            newSizeY = this.Size.y;
 
         if (realIndex == 0) // N (+y)
         {
-            newCenterY = this.Position.y + translate / 2;
-            newSizeY = this.Size.y + translate;
+            this.Size = this.Size + Vector2.up * translate;
+            this.Position = this.Position + this.Forward * translate / 2;
+
         }
         else if (realIndex == 1) // W (-x)
         {
-            newCenterX = this.Position.x + translate / 2;
-            newSizeX = this.Size.x - translate;
+            this.Size = this.Size + (-Vector2.right) * translate;
+            this.Position = this.Position + (this.Right) * translate / 2;
+
         }
         else if (realIndex == 2) // S (-y)
         {
-            newCenterY = this.Position.y + translate / 2;
-            newSizeY = this.Size.y - translate;
+            this.Size = this.Size + (-Vector2.up) * translate;
+            this.Position = this.Position + (this.Forward) * translate / 2;
+
         }
         else if (realIndex == 3) // E (+x)
         {
-            newCenterX = this.Position.x + translate / 2;
-            newSizeX = this.Size.x + translate;
+            this.Size = this.Size + Vector2.right * translate;
+            this.Position = this.Position + this.Right * translate / 2;
+
         }
         else
         {
             throw new System.NotImplementedException();
         }
-
-        this.Position = new Vector2(newCenterX, newCenterY);
-        this.Size = new Vector2(newSizeX, newSizeY);
     }
-
 }

@@ -137,34 +137,92 @@ public class VirtualEnvironment : Transform2D
         }
     }
 
-    public void MoveWallWithLimit(Room room, int wall, float translate) {
+    public void MoveWallWithLimit(Room room, int wall, float translate, Room rootRoom) {
         if (GetRoom(room) == null) return;
 
         Door maxDoor = null, minDoor = null;
-        float translate1, translate2;
+        float translate1 = 0, translate2 = 0, finalTranslate;
+        float l, e, max, min, w1, w2, o;
 
-        maxDoor = GetMaxDoorInDirection(room, Direction.Y);
-        translate1 = 1 / (1 - maxDoor.GetThisRoomWrapper(room).weight) * maxDoor.Size.x + room.Size.x;
-        // if(wall % 2 == 0) {
-        //     maxDoor = GetMaxDoorInDirection(room, Direction.Y);
-        //     translate1 = 1 / (1 - maxDoor.GetThisRoomWrapper(room).weight) * maxDoor.Size.x + room.Size.x;
+        if(wall % 2 != 0) {
+            maxDoor = GetMaxDoorInDirection(room, Direction.Y);
+            minDoor = GetMinDoorInDirection(room, Direction.Y);
 
-        //     minDoor = GetMinDoorInDirection(room, Direction.Y);
-        //     translate2 = 1 / (1 - minDoor.GetThisRoomWrapper(room).weight) * minDoor.Size.x + room.Size.x;
-        // }
-        // else {
-        //     maxDoor = GetMaxDoorInDirection(room, Direction.X);
-        //     translate1 = 1 / (1 - maxDoor.GetThisRoomWrapper(room).weight) * maxDoor.Size.x + room.Size.y;
+            if(maxDoor != null && minDoor != null) {
+                o = room.Position.x;
+                l = room.Size.x;
+                e = maxDoor.Extents.x;
+                max = room.Max.x;
+                min = room.Min.x;
+                w1 = maxDoor.GetThisRoomWrapper(room).weight;
+                w2 = minDoor.GetThisRoomWrapper(room).weight;
 
-        //     minDoor = GetMinDoorInDirection(room, Direction.X);
-        //     translate2 = 1 / (1 - minDoor.GetThisRoomWrapper(room).weight) * minDoor.Size.x + room.Size.y;
+                Debug.Log(room);
+                Debug.Log(maxDoor);
+                Debug.Log(minDoor);
+                Debug.Log($"l {l}");
+                Debug.Log($"e {e}");
+                Debug.Log($"max {max}");
+                Debug.Log($"min {min}");
+                Debug.Log($"w1 {w1}");
+                Debug.Log($"w2 {w2}");
+                Debug.Log(o + w1/2 * l + e);
+                Debug.Log(maxDoor.Max.x);
 
-        // }
+                if(wall == 3) {
+                    translate1 = (o + w1 / 2 * l + e - max) / ((1 - w1) / 2);
+                    translate2 = (o + w2 / 2 * l - e - min) / (- (1 + w2) / 2);
+                }
+                else {
+                    translate1 = (o + w1 / 2 * l + e - max) / (- (1 - w1) / 2);
+                    translate2 = (o + w2 / 2 * l - e - min) / ((1 + w2) / 2);
+                }
 
-        Debug.Log(maxDoor.GetThisRoomWrapper(room).weight);
-        Debug.Log(translate1);
+                finalTranslate = (Mathf.Abs(translate1) < Mathf.Abs(translate2)) ? translate1 : translate2;
+                if(finalTranslate * translate < 0) finalTranslate = translate;
+                else if(Mathf.Abs(translate) < Mathf.Abs(finalTranslate)) finalTranslate = translate;
+            }
+            else {
+                finalTranslate = translate;
+            }
+        }
+        else {
+            maxDoor = GetMaxDoorInDirection(room, Direction.X);
+            minDoor = GetMinDoorInDirection(room, Direction.X);
 
-        MoveWall(room, wall, translate1);
+            if(maxDoor != null && minDoor != null) {
+                o = room.Position.y;
+                l = room.Size.y;
+                e = maxDoor.Extents.x;
+                max = room.Max.y;
+                min = room.Min.y;
+                w1 = maxDoor.GetThisRoomWrapper(room).weight;
+                w2 = minDoor.GetThisRoomWrapper(room).weight;
+
+                if(wall == 0) {
+                    translate1 = (o + w1 / 2 * l + e - max) / ((1 - w1) / 2);
+                    translate2 = (o + w2 / 2 * l - e - min) / (- (1 + w2) / 2);
+                }
+                else {
+                    translate1 = (o + w1 / 2 * l + e - max) / (- (1 - w1) / 2);
+                    translate2 = (o + w2 / 2 * l - e - min) / ((1 + w2) / 2);
+                }
+
+                finalTranslate = (Mathf.Abs(translate1) < Mathf.Abs(translate2)) ? translate1 : translate2;
+                if(finalTranslate * translate < 0) finalTranslate = translate;
+                else if(Mathf.Abs(translate) < Mathf.Abs(finalTranslate)) finalTranslate = translate;
+            }
+            else {
+                finalTranslate = translate;
+            }
+        }
+
+        Debug.Log($"translate1 {translate1}");
+        Debug.Log($"translate2 {translate2}");
+        Debug.Log($"translate {translate}");
+        Debug.Log($"finalTranslate {finalTranslate}");
+
+        MoveWall(room, wall, finalTranslate, rootRoom);
     }
 
 
@@ -219,7 +277,9 @@ public class VirtualEnvironment : Transform2D
             {
                 Room w = door.GetConnectedRoom(u); // nextRoom
 
-                door.PlaceDoorAndConnectedRoom(u);
+                // door.PlaceDoorAndConnectedRoom(u);
+
+                door.PlaceDoor(u);
 
                 // if(u == currentRoom && userBody.IsTargetInUserFov(door.Position)) {
                 //     door.UpdateDoorWeight(door.Position, u);
@@ -231,6 +291,7 @@ public class VirtualEnvironment : Transform2D
                 if(w == null) continue;
                 else if (!visited[w])
                 {
+                    door.PlaceConnectedRoom(u);
                     visited[w] = true;
                     q.Enqueue(w);
                 }
@@ -260,6 +321,7 @@ public class VirtualEnvironment : Transform2D
         return adjList[v];
     }
 
+    // type 축으로 고정되어 있는 문들을 반환
     public List<Door> GetDoorsInDirection(Room v, Direction type) {
         List<Door> result = new List<Door>();
 
@@ -274,6 +336,7 @@ public class VirtualEnvironment : Transform2D
     // type 방향에 있는 문들 중에서 Max 값을 반환
     public Door GetMaxDoorInDirection(Room v, Direction type) { //TODO : align 된 좌표계에서만 통용
         List<Door> doors = GetDoorsInDirection(v, type);
+
         float temp = float.MinValue;
         Door result = null;
 
@@ -301,6 +364,7 @@ public class VirtualEnvironment : Transform2D
     // type 방향에 있는 문들 중에서 Min 값을 반환
     public Door GetMinDoorInDirection(Room v, Direction type) { //TODO : align 된 좌표계에서만 통용
         List<Door> doors = GetDoorsInDirection(v, type);
+
         float temp = float.MaxValue;
         Door result = null;
 
@@ -352,9 +416,5 @@ public class VirtualEnvironment : Transform2D
 
     private void ChangeCurrentRoom(Room targetRoom) {
         CurrentRoom = targetRoom;
-    }
-
-    public void CloseDoors() {
-
     }
 }

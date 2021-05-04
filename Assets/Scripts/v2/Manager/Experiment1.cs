@@ -1,21 +1,22 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
 
 public class Experiment1 : Manager
 {
     public enum DistanceType {
-        Short = -1,
-        Middle = 0,
-        Long = 1
+        Short = 0,
+        Middle = 1,
+        Long = 2
     }
 
     // public VirtualEnvironment virtualEnvironment;
     public GameObject targetObjectPrefab;
     public GameObject turnTargetObjectPrefab;
-
     public UIHandler userUI;
     public CustomLaserPointer userPointer;
+    public int totalTrial = 1;
     private Room currentRoom;
     private GameObject targetObj;
     private GameObject turnTargetObj;
@@ -25,7 +26,6 @@ public class Experiment1 : Manager
     private Dictionary<DistanceType, List<List<bool>>> answer; // T - yes, F - no
 
     private int currentTrial = 0;
-    public int totalTrial = 1;
     private int tempTrial = 0;
 
     Vector2 targetPosition;
@@ -33,8 +33,10 @@ public class Experiment1 : Manager
     int facingWall;
     int gainIndex;
     DistanceType distType;
-    Queue<int> distSample;
-    Queue<int>[] gainSample;
+    // Queue<int> distSample;
+    Queue<DistanceType> distTypeQueue;
+    // Queue<int>[] gainSample;
+    Dictionary<DistanceType, Queue<int>> gainQueue;
 
     public override void Awake() {
         base.Awake();
@@ -70,11 +72,16 @@ public class Experiment1 : Manager
 
         // PrintResult();
 
-        gainSample = new Queue<int>[3];
-        for(int i=0; i<gainSample.Length; i++)
-            gainSample[i] = new Queue<int>();
+        // gainSample = new Queue<int>[3]; // short, middle, long
+        // for(int i=0; i<gainSample.Length; i++)
+        //     gainSample[i] = new Queue<int>();
 
-        distSample = new Queue<int>();
+        distTypeQueue = new Queue<DistanceType>();
+
+        gainQueue = new Dictionary<DistanceType, Queue<int>>();
+        gainQueue.Add(DistanceType.Short, new Queue<int>());
+        gainQueue.Add(DistanceType.Middle, new Queue<int>());
+        gainQueue.Add(DistanceType.Long, new Queue<int>());
 
         targetPosition = Vector2.zero;
 
@@ -107,7 +114,9 @@ public class Experiment1 : Manager
         userBody.AddClickEvent(userPointer.HidePointer, 3);
 
         // userPointer.ShowPointer();
-        userUI.PopUpOkParagraph();
+        // userUI.PopUpOkParagraph();
+
+        // virtualEnvironment.MoveWall(currentRoom, 0, 1.0f);
     }
 
     public void QuitGame()
@@ -141,7 +150,9 @@ public class Experiment1 : Manager
     }
 
     public void CheckEndExperiment() {
-        if(gainSample[0].Count == 0 && gainSample[1].Count == 0 && gainSample[2].Count == 0) {
+        if(gainQueue[DistanceType.Short].Count == 0 
+        && gainQueue[DistanceType.Middle].Count == 0 
+        && gainQueue[DistanceType.Long].Count == 0) { 
             if(currentTrial == totalTrial) {
                 userUI.PopUpEndParagraph();
                 PrintResult();
@@ -153,7 +164,7 @@ public class Experiment1 : Manager
             }
         }
 
-        if(distSample.Count == 0)
+        if(distTypeQueue.Count == 0)
             InitializeDistance();
     }
 
@@ -165,8 +176,8 @@ public class Experiment1 : Manager
     }
 
     public void GenerateTurnTarget() {
-        Vector3 turnTargetInitPosition = virtualEnvironment.CurrentRoom.DenormalizePosition3D(targetPosition + direction[facingWall] * 0.4f, 1.4f); 
-        turnTargetObj = Instantiate(turnTargetObjectPrefab, turnTargetInitPosition, Quaternion.identity);
+        // Vector3 turnTargetInitPosition = virtualEnvironment.CurrentRoom.DenormalizePosition3D(targetPosition + direction[facingWall] * 0.4f, 1.4f); // TODO 여기고쳐
+        // turnTargetObj = Instantiate(turnTargetObjectPrefab, turnTargetInitPosition, Quaternion.identity);
     }
 
     public void DestroyTarget() {
@@ -182,20 +193,22 @@ public class Experiment1 : Manager
     }
 
     public void InitializeDistance() {
-        distSample = new Queue<int>(Utility.sampleWithoutReplacement(3, -1, 2)); // IV 1
-        if(targetPosition == Vector2.zero && distSample.Peek() == 0) {
-            distSample.Dequeue();
-            distSample.Enqueue(0);
+        distTypeQueue = new Queue<DistanceType>(Utility.sampleWithoutReplacement(3, 0, 3).Select(x => (DistanceType) x)); // IV 1
+        if(targetPosition == Vector2.zero && distTypeQueue.Peek() == DistanceType.Middle) {
+            distTypeQueue.Enqueue(distTypeQueue.Dequeue());
         }
     }
 
     public void InitializeAppliedGain() {
-        for(int i=0; i<gainSample.Length; i++)
-            gainSample[i] = new Queue<int>(Utility.sampleWithoutReplacement(5, 0, 5)); // IV 2
+        gainQueue[DistanceType.Short] = new Queue<int>(Utility.sampleWithoutReplacement(5, 0, 5)); // IV 2
+        gainQueue[DistanceType.Middle] = new Queue<int>(Utility.sampleWithoutReplacement(5, 0, 5)); // IV 2
+        gainQueue[DistanceType.Long] = new Queue<int>(Utility.sampleWithoutReplacement(5, 0, 5)); // IV 2
     }
 
     public void SelectNextTargetPositionAndTranslate() {
-        distType = (DistanceType) distSample.Dequeue();
+        distType = distTypeQueue.Dequeue();
+
+        Debug.Log(distType);
 
         Vector2 nextTargetPosition;
 
@@ -205,17 +218,18 @@ public class Experiment1 : Manager
         } while(targetPosition == nextTargetPosition);
 
         targetPosition = nextTargetPosition;
-        gainIndex = gainSample[((int)distType + 1)].Dequeue();
+        gainIndex = gainQueue[distType].Dequeue();
         translate = CalculateTranslate(facingWall, gainIndex);
 
-        tempTrial += 1;
-        Debug.Log($"Start {tempTrial} ---------------------");
-        Debug.Log($"Facing Wall {facingWall}");
-        Debug.Log($"Opposite Wall {(facingWall + 2) % 4}");
-        Debug.Log($"Distance from opposite wall {distType}");
-        Debug.Log($"Applied gain {wallTranslateGain[gainIndex]}");
-        Debug.Log($"Next target position {targetPosition}");
-        Debug.Log($"End {tempTrial} ---------------------");
+        // tempTrial += 1;
+        // Debug.Log($"Start {tempTrial} ---------------------");
+        // Debug.Log($"Facing Wall {facingWall}");
+        // Debug.Log($"Opposite Wall {(facingWall + 2) % 4}");
+        // Debug.Log($"Distance from opposite wall {distType}");
+        // Debug.Log($"Applied gain {wallTranslateGain[gainIndex]}");
+        // Debug.Log($"Next target position {targetPosition}");
+        // Debug.Log($"Next translate {translate}");
+        // Debug.Log($"End {tempTrial} ---------------------");
     }
 
     public void CheckAnswerYes() { // 커졌다고 대답
@@ -227,7 +241,7 @@ public class Experiment1 : Manager
     }
 
     public Vector2 CalculateTargetPosition(int facingWall, DistanceType distanceFromBehindWall) {
-        Vector2 result = (int) distanceFromBehindWall * grid * direction[facingWall];
+        Vector2 result = (int)(distanceFromBehindWall - 1) * grid * direction[facingWall];
         return result;
     }
 

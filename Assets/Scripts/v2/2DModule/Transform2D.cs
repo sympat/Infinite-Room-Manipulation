@@ -66,7 +66,7 @@ public class Transform2D : MonoBehaviour {
 
         set
         {
-            transform.position = CastVector2Dto3D(value);
+            transform.position = CastVector2Dto3D(value, transform.position.y);
         }
     }
 
@@ -75,7 +75,7 @@ public class Transform2D : MonoBehaviour {
         get { return CastVector3Dto2D(transform.localPosition); }
         set
         {
-            transform.localPosition = CastVector2Dto3D(value);
+            transform.localPosition = CastVector2Dto3D(value, transform.localPosition.y);
         }
     }
 

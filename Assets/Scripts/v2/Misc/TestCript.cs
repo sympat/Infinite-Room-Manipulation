@@ -13,7 +13,7 @@ public class TestCript : MonoBehaviour
 
         // virtualEnvironment.MoveWall(currentRoom, 1, 1.0f);
 
-        virtualEnvironment.MoveWallWithLimit(currentRoom, 1, 0);
+        // virtualEnvironment.MoveWallWithLimit(currentRoom, 1, 0);
 
         // Debug.Log($"MaxDoor in Y-Align {virtualEnvironment.GetMaxDoorInDirection(currentRoom, Direction.Y)}");
         // Debug.Log($"MinDoor in Y-Align {virtualEnvironment.GetMinDoorInDirection(currentRoom, Direction.Y)}");
