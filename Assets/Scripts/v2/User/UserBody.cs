@@ -186,16 +186,51 @@ public class UserBody : Transform2D {
         }
     }
 
-    public bool IsTargetInUserFov(Vector2 target, float bound = 50.0f) // global 좌표계 기준으로 비교
+    public bool IsTargetInUserFov(Vector2 target, float bound = 0) // global 좌표계 기준으로 비교
     {
         Vector2 userToTarget = target - this.Position;
         Vector2 userForward = this.Forward;
 
         float unsignedAngle = Vector2.Angle(userToTarget, userForward);
 
-        if (unsignedAngle - ((this.fov + bound) / 2) < 0.01f)
+        // Debug.Log($"target {target}");
+        // Debug.Log($"unsignedAngle {unsignedAngle}");
+        // Debug.Log($"user fov {this.fov}");
+
+        if (unsignedAngle - ((this.fov + bound)) < 0.01f)
             return true;
         else
             return false;
+    }
+
+    public bool IsTargetInUserFov(Vector2 start, Vector2 end, float bound = 0) {
+        Vector2 userToStart = start - this.Position;
+        Vector2 userToEnd = end - this.Position;
+        Vector2 userForward = this.Forward;
+        
+        float angleUserToStart = Vector2.SignedAngle(userForward, userToStart);
+        float angleUserToEnd = Vector2.SignedAngle(userForward, userToEnd);
+        float angleStartToEnd = Vector2.Angle(userToStart, userToEnd);
+
+        // Debug.Log($"start {start}");
+        // Debug.Log($"end {end}");
+        // Debug.Log($"user {this.Position}");
+
+        // Debug.Log(angleUserToStart);
+        // Debug.Log(angleUserToEnd);
+        // Debug.Log(angleStartToEnd);
+
+        if(angleUserToStart * angleUserToEnd < 0 && Mathf.Abs(angleUserToStart) + Mathf.Abs(angleUserToEnd) < angleStartToEnd + 0.01f) {
+            // Debug.Log("wall is in fov");
+            return true;
+        }
+        else if(IsTargetInUserFov(start, bound) || IsTargetInUserFov(end, bound)) {
+            // Debug.Log("vertex is in fov");
+            return true;
+        }
+        else {
+            // Debug.Log("not in fov");
+            return false;
+        }
     }
 }

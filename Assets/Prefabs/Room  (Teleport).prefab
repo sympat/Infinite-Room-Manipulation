@@ -10,7 +10,8 @@ GameObject:
   m_Component:
   - component: {fileID: 5804957049118244486}
   - component: {fileID: 8311861435439233170}
-  m_Layer: 0
+  - component: {fileID: 4070204088805687375}
+  m_Layer: 20
   m_Name: Point Light
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -24,11 +25,11 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5179895780354452437}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: -0.0069999993, z: 0.10000049}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 2, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
-  m_Father: {fileID: 3189960907995542607}
+  m_Father: {fileID: 4634433620657270112}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!108 &8311861435439233170
@@ -43,8 +44,8 @@ Light:
   m_Type: 2
   m_Shape: 0
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_Intensity: 2
-  m_Range: 3
+  m_Intensity: 1.5
+  m_Range: 5
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208
   m_CookieSize: 10
@@ -92,6 +93,21 @@ Light:
   m_UseBoundingSphereOverride: 0
   m_ShadowRadius: 0
   m_ShadowAngle: 0
+--- !u!114 &4070204088805687375
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5179895780354452437}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a5df2beecbb1c084e89b5f3e652d8376, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  isMovable: 1
+  isScalable: 0
+  allowZAxis: 1
 --- !u!1 &5411919919536617434
 GameObject:
   m_ObjectHideFlags: 0
@@ -103,7 +119,8 @@ GameObject:
   - component: {fileID: 4634433620657270112}
   - component: {fileID: 8646642211702203077}
   - component: {fileID: 5772484486385669647}
-  - component: {fileID: 5177566925949248368}
+  - component: {fileID: 3180004168399002280}
+  - component: {fileID: 2352418825087617169}
   m_Layer: 0
   m_Name: Room  (Teleport)
   m_TagString: Untagged
@@ -120,10 +137,11 @@ Transform:
   m_GameObject: {fileID: 5411919919536617434}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1.2, z: 1}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
-  - {fileID: 3189960907995542607}
+  - {fileID: 5804957049118244486}
   - {fileID: 6849228261576656816}
+  - {fileID: 3189960907995542607}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -174,7 +192,20 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
---- !u!114 &5177566925949248368
+--- !u!65 &3180004168399002280
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5411919919536617434}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 2, y: 1.9999999, z: 2}
+  m_Center: {x: 0, y: 0.99999994, z: 0}
+--- !u!114 &2352418825087617169
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -187,8 +218,23 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   initSize: {x: 0, y: 0}
-  height: 0
-  wallOutDirection: []
+  initHeight: 0
+  previousRoom: {fileID: 0}
+--- !u!114 &808401519883266749
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6849228261576656819}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a5df2beecbb1c084e89b5f3e652d8376, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  isMovable: 0
+  isScalable: 1
+  allowZAxis: 0
 --- !u!1001 &1233723685198689067
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -278,6 +324,12 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: c29358ef2ade91848a3e4b2ee80634f4, type: 3}
+--- !u!1 &6849228261576656819 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5625640210207814808, guid: c29358ef2ade91848a3e4b2ee80634f4,
+    type: 3}
+  m_PrefabInstance: {fileID: 1233723685198689067}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &6849228261576656816 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 5625640210207814811, guid: c29358ef2ade91848a3e4b2ee80634f4,
@@ -297,7 +349,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 132818, guid: 9b2a4f13248ef214b9e14c5bed331a51, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 498026, guid: 9b2a4f13248ef214b9e14c5bed331a51, type: 3}
       propertyPath: m_LocalPosition.x
@@ -329,7 +381,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 498026, guid: 9b2a4f13248ef214b9e14c5bed331a51, type: 3}
       propertyPath: m_RootOrder
-      value: 0
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 498026, guid: 9b2a4f13248ef214b9e14c5bed331a51, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x

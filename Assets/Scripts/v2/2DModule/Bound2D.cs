@@ -2,16 +2,21 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+[RequireComponent(typeof(BoxCollider))]
 public class Bound2D : Transform2D
 {
-    public bool usePredefinedSize;
-    public Vector2 initSize;
-    public float height;
 
-    private static int totalID = 0;
-    private int id;
-    protected BoxCollider box;
-    protected Vector3 originScale;
+    public Vector2 initSize;
+    public float initHeight;
+
+    protected static int totalID = 0;
+    protected int id;
+
+    protected BoxCollider Box {
+        get {
+            return GetComponent<BoxCollider>();
+        }
+    }
 
     public int ID {
         get {
@@ -23,7 +28,7 @@ public class Bound2D : Transform2D
     {
         get
         {
-            return CastVector3Dto2D(box.size);
+            return CastVector3Dto2D(Box.size);
         }
 
         set
@@ -36,7 +41,7 @@ public class Bound2D : Transform2D
     {
         get
         {
-            return box.size.y;
+            return Box.size.y;
         }
 
         set
@@ -50,7 +55,7 @@ public class Bound2D : Transform2D
         get
         {
             return TransformPoint(this.Localmax);
-            // return CastVector3Dto2D(box.size / 2) + this.Position;
+            // return CastVector3Dto2D(Box.size / 2) + this.Position;
         }
     }
 
@@ -59,14 +64,14 @@ public class Bound2D : Transform2D
         get
         {
             return TransformPoint(this.Localmin);
-            // return CastVector3Dto2D(-box.size / 2) + this.Position;
+            // return CastVector3Dto2D(-Box.size / 2) + this.Position;
         }
     }
 
     public Vector2 Localmax {
         get {
             return this.Size / 2;
-            // return CastVector3Dto2D(box.center + box.size / 2);
+            // return CastVector3Dto2D(Box.center + Box.size / 2);
         }
     }
 
@@ -74,7 +79,7 @@ public class Bound2D : Transform2D
         get
         {
             return -this.Size / 2;
-            // return CastVector3Dto2D(box.center - box.size / 2);
+            // return CastVector3Dto2D(Box.center - Box.size / 2);
 
         }
     }
@@ -84,53 +89,29 @@ public class Bound2D : Transform2D
         get
         {
             return this.Size / 2;
-            // return CastVector3Dto2D(box.size / 2);
+            // return CastVector3Dto2D(Box.size / 2);
         }
     }
 
     public override void Initializing()
     {
-        // Debug.Log("Initialzing room base");
         id = totalID++;
 
         ApplySize();
     }
 
     public void ApplySize() {
-        box = GetComponent<BoxCollider>();
 
-        if(!usePredefinedSize) {
-            if(box == null) box = this.gameObject.AddComponent<BoxCollider>();
+        // transform.localScale = Vector3.one; // ignore scale
 
-            originScale= transform.localScale;
-            transform.localScale = Vector3.one;
-            this.Size = initSize;
-            this.Height = height;
-        }
-        // else {
-        //     this.Size = CastVector3Dto2D(box.size);
-        //     this.Height = box.size.y;
-        // }
-
-        // if(useScaleAsSize) {
-        //     box.size = Vector3.Scale(box.size, transform.localScale);
-        //     originScale= transform.localScale;
-        //     transform.localScale = Vector3.one;
-        //     this.Size = CastVector3Dto2D(box.size);
-        //     this.Height = box.size.y;
-        // }
-        // else {
-        //     originScale= transform.localScale;
-        //     transform.localScale = Vector3.one;
-        //     this.Size = initSize;
-        //     this.Height = height;
-        // }
+        this.Size = initSize;
+        this.Height = initHeight;
     }
 
     protected virtual void UpdateBox(Vector2 size, float height) {
         // update collider
-        box.size = CastVector2Dto3D(size, height);
-        box.center = new Vector3(box.center.x, height / 2, box.center.z);
+        Box.size = CastVector2Dto3D(size, height);
+        Box.center = new Vector3(Box.center.x, height / 2, Box.center.z);
     }
 
     // TODO: 두 개의 bound를 비교할려면 근본적으로 하나의 bound 좌표계로 변환이 필요.
@@ -174,7 +155,7 @@ public class Bound2D : Transform2D
 
     public bool IsContain(Vector2 point) // this가 point를 포함하는지 판단하는 함수
     {
-        if (this.box.bounds.Contains(CastVector2Dto3D(point, this.Height / 2)))
+        if (this.Box.bounds.Contains(CastVector2Dto3D(point, this.Height / 2)))
         {
             return true;
         }
@@ -219,7 +200,7 @@ public class Bound2D : Transform2D
         }
     }
 
-    public int GetContactEdge(Room other) {
+    public int GetContactEdge(Bound2D other) {
         if(Mathf.Abs(this.Min.x - other.Max.x) < 0.01f) {
             if(IsIntersectInYAxis(other)) 
                 return 1;
@@ -302,38 +283,52 @@ public class Bound2D : Transform2D
         return CastVector2Dto3D(result, height);
     }
 
-    public Vector2 SamplingPosition(float bound = 0)
+    public Vector2 SamplingPosition(float bound = 0, Space relativeTo = Space.Self) 
     {
-        // float xSampling = Random.Range(this.Min.x + bound, this.Max.x - bound);
-        // float ySampling = Random.Range(this.Min.y + bound, this.Max.y - bound);
-
         float xSampling = Random.Range(this.Localmin.x + bound, this.Localmax.x - bound);
         float ySampling = Random.Range(this.Localmin.y + bound, this.Localmax.y - bound);
 
-        // return new Vector2(xSampling, ySampling);
-        return TransformPoint(new Vector2(xSampling, ySampling));
+        return (relativeTo == Space.Self) ? new Vector2(xSampling, ySampling) : TransformPoint(new Vector2(xSampling, ySampling));
     }
 
-    public Vector2 DenormalizePosition2D(Vector2 normalizedPos) {
-        // float xPos = (normalizedPos.x + 1) * (Max.x - Min.x) / 2 + Min.x;
-        // float yPos = (normalizedPos.y + 1) * (Max.y - Min.y) / 2 + Min.y;
+    public Vector2 DenormalizePosition2D(Vector2 normalizedPos, Space relativeTo = Space.Self) { // output이 relativeTo 좌표계에 있다는 뜻
+        float xPos = normalizedPos.x * Extents.x;
+        float yPos = normalizedPos.y * Extents.y;
 
-        float xPos = (normalizedPos.x + 1) * (Localmax.x - Localmin.x) / 2 + Localmin.x;
-        float yPos = (normalizedPos.y + 1) * (Localmax.y - Localmin.y) / 2 + Localmin.y;
-
-        // return new Vector2(xPos, yPos);
-        return TransformPoint(new Vector2(xPos, yPos));
+        return (relativeTo == Space.Self) ? new Vector2(xPos, yPos) : TransformPoint(new Vector2(xPos, yPos));
     }
 
-    public Vector3 DenormalizePosition3D(Vector2 normalizedPos, float height = 0) {
-        Vector2 result = DenormalizePosition2D(normalizedPos);
-        return Utility.CastVector2Dto3D(result, height);
+    public Vector3 DenormalizePosition3D(Vector3 normalizedPos, Space relativeTo = Space.Self) {
+        float xPos = normalizedPos.x * Extents.x;
+        float yPos = normalizedPos.z * Extents.y;
+        float height = normalizedPos.y * Height;
+
+        return (relativeTo == Space.Self) ? new Vector3(xPos, height, yPos) : transform.TransformPoint(new Vector3(xPos, height, yPos));
+    }
+
+    public Vector2 NormalizedPosition2D(Vector2 pos, Space relativeTo = Space.Self) { // input(pos)이 relativeTo 좌표계에 있다는 뜻
+        Vector2 diff = (relativeTo == Space.Self) ? (pos) : (InverseTransformPoint(pos));
+
+        float xPos = diff.x / Extents.x;
+        float yPos = diff.y / Extents.y;
+
+        return new Vector2(xPos, yPos);
+    }
+
+    public Vector3 NormalizedPosition3D(Vector3 pos, Space relativeTo = Space.Self) { // relativeTo = pos가 어떤 좌표계에 있는지
+        Vector3 diff = (relativeTo == Space.Self) ? (pos) : (transform.InverseTransformPoint(pos));
+
+        float xPos = diff.x / Extents.x;
+        float yPos = diff.z / Extents.y;
+        float height = diff.y / Height;
+
+        return new Vector3(xPos, height, yPos);
     }
 
     public override bool Equals(object obj)
     {
         if (obj == null) return false;
-        Room objAsRoom = obj as Room;
+        Bound2D objAsRoom = obj as Bound2D;
         if (objAsRoom == null) return false;
         else return Equals(objAsRoom);
     }
@@ -343,7 +338,7 @@ public class Bound2D : Transform2D
         return this.id;
     }
 
-    public bool Equals(Room v)
+    public bool Equals(Bound2D v)
     {
         if (v == null) return false;
         else return (this.id == v.id);

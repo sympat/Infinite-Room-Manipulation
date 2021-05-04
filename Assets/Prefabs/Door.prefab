@@ -243,11 +243,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7db334b67bba5d544815d6c4e8e9f979, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  usePredefinedSize: 1
-  initSize: {x: 0, y: 0}
-  height: 0
+  initSize: {x: 1.2, y: 0.1}
+  initHeight: 2.2
   room1: {fileID: 0}
   room2: {fileID: 0}
+  attachedWall: 0
 --- !u!65 &4941916789704455056
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -259,8 +259,8 @@ BoxCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 1.5, y: 2.6, z: 0.2}
-  m_Center: {x: 0, y: 1.3, z: 0}
+  m_Size: {x: 1.2, y: 2.2, z: 0.1}
+  m_Center: {x: 0, y: 1.1, z: 0}
 --- !u!1 &4515736846924905202
 GameObject:
   m_ObjectHideFlags: 0
@@ -334,8 +334,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4515736847018903312}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.575, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalPosition: {x: 0.40100002, y: 0, z: 0}
+  m_LocalScale: {x: 0.7, y: 0.8, z: 0.7}
   m_Children:
   - {fileID: 4515736846336034584}
   - {fileID: 4515736848192280023}
@@ -519,8 +519,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4515736847083070240}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.673, y: 0, z: -0.05}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalPosition: {x: 0.47, y: 0, z: -0.05}
+  m_LocalScale: {x: 0.7, y: 0.8, z: 0.7}
   m_Children: []
   m_Father: {fileID: 4515736846528816453}
   m_RootOrder: 0

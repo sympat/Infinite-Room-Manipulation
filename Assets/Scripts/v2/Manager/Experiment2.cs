@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum LocomotionType { Manipulation, Teleportation, }
+public enum LocomotionType { Manipulation, Teleportation, S2C };
 
 public class Experiment2 : Manager
 {
@@ -21,6 +21,11 @@ public class Experiment2 : Manager
 
         // // userPointer.ShowPointer();
         // userUI.PopUpOkParagraph();
+
+        // virtualEnvironment.MoveWallWithLimit(virtualEnvironment.CurrentRoom, 3, -3.0f);
+        // virtualEnvironment.MoveWallWithLimit(virtualEnvironment.CurrentRoom, 2);
+
+        // virtualEnvironment.MoveWall(virtualEnvironment.CurrentRoom, 3, -1f);
     }
 
 }

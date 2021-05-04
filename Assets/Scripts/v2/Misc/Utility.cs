@@ -140,11 +140,18 @@ public static class Utility
         return Mathf.Max(Mathf.Min(randNormal, max), min);
     }
 
-    public static int[] sampleWithoutReplacement(int sampleSize, int min, int max) {  // TODO: O(n^2) 보다 최적화 작업 진행
-        int[] result = new int[sampleSize];
+    public static int[] sampleWithoutReplacement(int sampleSize, int min, int max) {  // TODO: O(n^2) 보다 최적화 작업 진행 [min, max)
+        if(min > max) { // if min and max is changed, swap these
+            int temp = min; 
+            min = max; 
+            max = temp;
+        }
+
+        int resultSize = (sampleSize > max - min) ? (max - min) : sampleSize;
+        int[] result = new int[resultSize];
         bool equalFlag;
 
-        for(int i=0; i<sampleSize; i++) {
+        for(int i=0; i<resultSize; i++) {
             while(true) {
                 result[i] = sampleUniform(min, max);
                 equalFlag = false;
