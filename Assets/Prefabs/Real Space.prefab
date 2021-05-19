@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 9142221434337372882}
   - component: {fileID: 9142221434337372884}
   - component: {fileID: 708567150}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: Real Space
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -75,7 +75,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   initSize: {x: 5, y: 5}
-  height: 3
+  initHeight: 0
 --- !u!1001 &5478563531352489534
 PrefabInstance:
   m_ObjectHideFlags: 0

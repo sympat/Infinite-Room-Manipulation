@@ -11,9 +11,6 @@ public class Door : Bound2D
 
     [Range(0, 3)]
     public int attachedWall;
-
-    // private static int doorTotalID = 0;
-    // private int doorID;
     private RoomWrapper source, target;
     private bool isOpened = false;
 
@@ -171,39 +168,39 @@ public class Door : Bound2D
     //     GetThisRoomWrapper(currentRoom).weight = newWeight;
     // }
 
-    public void PlaceDoorAndConnectedRoom(Room currentRoom) {
-        float doorXPos = 0, doorYPos = 0, roomXPos = 0, roomYPos = 0;
+    // public void PlaceDoorAndConnectedRoom(Room currentRoom) {
+    //     float doorXPos = 0, doorYPos = 0, roomXPos = 0, roomYPos = 0;
 
-        Room v = GetThisRoomWrapper(currentRoom).room;
-        Room u = GetConnectedRoomWrapper(currentRoom).room;
-        int vWall = GetThisRoomWrapper(currentRoom).wall;
-        float vWeight = GetThisRoomWrapper(currentRoom).weight;
-        float uWeight = GetConnectedRoomWrapper(currentRoom).weight;
+    //     Room v = GetThisRoomWrapper(currentRoom).room;
+    //     Room u = GetConnectedRoomWrapper(currentRoom).room;
+    //     int vWall = GetThisRoomWrapper(currentRoom).wall;
+    //     float vWeight = GetThisRoomWrapper(currentRoom).weight;
+    //     float uWeight = GetConnectedRoomWrapper(currentRoom).weight;
 
-        if (vWall == 0 || vWall == 2)
-        {
-            doorXPos = (vWeight + 1) / 2 * (v.Max.x - v.Min.x) + v.Min.x; // 방 v 기준 문의 x축 위치
-            doorYPos = (vWall == 0) ? v.Max.y : v.Min.y;
+    //     if (vWall == 0 || vWall == 2)
+    //     {
+    //         doorXPos = (vWeight + 1) / 2 * (v.Max.x - v.Min.x) + v.Min.x; // 방 v 기준 문의 x축 위치
+    //         doorYPos = (vWall == 0) ? v.Max.y : v.Min.y;
 
-            if(u != null) {
-                roomXPos = doorXPos - ((uWeight * u.Size.x) / 2);
-                roomYPos = (vWall == 0) ? v.Max.y + u.Extents.y : v.Min.y - u.Extents.y;
-            }
-        }
-        else if (vWall == 1 || vWall == 3)
-        {
-            doorXPos = (vWall == 3) ? v.Max.x : v.Min.x;
-            doorYPos = (vWeight + 1) / 2 * (v.Max.y - v.Min.y) + v.Min.y;
+    //         if(u != null) {
+    //             roomXPos = doorXPos - ((uWeight * u.Size.x) / 2);
+    //             roomYPos = (vWall == 0) ? v.Max.y + u.Extents.y : v.Min.y - u.Extents.y;
+    //         }
+    //     }
+    //     else if (vWall == 1 || vWall == 3)
+    //     {
+    //         doorXPos = (vWall == 3) ? v.Max.x : v.Min.x;
+    //         doorYPos = (vWeight + 1) / 2 * (v.Max.y - v.Min.y) + v.Min.y;
 
-            if(u != null) {
-                roomXPos = (vWall == 3) ? v.Max.x + u.Extents.x : v.Min.x - u.Extents.x;
-                roomYPos = doorYPos - ((uWeight * u.Size.y) / 2);
-            }
-        }
+    //         if(u != null) {
+    //             roomXPos = (vWall == 3) ? v.Max.x + u.Extents.x : v.Min.x - u.Extents.x;
+    //             roomYPos = doorYPos - ((uWeight * u.Size.y) / 2);
+    //         }
+    //     }
 
-        if(u != null) u.Position = new Vector2(roomXPos, roomYPos);
-        this.Position = new Vector2(doorXPos, doorYPos);
-    }
+    //     if(u != null) u.Position = new Vector2(roomXPos, roomYPos);
+    //     this.Position = new Vector2(doorXPos, doorYPos);
+    // }
 
     public void PlaceDoor(Room currentRoom) {
         float doorXPos = 0, doorYPos = 0;

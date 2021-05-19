@@ -19,9 +19,7 @@ public class SteerToTargetRedirector : GainRedirector
     public virtual void PickSteeringTarget() {}
 
     public override (GainType, float) ApplyRedirection()
-    {
-        // Debug.Log("SteerToTargetRedirector");
-        
+    {        
         // define some variables for redirection
         realUser = realSpace.GetComponentInChildren<Transform2D>();
         userPosition = realUser.Position;
@@ -36,7 +34,7 @@ public class SteerToTargetRedirector : GainRedirector
 
         // control applied gains according to user and target
         float directionToTarget = Mathf.Sign(Vector2.SignedAngle(userDirection, userToTarget)); // if target is to the left of the user, directionToTarget > 0
-        float directionRotation = Mathf.Sign(virtualUser.DeltaRotation); // If user is rotating to the left, directionRotation > 0
+        float directionRotation = Mathf.Sign(user.body.deltaRotation); // If user is rotating to the left, directionRotation > 0
 
         if (directionToTarget > 0)  // If the target is to the left of the user,
             curvatureGain = HODGSON_MIN_CURVATURE_GAIN;
@@ -51,10 +49,10 @@ public class SteerToTargetRedirector : GainRedirector
         // select the largest magnitude
         float rotationMagnitude = 0, curvatureMagnitude = 0;
 
-        if (Mathf.Abs(virtualUser.DeltaRotation) >= ROTATION_THRESHOLD)
-            rotationMagnitude = rotationGain * virtualUser.DeltaRotation;
-        if (virtualUser.DeltaPosition.magnitude > MOVEMENT_THRESHOLD)
-            curvatureMagnitude = Mathf.Rad2Deg * curvatureGain * virtualUser.DeltaPosition.magnitude;
+        if (Mathf.Abs(user.body.deltaRotation) >= ROTATION_THRESHOLD)
+            rotationMagnitude = rotationGain * user.body.deltaRotation;
+        if (user.body.deltaPosition.magnitude > MOVEMENT_THRESHOLD)
+            curvatureMagnitude = Mathf.Rad2Deg * curvatureGain * user.body.deltaPosition.magnitude;
 
         float selectedMagnitude = Mathf.Max(Mathf.Abs(rotationMagnitude), Mathf.Abs(curvatureMagnitude)); // selectedMagnitude is ABS(절대값)
         bool isCurvatureSelected = Mathf.Abs(curvatureMagnitude) > Mathf.Abs(rotationMagnitude);

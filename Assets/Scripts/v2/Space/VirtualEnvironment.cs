@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class VirtualEnvironment : Transform2D
 {
-    public User user;
+    public Users users;
     public Room startRoom;
     public bool useCenterStart;
     public bool useFullVisualization;
@@ -13,11 +13,9 @@ public class VirtualEnvironment : Transform2D
     private static int totalID = 1;
     private int id;
 
-    public UserBody userBody {
-        get {
-            return user.GetTrackedUserBody();
-        }
-    }
+    // public User activeUser {
+    //     get { return users.GetActiveUser(); }
+    // }
 
     public Room CurrentRoom {
         get {
@@ -67,13 +65,11 @@ public class VirtualEnvironment : Transform2D
             AddDoor(door);
         }
 
-        // userBody.Initializing();
-        // AddUser(startUser);
-        userBody.AddEnterNewRoomEvent(ChangeCurrentRoom);
+        // users.AddEnterNewRoomEvent(ChangeCurrentRoom);
 
         CurrentRoom = startRoom;
 
-        if(useCenterStart) userBody.Position = CurrentRoom.Position;
+        if(useCenterStart) users.Position = CurrentRoom.Position;
 
         this.gameObject.layer = LayerMask.NameToLayer("VirtualEnvironment");
         this.gameObject.tag = "VirtualEnvironment";
@@ -98,13 +94,6 @@ public class VirtualEnvironment : Transform2D
         adjList[room1].Add(door);
         if(room2 != null) adjList[room2].Add(door);
     }
-
-    // public void AddUser(User user) {
-    //     if(user == null) return;
-
-    //     this.user = user;
-    //     userBody.AddEnterRoomEvent(ChangeCurrentRoom);
-    // }
 
     public void SwitchRoomVisualization(Room room, bool isShow) {
         if(GetRoom(room) == null) return;
@@ -157,17 +146,17 @@ public class VirtualEnvironment : Transform2D
                 w1 = maxDoor.GetThisRoomWrapper(room).weight;
                 w2 = minDoor.GetThisRoomWrapper(room).weight;
 
-                Debug.Log(room);
-                Debug.Log(maxDoor);
-                Debug.Log(minDoor);
-                Debug.Log($"l {l}");
-                Debug.Log($"e {e}");
-                Debug.Log($"max {max}");
-                Debug.Log($"min {min}");
-                Debug.Log($"w1 {w1}");
-                Debug.Log($"w2 {w2}");
-                Debug.Log(o + w1/2 * l + e);
-                Debug.Log(maxDoor.Max.x);
+                // Debug.Log(room);
+                // Debug.Log(maxDoor);
+                // Debug.Log(minDoor);
+                // Debug.Log($"l {l}");
+                // Debug.Log($"e {e}");
+                // Debug.Log($"max {max}");
+                // Debug.Log($"min {min}");
+                // Debug.Log($"w1 {w1}");
+                // Debug.Log($"w2 {w2}");
+                // Debug.Log(o + w1/2 * l + e);
+                // Debug.Log(maxDoor.Max.x);
 
                 if(wall == 3) {
                     translate1 = (o + w1 / 2 * l + e - max) / ((1 - w1) / 2);
@@ -217,10 +206,10 @@ public class VirtualEnvironment : Transform2D
             }
         }
 
-        Debug.Log($"translate1 {translate1}");
-        Debug.Log($"translate2 {translate2}");
-        Debug.Log($"translate {translate}");
-        Debug.Log($"finalTranslate {finalTranslate}");
+        // Debug.Log($"translate1 {translate1}");
+        // Debug.Log($"translate2 {translate2}");
+        // Debug.Log($"translate {translate}");
+        // Debug.Log($"finalTranslate {finalTranslate}");
 
         MoveWall(room, wall, finalTranslate, rootRoom);
     }
@@ -320,6 +309,17 @@ public class VirtualEnvironment : Transform2D
         if (GetRoom(v) == null) return null;
         return adjList[v];
     }
+
+    // public List<Door> GetDoorsInWall(Room v, int wall) {
+    //     List<Door> result = new List<Door>();
+
+    //     foreach(var door in adjList[v]) {
+    //         if(door.GetThisRoomWrapper(v).wall == wall)
+    //             result.Add(door);
+    //     }
+
+    //     return result;
+    // }
 
     // type 축으로 고정되어 있는 문들을 반환
     public List<Door> GetDoorsInDirection(Room v, Direction type) {

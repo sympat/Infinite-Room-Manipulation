@@ -169,7 +169,6 @@ public class Room : Bound2D
         {
             this.Size = this.Size + Vector2.up * translate;
             this.Position = this.Position + this.Forward * translate / 2;
-
         }
         else if (realIndex == 1) // W (-x)
         {
@@ -181,13 +180,11 @@ public class Room : Bound2D
         {
             this.Size = this.Size + (-Vector2.up) * translate;
             this.Position = this.Position + (this.Forward) * translate / 2;
-
         }
         else if (realIndex == 3) // E (+x)
         {
             this.Size = this.Size + Vector2.right * translate;
             this.Position = this.Position + this.Right * translate / 2;
-
         }
         else
         {

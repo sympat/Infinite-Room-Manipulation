@@ -1,93 +1,35 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
-using System;
 using UnityEngine;
-using UnityEngine.Events;
-using Valve.VR.Extras;
 
-public class UserBody : Transform2D {
+public class UserBody : Transform2D
+{
+    private float _deltaRotation;    
+    private Vector2 _deltaPosition;
+    private Vector2 _previousPosition;
+    private float _previousRotation;
+    private Vector2 _previousForward;
 
-    private static int totalID = 0;
-    private int id;
-    private Camera userCamera;
-    private CustomLaserPointer laserPointer;
-    private Room enteredRoom;
-    private bool isEnterNewRoom, isExitCurrentRoom;
-    private class RoomEvent : UnityEvent<Room> { }
-    public struct UserEventArgs
-    {
-        public Transform target;
-        public UserEventArgs(Transform tf) { target = tf; }
-    }
-    private static RoomEvent onEnterNewRoom = new RoomEvent();
-    private static RoomEvent onTempEnterNewRoom = new RoomEvent();
-    private static RoomEvent onExitRoom = new RoomEvent();
-    private static UnityEvent onEnterTarget = new UnityEvent();
-    private static UnityEvent onDetachTurnTarget = new UnityEvent();
-    private static List<UnityEvent> onClickButtons = new List<UnityEvent>();
-
-    private float deltaRotation;    
-    private Vector2 deltaPosition;
-    private Vector2 previousPosition;
-    private float previousRotation;
-    private Vector2 previousForward;
-
-
-    public float fov
-    {
-        get { return userCamera.fieldOfView; }
+    public User parentUser {
+        get { return transform.parent.GetComponent<User>(); }
     }
 
-    public float DeltaRotation {
-        get { return deltaRotation; }
+    public float deltaRotation {
+        get { return _deltaRotation; }
     }
 
-    public Vector2 DeltaPosition {
-        get { return deltaPosition; }
-    }
-
-    public void AddTempEnterNewRoomEvent(UnityAction<Room> call) {
-        onTempEnterNewRoom.AddListener(call);
-    }
-
-    public void AddEnterNewRoomEvent(UnityAction<Room> call) {
-        onEnterNewRoom.AddListener(call);
-    }
-
-    public void AddExitRoomEvent(UnityAction<Room> call) {
-        onExitRoom.AddListener(call);
-    }
-
-    public void AddReachTargetEvent(UnityAction call) {
-        onEnterTarget.AddListener(call);
-    }
-
-    public void AddDetachTargetEvent(UnityAction call) {
-        onDetachTurnTarget.AddListener(call);
-    }
-
-    public void AddClickEvents(UnityAction call) {
-        foreach(var eachClickEvent in onClickButtons) {
-            eachClickEvent.AddListener(call);
-        }
-    }
-
-    public void AddClickEvent(UnityAction call, int index) {
-        while (onClickButtons.Count <= index) {
-            onClickButtons.Add(new UnityEvent());
-        }
-        onClickButtons[index].AddListener(call);
+    public Vector2 deltaPosition {
+        get { return _deltaPosition; }
     }
 
     private IEnumerator UpdateCurrentState()
     {
         while(true) {
-            // TODO: VR body 일때 delta 값이 적게 측정되는 경우가 있음
-            deltaPosition = (this.Position - previousPosition) / Time.fixedDeltaTime;
-            deltaRotation = Vector2.SignedAngle(previousForward, this.Forward) / Time.fixedDeltaTime;
+            _deltaPosition = (this.Position - _previousPosition) / Time.fixedDeltaTime;
+            _deltaRotation = Vector2.SignedAngle(_previousForward, this.Forward) / Time.fixedDeltaTime;
 
-            previousPosition = this.Position;
-            previousForward = this.Forward;
+            _previousPosition = this.Position;
+            _previousForward = this.Forward;
 
             yield return new WaitForFixedUpdate();
         }
@@ -95,29 +37,10 @@ public class UserBody : Transform2D {
 
     private void ResetCurrentState()
     {
-        deltaPosition = Vector2.zero;
-        deltaRotation = 0;
-        previousPosition = this.Position;
-        previousForward = this.Forward;
-    }
-
-    public override void Initializing()
-    {
-        id = totalID++;
-
-        userCamera = GetComponentInChildren<Camera>(); // 현재 object에서 camera component를 찾는다
-        if (userCamera == null)
-        {
-            userCamera = transform.parent.GetComponentInChildren<Camera>(); // 다른 object에서 camera component를 찾는다
-            if (userCamera == null) throw new System.Exception("Can't find user camera");
-        }
-
-        laserPointer = transform.parent.GetComponentInChildren<CustomLaserPointer>();
-        if(laserPointer != null)  {
-            laserPointer.PointerClick += OnClickButton;
-        }
-
-        this.gameObject.layer = LayerMask.NameToLayer("Player");
+        _deltaPosition = Vector2.zero;
+        _deltaRotation = 0;
+        _previousPosition = this.Position;
+        _previousForward = this.Forward;
     }
 
     private void OnEnable() {
@@ -130,107 +53,12 @@ public class UserBody : Transform2D {
     }
 
     private void OnTriggerEnter(Collider other) {
-        if(other.gameObject.layer == LayerMask.NameToLayer("Room")) {
-            Room room = other.GetComponent<Room>();
-
-            if(other.gameObject.tag != "CurrentRoom") {
-                enteredRoom = room;
-                isEnterNewRoom = true;
-                onTempEnterNewRoom.Invoke(enteredRoom);
-            }
-        }
-        else if(other.gameObject.layer == LayerMask.NameToLayer("Target")) {
-            onEnterTarget.Invoke();
-        }
+        UserEventArgs caller = new UserEventArgs(other.transform);
+        parentUser.CallEvent(caller, UserEventType.onEnter);
     }
 
     private void OnTriggerExit(Collider other) {
-        if(other.gameObject.layer == LayerMask.NameToLayer("Room")) {
-            Room room = other.GetComponent<Room>();
-
-            onExitRoom.Invoke(room);
-
-            if(room == enteredRoom) {
-                enteredRoom = null;
-                isEnterNewRoom = false;
-            }
-            else if(other.gameObject.tag == "CurrentRoom") {
-                if(isEnterNewRoom) {
-                    onEnterNewRoom.Invoke(enteredRoom);
-                }
-            }
-        }
-    }
-
-    public void OnExitTrigger(UserEventArgs e) {
-        if(e.target.gameObject.layer == LayerMask.NameToLayer("Real Space")) {
-            Debug.Log("User exited real space");
-        }
-    }
-    
-    public void OnDetachFromHand(UserEventArgs e) {
-        if(e.target.gameObject.layer == LayerMask.NameToLayer("TurnTarget"))
-            onDetachTurnTarget.Invoke();
-    }
-
-    public void OnClickButton(object sender, PointerEventArgs e) { // sender = dispatcher, e = producer
-        if(e.target.gameObject.layer == LayerMask.NameToLayer("UI")) {
-            if(e.target.gameObject.tag == "OKButton")
-                onClickButtons[0].Invoke();
-            else if(e.target.gameObject.tag == "OK2Button")
-                onClickButtons[1].Invoke();
-            else if(e.target.gameObject.tag == "YesButton")
-                onClickButtons[2].Invoke();
-            else if(e.target.gameObject.tag == "NoButton")
-                onClickButtons[3].Invoke();
-        }
-    }
-
-    public bool IsTargetInUserFov(Vector2 target, float bound = 0) // global 좌표계 기준으로 비교
-    {
-        Vector2 userToTarget = target - this.Position;
-        Vector2 userForward = this.Forward;
-
-        float unsignedAngle = Vector2.Angle(userToTarget, userForward);
-
-        // Debug.Log($"target {target}");
-        // Debug.Log($"unsignedAngle {unsignedAngle}");
-        // Debug.Log($"user fov {this.fov}");
-
-        if (unsignedAngle - ((this.fov + bound)) < 0.01f)
-            return true;
-        else
-            return false;
-    }
-
-    public bool IsTargetInUserFov(Vector2 start, Vector2 end, float bound = 0) {
-        Vector2 userToStart = start - this.Position;
-        Vector2 userToEnd = end - this.Position;
-        Vector2 userForward = this.Forward;
-        
-        float angleUserToStart = Vector2.SignedAngle(userForward, userToStart);
-        float angleUserToEnd = Vector2.SignedAngle(userForward, userToEnd);
-        float angleStartToEnd = Vector2.Angle(userToStart, userToEnd);
-
-        // Debug.Log($"start {start}");
-        // Debug.Log($"end {end}");
-        // Debug.Log($"user {this.Position}");
-
-        // Debug.Log(angleUserToStart);
-        // Debug.Log(angleUserToEnd);
-        // Debug.Log(angleStartToEnd);
-
-        if(angleUserToStart * angleUserToEnd < 0 && Mathf.Abs(angleUserToStart) + Mathf.Abs(angleUserToEnd) < angleStartToEnd + 0.01f) {
-            // Debug.Log("wall is in fov");
-            return true;
-        }
-        else if(IsTargetInUserFov(start, bound) || IsTargetInUserFov(end, bound)) {
-            // Debug.Log("vertex is in fov");
-            return true;
-        }
-        else {
-            // Debug.Log("not in fov");
-            return false;
-        }
+        UserEventArgs caller = new UserEventArgs(other.transform);
+        parentUser.CallEvent(caller, UserEventType.onEnter);
     }
 }

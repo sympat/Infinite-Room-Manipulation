@@ -5,7 +5,7 @@ using UnityEngine;
 public class Manager : MonoBehaviour
 {
     protected VirtualEnvironment virtualEnvironment;
-    protected User user;
+    protected Users users;
     protected RealSpace realSpace;
 
     // Start is called before the first frame update
@@ -17,8 +17,8 @@ public class Manager : MonoBehaviour
 
             if(tf is VirtualEnvironment)
                 virtualEnvironment = tf as VirtualEnvironment;
-            else if(tf is User)
-                user = tf as User;
+            else if(tf is Users)
+                users = tf as Users;
             else if(tf is RealSpace)
                 realSpace = tf as RealSpace;
         }
