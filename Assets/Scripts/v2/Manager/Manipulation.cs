@@ -7,12 +7,15 @@ using System.Linq;
 public class Manipulation : Experiment2
 {
     private float DT = 1.2f;
-    // private Vector2 minSize = 2.0f * Vector2.one;
 
-    // public VirtualEnvironment VE;
-    // public RealSpace realSpace;
+    public override void Awake() {
+        base.Awake();
+ 
+        // users.AddEnterNewRoomEvent(SwitchEnable);
+        // users.AddEnterNewRoomEvent(OvertManipulate);
+    }
 
-    public bool[] CheckWallVisibleToUser(Room currentRoom, UserBody userBody) {
+    public bool[] CheckWallVisibleToUser(Room currentRoom, User user) {
         bool[] isVisibleToUser = new bool[4];
         for (int i = 0; i < 4; i++)
             isVisibleToUser[i] = false;
@@ -20,33 +23,18 @@ public class Manipulation : Experiment2
         // 벽이 사용자 시야에 있는지를 판단
         for (int i = 0; i < 4; i++)
         {
-            // Vector2 vertexPosition = currentRoom.GetVertex2D(i, Space.World);
-            // Vector2 wallPosition = currentRoom.GetEdge2D(i, Space.World);
-            // Debug.Log($"{i} wall");
-
             Vector2 vertex1 = currentRoom.GetVertex2D(Utility.mod(i, 4), Space.World);
             Vector2 vertex2 = currentRoom.GetVertex2D(Utility.mod(i + 1, 4), Space.World);
 
-            if(userBody.IsTargetInUserFov(vertex1, vertex2)) {
+            if(user.IsTargetInUserFov(vertex1, vertex2)) {
                 isVisibleToUser[Utility.mod(i, 4)] = true;
             }
-
-            // if (userBody.IsTargetInUserFov(vertexPosition))
-            // {
-            //     isVisibleToUser[Utility.mod(i, 4)] = true;
-            //     isVisibleToUser[Utility.mod(i - 1, 4)] = true;
-            // }
-
-            // if(userBody.IsTargetInUserFov(wallPosition))
-            // {
-            //     isVisibleToUser[Utility.mod(i, 4)] = true;
-            // }
         }
 
         return isVisibleToUser;
     }
 
-    public bool[] CheckWallCenterVisibleToUser(Room currentRoom, UserBody userBody) {
+    public bool[] CheckWallCenterVisibleToUser(Room currentRoom, User user) {
         bool[] isCenterVisibleToUser = new bool[4];
         for (int i = 0; i < 4; i++)
             isCenterVisibleToUser[i] = false;
@@ -56,57 +44,13 @@ public class Manipulation : Experiment2
         {
             Vector2 wallCenter = currentRoom.GetEdge2D(i, Space.World);
 
-            if(userBody.IsTargetInUserFov(wallCenter)) {
+            if(user.IsTargetInUserFov(wallCenter)) {
                 isCenterVisibleToUser[Utility.mod(i, 4)] = true;
             }
         }
 
         return isCenterVisibleToUser;
     }
-
-    // public bool[] CheckWallMovable(VirtualEnvironment virtualEnvironment, Room currentRoom, UserBody userBody) // translate은 xx,y 좌표계 기준으로 부호가 결정
-    // {
-    //     bool[] isMovable = new bool[4];
-    //     for (int i = 0; i < 4; i++)
-    //     {
-    //         isMovable[i] = true; // i와 i+1 사이 wall
-    //     }
-
-    //     // 벽이 사용자와 충분히 멀리 있는지를 판단
-    //     for (int i = 0; i < 4; i++)
-    //     {
-    //         Vector2 wallPosition = currentRoom.GetEdge2D(i, Space.World);
-
-    //         if (i % 2 == 0 && Mathf.Abs(wallPosition.y - userBody.Position.y) < 0.4f) // 현재 벽 i가 0, 2번 벽이고 user와 너무 가까운 경우, 0.1f는 여유 boundary , user.Size.y / 2
-    //         {
-    //             isMovable[i] = false;
-    //         }
-    //         else if (i % 2 != 0 && Mathf.Abs(wallPosition.x - userBody.Position.x) < 0.4f) // user.Size.x / 2
-    //         {
-    //             isMovable[i] = false;
-    //         }
-    //     }
-
-    //     // 벽이 사용자 시야에 있는지를 판단
-    //     for (int i = 0; i < 4; i++)
-    //     {
-    //         Vector2 vertexPosition = currentRoom.GetVertex2D(i, Space.World);
-    //         Vector2 wallPosition = currentRoom.GetEdge2D(i, Space.World);
-
-    //         if (userBody.IsTargetInUserFov(vertexPosition))
-    //         {
-    //             isMovable[Utility.mod(i, 4)] = false;
-    //             isMovable[Utility.mod(i - 1, 4)] = false;
-    //         }
-
-    //         if(userBody.IsTargetInUserFov(wallPosition))
-    //         {
-    //             isMovable[Utility.mod(i, 4)] = false;
-    //         }
-    //     }
-
-    //     return isMovable;
-    // }
 
     public Tuple<Vector2, Vector2> GetScaleTranlslate(Room currentRoom, Bound2D realSpace) // v is currentRoom
     {
@@ -119,7 +63,7 @@ public class Manipulation : Experiment2
 
     private bool[] isWallMoveDone = new bool[4];
 
-    public void Restore(VirtualEnvironment virtualEnvironment, Room currentRoom, UserBody user, Vector2 scale, Vector2 translate)
+    public void Restore(VirtualEnvironment virtualEnvironment, Room currentRoom, User user, Vector2 scale, Vector2 translate)
     {
         float[] DistWalltoDest = new float[4];
         DistWalltoDest[0] = (scale.y - 1) * currentRoom.Size.y / 2 + translate.y;
@@ -141,11 +85,6 @@ public class Manipulation : Experiment2
 
         bool[] isVisible = CheckWallVisibleToUser(currentRoom, user);
         bool[] isCenterVisible = CheckWallCenterVisibleToUser(currentRoom, user);
-
-        for(int i=0; i<4; i++) {
-            Debug.Log($"{i} {isVisible[i]}");
-        }
-        Debug.Log("");
 
         for (int i = 0; i < 4; i++)
         {
@@ -177,23 +116,18 @@ public class Manipulation : Experiment2
 
         if (xMinDist > 0) // 1벽
         {
-            // virtualEnvironment.MoveWall(targetRoom, 1, xMinDist, currentRoom);
             virtualEnvironment.MoveWallWithLimit(targetRoom, 1, xMinDist, currentRoom);
-
         }
         if (xMaxDist < 0) // 3벽
         {
-            // virtualEnvironment.MoveWall(targetRoom, 3, xMaxDist, currentRoom);
             virtualEnvironment.MoveWallWithLimit(targetRoom, 3, xMaxDist, currentRoom);
         }
         if (yMinDist > 0) // 2벽
         {
-            // virtualEnvironment.MoveWall(targetRoom, 2, yMinDist, currentRoom);
             virtualEnvironment.MoveWallWithLimit(targetRoom, 2, yMinDist, currentRoom);
         }
         if (yMaxDist < 0) // 0벽
         {
-            // virtualEnvironment.MoveWall(targetRoom, 0, yMaxDist, currentRoom);
             virtualEnvironment.MoveWallWithLimit(targetRoom, 0, yMaxDist, currentRoom);
         }
     }
@@ -226,28 +160,6 @@ public class Manipulation : Experiment2
         }
     }
 
-    // public void ResizeRoom(Room room) {
-    //     Debug.Log("ResizeRoom");
-
-    //     int wall = virtualEnvironment.GetDoor(room, room.previousRoom).GetContactWall(room);
-
-    //     if(wall % 2 != 0 && room.Size.x < minSize.x) {
-    //         Debug.Log("Resize X");
-    //         float magnitude = minSize.x - room.Size.x;
-    //         float outDirection = (wall == 3) ? 1 : -1;
-
-    //         virtualEnvironment.MoveWall(room, wall, magnitude * outDirection);
-    //     }
-    //     else if(wall % 2 == 0 && room.Size.y < minSize.y) {
-    //         Debug.Log("Resize Y");
-
-    //         float magnitude = minSize.y - room.Size.y;
-    //         float outDirection = (wall == 0) ? 1 : -1;
-
-    //         virtualEnvironment.MoveWall(room, wall, magnitude * outDirection);
-    //     }
-    // }
-
     bool NeedAdjust(VirtualEnvironment virtualEnvironment, Room currentRoom)
     {
         List<Door> connectedDoors = virtualEnvironment.GetConnectedDoors(currentRoom);
@@ -260,7 +172,7 @@ public class Manipulation : Experiment2
         return false;
     }
 
-    void Adjust(VirtualEnvironment virtualEnvironment, Room currentRoom, UserBody user)
+    void Adjust(VirtualEnvironment virtualEnvironment, Room currentRoom, User user)
     {
         List<Door> connectedDoors = virtualEnvironment.GetConnectedDoors(currentRoom);
 
@@ -274,19 +186,10 @@ public class Manipulation : Experiment2
         this.enabled = !this.enabled;
     }
 
-    public override void Awake() {
-        base.Awake();
-        UserBody userBody = user.GetTrackedUserBody();
-
-        userBody.AddEnterNewRoomEvent(SwitchEnable);
-        userBody.AddEnterNewRoomEvent(OvertManipulate);
-        // userBody.AddEnterNewRoomEvent(ResizeRoom);
-    }
-
     private void FixedUpdate() 
     {
+        User user = users.GetActiveUser();
         Room currentRoom = virtualEnvironment.CurrentRoom;
-        UserBody user = virtualEnvironment.userBody;
 
         // 알고리즘 시작
         Tuple<Vector2, Vector2> st = GetScaleTranlslate(currentRoom, realSpace); 
@@ -294,7 +197,7 @@ public class Manipulation : Experiment2
 
         if ((scale - Vector2.one).magnitude > 0.01f || (translate - Vector2.zero).magnitude > 0.01f) // 복원 연산
         {
-            // Debug.Log("Restore");
+            Debug.Log("Restore");
             Restore(virtualEnvironment, currentRoom, user, scale, translate);
         }
         else if(NeedAdjust(virtualEnvironment, currentRoom)) // 조정 연산

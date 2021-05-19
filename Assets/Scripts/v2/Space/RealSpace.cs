@@ -7,13 +7,17 @@ public class RealSpace : Bound2D
     public override void Initializing()
     {
         base.Initializing();
-        // Debug.Log($"Initialzing {this.gameObject.name}");
+
+        foreach(Transform child in this.transform) {
+            Transform2D tf = child.GetComponent<Transform2D>();
+
+            if(tf is RealUser)  {
+                tf.Initializing();
+            }
+        }
 
         this.gameObject.layer = LayerMask.NameToLayer("Real Space");
         this.gameObject.tag = "Real Space";
-
-        // if(transform.childCount > 0) transform.GetChild(0).localScale = Vector3.Scale(transform.GetChild(0).localScale, originScale); // Real User
-
     }
 
 }

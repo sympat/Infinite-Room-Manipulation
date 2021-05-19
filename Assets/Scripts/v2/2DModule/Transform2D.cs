@@ -33,7 +33,7 @@ public class Transform2D : MonoBehaviour {
         return -rotation.eulerAngles.y;
     }
 
-    public Vector2 Forward
+    public virtual Vector2 Forward
     {
         get { return CastVector3Dto2D(transform.forward); }
         set
@@ -45,7 +45,7 @@ public class Transform2D : MonoBehaviour {
         }
     }
 
-    public Vector2 Right
+    public virtual Vector2 Right
     {
         get { return CastVector3Dto2D(transform.right); }
         set
@@ -57,7 +57,7 @@ public class Transform2D : MonoBehaviour {
         }
     }
 
-    public Vector2 Position 
+    public virtual Vector2 Position 
     {
         get
         {
@@ -70,7 +70,7 @@ public class Transform2D : MonoBehaviour {
         }
     }
 
-    public Vector2 LocalPosition
+    public virtual Vector2 LocalPosition
     {
         get { return CastVector3Dto2D(transform.localPosition); }
         set
@@ -79,7 +79,7 @@ public class Transform2D : MonoBehaviour {
         }
     }
 
-    public float Rotation
+    public virtual float Rotation
     {
         get { return CastRotation3Dto2D(transform.rotation); }
         set
@@ -88,7 +88,7 @@ public class Transform2D : MonoBehaviour {
         }
     }
 
-    public float LocalRotation
+    public virtual float LocalRotation
     {
         get { return CastRotation3Dto2D(transform.localRotation); }
         set
@@ -97,7 +97,7 @@ public class Transform2D : MonoBehaviour {
         }
     }
 
-    public Vector2 LocalScale
+    public virtual Vector2 LocalScale
     {
         get { return CastVector3Dto2D(transform.localScale); }
         set

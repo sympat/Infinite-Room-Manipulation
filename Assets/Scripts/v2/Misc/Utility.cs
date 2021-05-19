@@ -3,6 +3,44 @@ using System.Linq;
 using UnityEngine;
 using System.Collections.Generic;
 
+[Serializable]
+public class SerializeDicString : SerializeDictionary<string, string> { }
+
+[Serializable]
+public class SerializeDictionary<K, V> : Dictionary<K,V>, ISerializationCallbackReceiver
+{
+	[SerializeField]
+	List<K> keys = new List<K>();
+
+	[SerializeField]
+	List<V> values = new List<V>();
+
+	public void OnBeforeSerialize()
+	{
+		keys.Clear();
+		values.Clear();
+
+		foreach( KeyValuePair<K, V> pair in this )
+		{
+			keys.Add( pair.Key );
+			values.Add( pair.Value );
+		}
+	}
+
+	public void OnAfterDeserialize()
+	{
+		this.Clear();
+
+        Debug.Log(keys.Count);
+        Debug.Log(values.Count);
+
+		for( int i = 0; i < keys.Count; i++ )
+		{
+			this.Add( keys[i], values[i] );
+		}
+	}
+}
+
 public static class Utility
 {
     public static GameObject GetChildWithLayer(this GameObject parent, string layer) {

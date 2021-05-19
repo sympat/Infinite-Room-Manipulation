@@ -4,20 +4,33 @@ using UnityEngine;
 
 public class RealUser : Transform2D
 {
-    public User virtualUser;
+    public Users trackedUsers;
+
+    private Vector2 offsetPosition;
+    private float offsetRotation;
 
     public override void Initializing() {
-        this.gameObject.layer = LayerMask.NameToLayer("Player");
-    }
+        UserBody trackedUserBody = trackedUsers.GetActiveUser().body;
 
-    private void Awake() {
-        Initializing();
+        offsetPosition = this.Position - trackedUserBody.Position;
+        offsetRotation = this.Rotation - trackedUserBody.Rotation;
+
+        this.gameObject.layer = LayerMask.NameToLayer("Player");
     }
 
     private void OnTriggerExit(Collider other) {
         if(other.gameObject.layer == LayerMask.NameToLayer("Real Space")) {
-            UserBody.UserEventArgs caller = new UserBody.UserEventArgs(other.transform);
-            virtualUser.GetTrackedUserBody().OnExitTrigger(caller);
+            User trackedUser = trackedUsers.GetActiveUser();
+            UserEventArgs caller = new UserEventArgs(other.transform);
+            trackedUser.CallEvent(caller, UserEventType.onExit);
         }
+    }
+
+    private void Update() {
+        UserBody trackedUserBody = trackedUsers.GetActiveUser().body;
+
+
+        this.Position = trackedUserBody.Position + offsetPosition;
+        this.Rotation = trackedUserBody.Rotation + offsetRotation;
     }
 }

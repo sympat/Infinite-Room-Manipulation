@@ -8,14 +8,12 @@ public class GrabInteraction : MonoBehaviour
 {
     private Hand.AttachmentFlags attachmentFlags = Hand.defaultAttachmentFlags & (~Hand.AttachmentFlags.SnapOnAttach) & (~Hand.AttachmentFlags.DetachOthers) & (~Hand.AttachmentFlags.VelocityMovement);
     private Interactable interactable;
-    private UserBody userBody;
+    private Users users;
 
-
-    private void Awake()
+    private void Start()
     {
-        userBody = GameObject.FindGameObjectWithTag("Player").GetComponent<User>().GetTrackedUserBody();
-
         interactable = this.GetComponent<Interactable>();
+        users = GameObject.FindGameObjectWithTag("Users").GetComponent<Users>();
     }
 
     private void HandHoverUpdate(Hand hand)
@@ -46,7 +44,9 @@ public class GrabInteraction : MonoBehaviour
 
     private void OnDetachedFromHand(Hand hand)
     {
-        UserBody.UserEventArgs caller = new UserBody.UserEventArgs(this.transform);
-        userBody.OnDetachFromHand(caller);
+        User user = users.GetActiveUser();
+        UserEventArgs caller = new UserEventArgs(this.transform);
+
+        user.CallEvent(caller, UserEventType.onRelease);
     }
 }

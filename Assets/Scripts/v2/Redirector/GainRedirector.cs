@@ -33,27 +33,32 @@ public class GainRedirector : MonoBehaviour
     protected float translationGain;
     protected float rotationGain;
     protected float curvatureGain;
+    protected User user;
 
-    protected UserBody virtualUser;
-    protected VirtualEnvironment virtualEnvironment;
+    public Users users;
+    public VirtualEnvironment virtualEnvironment;
+
+    private void Start() {
+        StartCoroutine(ApplyGain());
+    }
 
     public virtual (GainType, float) ApplyRedirection() {
         float degree = 0;
         GainType type = GainType.Undefined;
 
-        if (virtualUser.DeltaPosition.magnitude > MOVEMENT_THRESHOLD && virtualUser.DeltaPosition.magnitude >= Mathf.Abs(virtualUser.DeltaRotation)) // Translation
+        if (user.body.deltaPosition.magnitude > MOVEMENT_THRESHOLD && user.body.deltaPosition.magnitude >= Mathf.Abs(user.body.deltaRotation)) // Translation
         {
-            degree = virtualUser.DeltaPosition.magnitude * (MAX_TRANSLATION_GAIN);
+            degree = user.body.deltaPosition.magnitude * (MAX_TRANSLATION_GAIN);
             type = GainType.Translation;
         }
-        // if(virtualUser.DeltaPosition.magnitude > 0.2f && virtualUser.DeltaPosition.magnitude >= Mathf.Abs(virtualUser.DeltaRotation)) // Curvature
+        // if(user.body.deltaPosition.magnitude > 0.2f && user.body.deltaPosition.magnitude >= Mathf.Abs(user.body.deltaRotation)) // Curvature
         // {
-        //     degree = Mathf.Rad2Deg * virtualUser.DeltaPosition.magnitude * (HODGSON_MAX_CURVATURE_GAIN);
+        //     degree = Mathf.Rad2Deg * user.body.deltaPosition.magnitude * (HODGSON_MAX_CURVATURE_GAIN);
         //     type = GainType.Curvature;
         // }
-        else if (Mathf.Abs(virtualUser.DeltaRotation) > ROTATION_THRESHOLD && virtualUser.DeltaPosition.magnitude < Mathf.Abs(virtualUser.DeltaRotation)) // Rotation
+        else if (Mathf.Abs(user.body.deltaRotation) > ROTATION_THRESHOLD && user.body.deltaPosition.magnitude < Mathf.Abs(user.body.deltaRotation)) // Rotation
         {
-            degree = virtualUser.DeltaRotation * (MIN_ROTATION_GAIN);
+            degree = user.body.deltaRotation * (MIN_ROTATION_GAIN);
             type = GainType.Rotation;
         }
         else
@@ -64,18 +69,13 @@ public class GainRedirector : MonoBehaviour
         return (type, degree);
     }
 
-    private void Start() {
-        virtualEnvironment = GetComponent<VirtualEnvironment>();
-        StartCoroutine(ApplyGain());
-    }
-
     IEnumerator ApplyGain() {
         yield return new WaitForSeconds(2.0f); // just for delay when initializing
 
         while(true) {
-            virtualUser = virtualEnvironment.userBody;
+            user = users.GetActiveUser();
 
-            if (virtualUser.DeltaPosition.magnitude > MOVEMENT_THRESHOLD || Mathf.Abs(virtualUser.DeltaRotation) > ROTATION_THRESHOLD) {
+            if (user.body.deltaPosition.magnitude > MOVEMENT_THRESHOLD || Mathf.Abs(user.body.deltaRotation) > ROTATION_THRESHOLD) {
                 var result = ApplyRedirection();
 
                 GainType gainType = result.Item1;
@@ -84,13 +84,13 @@ public class GainRedirector : MonoBehaviour
                 switch (gainType)
                 {
                     case GainType.Translation:
-                        virtualEnvironment.Translate(-virtualUser.Forward * degree * Time.fixedDeltaTime, Space.World);
+                        virtualEnvironment.Translate(-user.body.Forward * degree * Time.fixedDeltaTime, Space.World);
                         break;
                     case GainType.Rotation:
-                        virtualEnvironment.RotateAround(virtualUser.Position, degree * Time.fixedDeltaTime);
+                        virtualEnvironment.RotateAround(user.body.Position, degree * Time.fixedDeltaTime);
                         break;
                     case GainType.Curvature:
-                        virtualEnvironment.RotateAround(virtualUser.Position, degree * Time.fixedDeltaTime);
+                        virtualEnvironment.RotateAround(user.body.Position, degree * Time.fixedDeltaTime);
                         break;
                     default:
                         break;

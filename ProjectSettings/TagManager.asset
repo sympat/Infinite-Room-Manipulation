@@ -13,9 +13,11 @@ TagManager:
   - OKButton
   - YesButton
   - NoButton
-  - OK2Button
   - VirtualEnvironment
   - Real Space
+  - Users
+  - Button
+  - FacingDoor
   layers:
   - Default
   - TransparentFX
@@ -30,14 +32,14 @@ TagManager:
   - Room
   - Real Space
   - Door Main
-  - Target
+  - Portal
   - Coin
   - VirtualEnvironment
   - TurnTarget
   - Knob
   - Grabble
   - Door Frame
-  - 
+  - CenterPortal
   - 
   - 
   - 
