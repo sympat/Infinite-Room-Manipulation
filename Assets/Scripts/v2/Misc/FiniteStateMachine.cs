@@ -12,13 +12,6 @@ public class FiniteStateMachine<TState, TInput>
     Dictionary<TState, Dictionary<TInput, Transition<TState>>> transitions;
     TState currentState;
 
-    // public TState CurrentState {
-    //     get { return currentState; }
-    //     private set {
-            
-    //     }
-    // }
-
     private event Action<TState> OnStateEnter;
     private event Action<TState> OnStateExit;
     private event Action<TState, TState> OnStateChange;
@@ -97,6 +90,8 @@ public class FiniteStateMachine<TState, TInput>
 
     public void Processing(TInput input)
     {
+        Debug.Log("Processing!");
+        
         if(OnInput != null) OnInput(input);
 
         if (transitions[currentState].ContainsKey(input))

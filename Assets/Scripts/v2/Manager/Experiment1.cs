@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
+using System.IO;
 using Valve.VR;
 
 public class Experiment1 : Manager
@@ -12,25 +13,16 @@ public class Experiment1 : Manager
         Long = 2
     }
 
-    public Experiement1State currentState {
-        get { return _currentState; }
-        set { 
-            _currentState = value;
-            _currentState.onDefault();
-        }
-    }
-
     public GameObject portalPrefab;
     public GameObject centerPortalPrefab;
-    // public GameObject turnTargetObjectPrefab;
     public int totalTrial = 1;
+    [Range(1, 16)]
+    public int experimentID;
     [TextArea]
     public string initialText, watchAroundText, targetText, viewDoorText, turnBehindText, selectionText, goToCenterText, endText;
-
-    private Experiement1State _currentState;
     private Room currentRoom;
     private GameObject targetObj;
-    private GameObject turnTargetObj;
+    private GameObject centerObj;
     private float[] wallTranslateGain;
     private Vector2[] direction;
     private float grid;
@@ -87,20 +79,20 @@ public class Experiment1 : Manager
         targetPosition = Vector2.zero;
 
         // Add User event as input for task
-        User user = users.GetActiveUser();
-        user.AddEnterEvent("Portal", "Untagged", () => task.Processing("onEnterPortal"));
-        user.AddViewEvent("Door", "FacingDoor", () => task.Processing("onViewFacingDoor"));
-        user.AddEnterEvent("CenterPortal", "Untagged", () => task.Processing("onEnterCenterPortal"));
-        user.AddClickEvent("UI", "OKButton", () => task.Processing("onClickOK"));
-        user.AddClickEvent("UI", "YesButton", () => task.Processing("onClickYes"));
-        user.AddClickEvent("UI", "NoButton", () => task.Processing("onClickNo"));
+        users.AddEnterEvent("Portal", "Untagged", () => task.Processing("onEnterPortal"));
+        users.AddViewEvent("Door", "FacingDoor", () => task.Processing("onViewFacingDoor"));
+        users.AddEnterEvent("CenterPortal", "Untagged", () => task.Processing("onEnterCenterPortal"));
+        users.AddClickEvent("UI", "OKButton", () => task.Processing("onClickOK"));
+        users.AddClickEvent("UI", "YesButton", () => task.Processing("onClickYes"));
+        users.AddClickEvent("UI", "NoButton", () => task.Processing("onClickNo"));
 
         // Define task for experiment 1
         task = new FiniteStateMachine<string, string>("Initial", "Around", "Target", "Door_Step1", "Door_Step2", "Door_Step3", "Behind", "Selection", "Center", "End");
         task.AddStateStart("Initial", () => EnableOKUI(initialText))
         .AddTransition("Initial", "Around", "onClickOK", DisableUIandPointer)
 
-        .AddStateStart("Around", () => WakeAfterSeconds(10.0f))
+        .AddStateStart("Around", () => EnableOKUI(watchAroundText))
+        .AddTransition("Around", "onClickOK", DisableUIandPointer, () => WakeAfterSeconds(10.0f))
         .AddTransition("Around", "Target", "onAfterSeconds")
 
         .AddStateStart("Target", () => EnableOKUI(targetText), InitializeTarget)
@@ -128,7 +120,9 @@ public class Experiment1 : Manager
         .AddTransition("Center", "onEnterCenterPortal", DestroyCenterPoint, UserCameraFadeOut, () => WakeAfterSeconds(3.0f))
         .AddTransition("Center", "onAfterSeconds", RestoreOriginWall, UserCameraFadeIn, RaiseEndCondition)
         .AddTransition("Center", "End", "onEnd")
-        .AddTransition("Center", "Around", "onNotEnd");
+        .AddTransition("Center", "Around", "onNotEnd")
+
+        .AddStateStart("End", () => EnableEndUI(endText));
 
         // Debug for task process
         task.OnEachInput((newInput) => { Debug.Log($"{newInput} call"); } );
@@ -166,6 +160,8 @@ public class Experiment1 : Manager
 
     public void EnableOKUI(string paragraphText) {
         User user = users.GetActiveUser();
+
+        Debug.Log(user.gameObject);
 
         user.ui.PopUpParagraph(paragraphText); 
         user.ui.PopUpOkButton();
@@ -209,6 +205,20 @@ public class Experiment1 : Manager
         #else
             Application.Quit();
         #endif
+    }
+
+    public void WriteResultInFile(string text) {
+        string path = $"answer_{experimentID}.txt";
+        TextWriter writer;
+
+        if(!File.Exists(path)) {
+            writer = File.CreateText(path);
+        }
+        else {
+            writer = File.AppendText(path);
+        }
+
+        writer.WriteLine(text);
     }
 
     public void PrintResult() {
@@ -270,8 +280,6 @@ public class Experiment1 : Manager
         Vector3 targetInitPosition = Utility.CastVector2Dto3D(denormalizedTargetPosition2D);
         targetObj = Instantiate(portalPrefab, targetInitPosition, Quaternion.identity);
     }
-
-    private GameObject centerObj;
 
     public void GenerateCenterPoint() {
         Debug.Log("GenerateCenterPoint");
@@ -383,7 +391,7 @@ public class Experiment1 : Manager
     }
 
     public void WriteAnswer(bool userAnswer) {
-        answer[distType][currentTrial-1][gainIndex] = userAnswer;
+        answer[distType][currentTrial-1][gainIndex] = userAnswer;      
     }
 
     public Vector2 CalculateTargetPosition(int facingWall, DistanceType distanceFromBehindWall) {

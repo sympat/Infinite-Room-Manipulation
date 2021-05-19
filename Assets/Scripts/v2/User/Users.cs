@@ -27,75 +27,43 @@ public class Users : Transform2D
         throw new System.Exception("There are no tracked user");
     }
 
-    // public void AddEnterNewRoomEvent(UnityAction<Room> call) {
-    //     foreach(var user in users) {
-    //         user.AddEnterNewRoomEvent(call);
-    //     }
-    // }
+    public void AddEnterEvent(string layer, string tag, UnityAction call) {
+        foreach(var user in users)
+            user.AddEnterEvent(layer, tag, call);
+    }
 
-    // public void AddExitRoomEvent(UnityAction<Room> call) {
-    //     foreach(var user in users) {
-    //         user.AddExitRoomEvent(call);
-    //     }
-    // }
+    public void RemoveEnterEvent(string layer, string tag, UnityAction call) {
+        foreach(var user in users)
+            user.RemoveEnterEvent(layer, tag, call);
+    }
 
-    // public void AddExitRealSpaceEvent(UnityAction call) {
-    //     foreach(var user in users) {
-    //         user.AddExitRealSpaceEvent(call);
-    //     }
-    // }
+    public void AddExitEvent(string layer, string tag, UnityAction call) {
+        foreach(var user in users)
+            user.AddExitEvent(layer, tag, call);
+    }
 
-    // public void AddEnterTargetEvent(UnityAction call) {
-    //     foreach(var user in users) {
-    //         user.AddEnterTargetEvent(call);
-    //     }
-    // }
+    public void RemoveExitEvent(string layer, string tag, UnityAction call) {
+        foreach(var user in users)
+            user.RemoveExitEvent(layer, tag, call);
+    }
 
-    // public void AddDetachTargetEvent(UnityAction call) {
-    //     foreach(var user in users) {
-    //         user.AddDetachTargetEvent(call);
-    //     }
-    // }
+    public void AddViewEvent(string layer, string tag, UnityAction call) {
+        foreach(var user in users)
+            user.AddViewEvent(layer, tag, call);
+    }
 
-    // public void AddClickEvents(UnityAction call) {
-    //     foreach(var user in users) {
-    //         user.AddClickEvents(call);
-    //     }
-    // }
+    public void RemoveViewEvent(string layer, string tag, UnityAction call) {
+        foreach(var user in users)
+            user.RemoveViewEvent(layer, tag, call);
+    }
 
-    // public void AddClickOkEvent(UnityAction call) {
-    //     foreach(var user in users) {
-    //         user.AddClickOkEvent(call);
-    //     }
-    // }
+    public void AddClickEvent(string layer, string tag, UnityAction call) {
+        foreach(var user in users)
+            user.AddClickEvent(layer, tag, call);
+    }
 
-    // public void RemoveClickOkEvent(UnityAction call) {
-    //     foreach(var user in users) {
-    //         user.RemoveClickOkEvent(call);
-    //     }
-    // }
-
-    // public void AddClickYesEvent(UnityAction call) {
-    //     foreach(var user in users) {
-    //         user.AddClickYesEvent(call);
-    //     }
-    // }
-
-    // public void RemoveClickYesEvent(UnityAction call) {
-    //     foreach(var user in users) {
-    //         user.RemoveClickYesEvent(call);
-    //     }
-    // }
-
-    // public void AddClickNoEvent(UnityAction call) {
-    //     foreach(var user in users) {
-    //         user.AddClickNoEvent(call);
-    //     }
-    // }
-
-    // public void RemoveClickNoEvent(UnityAction call) {
-    //     foreach(var user in users) {
-    //         user.RemoveClickNoEvent(call);
-    //     }
-    // }
+    public void RemoveClickEvent(string layer, string tag, UnityAction call) {
+        foreach(var user in users)
+            user.RemoveClickEvent(layer, tag, call);
+    }
 }

@@ -423,14 +423,20 @@ MonoBehaviour:
   centerPortalPrefab: {fileID: 2378513342725396498, guid: d8b867cd20d2b4f4e80c6343505f52a4,
     type: 3}
   totalTrial: 1
-  initialText: "\uD655\uC778\uC744 \uB20C\uB7EC\uC11C \uC2E4\uD5D8\uC744 \uC2DC\uC791\uD558\uC138\uC694."
-  watchAroundText: "\uC8FC\uC704\uB97C \uB458\uB7EC\uBCF4\uC138\uC694."
-  targetText: "\uC8FC\uC5B4\uC9C4 \uBAA9\uD45C\uB97C \uD5A5\uD574 \uAC78\uC5B4\uAC00\uC138\uC694."
-  viewDoorText: "\uBE68\uAC04\uC0C9\uC73C\uB85C \uAC15\uC870\uB41C \uBB38\uC744 \uBC14\uB77C\uBCF4\uC138\uC694."
-  turnBehindText: "\uB4A4\uB97C \uBC14\uB77C\uBCF4\uC138\uC694."
-  selectionText: "\uACF5\uAC04\uC774 \uCEE4\uC84C\uC2B5\uB2C8\uAE4C? \uC544\uB2C8\uBA74
-    \uC791\uC544\uC84C\uC2B5\uB2C8\uAE4C?"
-  goToCenterText: "\uC911\uC559\uC73C\uB85C \uB3CC\uC544\uAC00\uC138\uC694."
+  initialText: "\uD655\uC778 \uBC84\uD2BC\uC744 \uB204\uB974\uACE0 \uC2E4\uD5D8\uC744
+    \uC2DC\uC791\uD558\uC138\uC694."
+  watchAroundText: "\uD655\uC778 \uBC84\uD2BC\uC744 \uB204\uB974\uACE0 \uBC29\uC744
+    \uC790\uC720\uB86D\uAC8C \uB458\uB7EC\uBCF4\uC138\uC694."
+  targetText: "\uD655\uC778 \uBC84\uD2BC\uC744 \uB204\uB974\uACE0 \uD30C\uB780\uC0C9
+    \uC6D0\uD615 \uC9C0\uC810\uC744 \uD5A5\uD574 \uAC78\uC5B4\uAC00\uC138\uC694."
+  viewDoorText: "\uD655\uC778 \uBC84\uD2BC\uC744 \uB204\uB974\uACE0 \uBE68\uAC04\uC0C9\uC73C\uB85C
+    \uAC15\uC870\uB41C \uBB38\uC744 \uBC14\uB77C\uBCF4\uC138\uC694."
+  turnBehindText: "\uD655\uC778 \uBC84\uD2BC\uC744 \uB204\uB978 \uB4A4\uC5D0 \uC81C\uC790\uB9AC\uC11C
+    \uB4A4\uB97C \uB3CC\uC544\uBCF4\uC138\uC694."
+  selectionText: "\uBC29\uC774 \uC6D0\uB798\uBCF4\uB2E4 \uCEE4\uC84C\uC2B5\uB2C8\uAE4C?
+    \uC544\uB2C8\uBA74 \uC791\uC544\uC84C\uC2B5\uB2C8\uAE4C?"
+  goToCenterText: "\uD655\uC778 \uBC84\uD2BC\uC744 \uB204\uB978 \uB4A4\uC5D0 \uC8FC\uD669\uC0C9
+    \uC6D0\uD615 \uC9C0\uC810\uC744 \uD5A5\uD574 \uAC78\uC5B4\uAC00\uC138\uC694."
   endText: "\uC2E4\uD5D8\uC774 \uC885\uB8CC\uB418\uC5C8\uC2B5\uB2C8\uB2E4."
 --- !u!114 &742489983 stripped
 MonoBehaviour:
@@ -705,6 +711,11 @@ PrefabInstance:
       propertyPath: height
       value: 2.4
       objectReference: {fileID: 0}
+    - target: {fileID: 5179895780354452437, guid: 495952893ccb94a48b6838c88065dcd8,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 5411919919536617434, guid: 495952893ccb94a48b6838c88065dcd8,
         type: 3}
       propertyPath: m_Name
@@ -743,7 +754,7 @@ PrefabInstance:
     - target: {fileID: 5804957049118244486, guid: 495952893ccb94a48b6838c88065dcd8,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 8311861435439233170, guid: 495952893ccb94a48b6838c88065dcd8,
         type: 3}
@@ -1553,10 +1564,20 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 7710530837360231260, guid: 9698eea9e8a96b848bb183026511d547,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 7710530837360236794, guid: 9698eea9e8a96b848bb183026511d547,
         type: 3}
       propertyPath: m_Name
       value: User_VR (ver.3)
+      objectReference: {fileID: 0}
+    - target: {fileID: 7710530837360240168, guid: 9698eea9e8a96b848bb183026511d547,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 9698eea9e8a96b848bb183026511d547, type: 3}
