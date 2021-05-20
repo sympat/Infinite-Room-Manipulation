@@ -4,6 +4,7 @@ using UnityEngine;
 using System.Linq;
 using System.IO;
 using Valve.VR;
+using System.Text;
 
 public class Experiment1 : Manager
 {
@@ -15,8 +16,8 @@ public class Experiment1 : Manager
 
     public GameObject portalPrefab;
     public GameObject centerPortalPrefab;
-    public int totalTrial = 1;
-    [Range(1, 16)]
+    public int totalTrial;
+    [Range(1, 20)]
     public int experimentID;
     [TextArea]
     public string initialText, watchAroundText, targetText, viewDoorText, turnBehindText, selectionText, goToCenterText, endText;
@@ -122,7 +123,7 @@ public class Experiment1 : Manager
         .AddTransition("Center", "End", "onEnd")
         .AddTransition("Center", "Around", "onNotEnd")
 
-        .AddStateStart("End", () => EnableEndUI(endText));
+        .AddStateStart("End", () => EnableEndUI(endText), PrintResult);
 
         // Debug for task process
         task.OnEachInput((newInput) => { Debug.Log($"{newInput} call"); } );
@@ -207,18 +208,41 @@ public class Experiment1 : Manager
         #endif
     }
 
-    public void WriteResultInFile(string text) {
-        string path = $"answer_{experimentID}.txt";
-        TextWriter writer;
+    public void WriteResultInFile(DistanceType distType, int trial, int gainIdx, char character) {
+        string directoryPath = "Assets/Resources/Experiment1_Result";
+        string fileName = $"answer_{distType}_{experimentID}.txt";
+        string filePath = directoryPath + "/" + fileName;
+        int gainCount = wallTranslateGain.Length;
 
-        if(!File.Exists(path)) {
-            writer = File.CreateText(path);
-        }
-        else {
-            writer = File.AppendText(path);
+        if(!Directory.Exists(directoryPath)) 
+            Directory.CreateDirectory(directoryPath);
+
+        if(!File.Exists(filePath)) {
+            List<string> lines = new List<string>();
+
+            for(int i=0; i<totalTrial; i++) {
+                string line = null;
+                
+                for(int j=0; j<gainCount; j++) 
+                    line += "U";
+
+                lines.Add(line);
+            }
+
+            foreach(var myLine in lines)
+                Debug.Log(myLine);
+
+            File.WriteAllLines(filePath, lines);
         }
 
-        writer.WriteLine(text);
+        string[] inputs = File.ReadAllLines(filePath);
+
+        StringBuilder sb = new StringBuilder(inputs[trial]);
+
+        sb[gainIdx] = character;
+        inputs[trial] = sb.ToString();
+
+        File.WriteAllLines(filePath, inputs);
     }
 
     public void PrintResult() {
@@ -391,7 +415,12 @@ public class Experiment1 : Manager
     }
 
     public void WriteAnswer(bool userAnswer) {
-        answer[distType][currentTrial-1][gainIndex] = userAnswer;      
+        answer[distType][currentTrial-1][gainIndex] = userAnswer;
+
+        if(userAnswer)
+            WriteResultInFile(distType, currentTrial-1, gainIndex, 'Y');
+        else
+            WriteResultInFile(distType, currentTrial-1, gainIndex, 'N');
     }
 
     public Vector2 CalculateTargetPosition(int facingWall, DistanceType distanceFromBehindWall) {

@@ -89,9 +89,7 @@ public class FiniteStateMachine<TState, TInput>
     }
 
     public void Processing(TInput input)
-    {
-        Debug.Log("Processing!");
-        
+    {        
         if(OnInput != null) OnInput(input);
 
         if (transitions[currentState].ContainsKey(input))
