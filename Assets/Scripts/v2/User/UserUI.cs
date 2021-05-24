@@ -7,22 +7,12 @@ using TMPro;
 
 public class UserUI : MonoBehaviour
 {
-    // [TextArea]
-    // public string paragraph1Text;
-    // [TextArea]
-    // public string paragraph2Text;
-    // [TextArea]
-    // public string choiceText;
-    // [TextArea]
-    // public string endText;
-
-    // [TextArea]
-    // public List<string> texts;
-
     public GameObject paragraph;
     public GameObject buttonOK;
     public GameObject buttonYes;
     public GameObject buttonNo;
+    public GameObject buttonYes2;
+    public GameObject buttonNo2;
 
     public void DisableUI() {
         foreach(Transform child in transform) {
@@ -45,5 +35,13 @@ public class UserUI : MonoBehaviour
 
     public void PopUpNoButton() {
         buttonNo.SetActive(true);
+    }
+
+    public void PopUpYes2Button() {
+        buttonYes2.SetActive(true);
+    }
+
+    public void PopUpNo2Button() {
+        buttonNo2.SetActive(true);
     }
 }

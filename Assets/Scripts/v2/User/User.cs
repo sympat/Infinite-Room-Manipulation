@@ -127,11 +127,22 @@ public class User : Transform2D
     }
 
     public void AddClickEvent(string layer, string tag, UnityAction call) {
-        ui.transform.FindObjectWithTag(tag).GetComponent<Button>().onClick.AddListener(call);
+        // ui.transform.FindObjectWithTag(tag).GetComponent<Button>().onClick.AddListener(call);
+        List<GameObject> buttons = ui.transform.FindObjectsWithTag(tag);
+
+        foreach(GameObject myButton in buttons) {
+            myButton.GetComponent<Button>().onClick.AddListener(call);
+        }
     }
 
     public void RemoveClickEvent(string layer, string tag, UnityAction call) {
-        ui.transform.FindObjectWithTag(tag).GetComponent<Button>().onClick.RemoveListener(call);
+        // ui.transform.FindObjectWithTag(tag).GetComponent<Button>().onClick.RemoveListener(call);
+
+        List<GameObject> buttons = ui.transform.FindObjectsWithTag(tag);
+
+        foreach(GameObject myButton in buttons) {
+            myButton.GetComponent<Button>().onClick.RemoveListener(call);
+        }
     }
 
     public void CallEvent(UserEventArgs e, UserEventType eventType) {

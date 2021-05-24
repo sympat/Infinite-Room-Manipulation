@@ -650,6 +650,16 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 1275746823}
     m_Modifications:
+    - target: {fileID: 6910533018129551893, guid: 9698eea9e8a96b848bb183026511d547,
+        type: 3}
+      propertyPath: m_fontSize
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 6910533018129551893, guid: 9698eea9e8a96b848bb183026511d547,
+        type: 3}
+      propertyPath: m_fontSizeBase
+      value: 3
+      objectReference: {fileID: 0}
     - target: {fileID: 7710530837360027778, guid: 9698eea9e8a96b848bb183026511d547,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -708,7 +718,7 @@ PrefabInstance:
     - target: {fileID: 7710530837360231260, guid: 9698eea9e8a96b848bb183026511d547,
         type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7710530837360236794, guid: 9698eea9e8a96b848bb183026511d547,
         type: 3}
@@ -718,7 +728,7 @@ PrefabInstance:
     - target: {fileID: 7710530837360240168, guid: 9698eea9e8a96b848bb183026511d547,
         type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 9698eea9e8a96b848bb183026511d547, type: 3}
@@ -769,8 +779,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ef773a4e92e5cc1498cc40123f0b1557, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  initialText: "\uBCF8 \uC2E4\uD5D8 \uC804 VR \uC801\uC751\uC744 \uC704\uD55C \uC138\uC158\uC785\uB2C8\uB2E4.\n\uD655\uC778\uC744
-    \uB204\uB978 \uB4A4\uC5D0 \uBC29\uC744 \uC790\uC720\uB86D\uAC8C \uB458\uB7EC\uBCF4\uC138\uC694."
+  initialText: "\uBCF8 \uC2E4\uD5D8 \uC804 VR \uC801\uC751\uC744 \uC704\uD55C \uC138\uC158\uC785\uB2C8\uB2E4.\n\uC67C\uCABD\uC758
+    \uAC80\uC740\uC0C9 \uD3EC\uC778\uD130\uB97C \uD655\uC778 \uBC84\uD2BC\uC5D0 \uAC00\uC838\uAC04
+    \uB4A4\uC5D0\n\uC67C\uCABD \uD2B8\uB9AC\uAC70 \uBC84\uD2BC\uC744 \uB20C\uB7EC\uC11C
+    \uC9C4\uD589\uD558\uC138\uC694."
+  step1Text: "\uB2E4\uC2DC \uD655\uC778 \uBC84\uD2BC\uC744 \uB204\uB978 \uB4A4\uC5D0\n\uBC29\uC744
+    \uC790\uC720\uB86D\uAC8C \uD0D0\uD5D8\uD558\uC138\uC694."
   endText: "\uC138\uC158\uC774 \uBAA8\uB450 \uC644\uB8CC\uB418\uC5C8\uC2B5\uB2C8\uB2E4.\n\uC2E4\uD5D8\uC790\uC758
     \uC9C0\uC2DC\uC5D0 \uB530\uB77C \uB2E4\uC74C \uB2E8\uACC4\uB85C \uB118\uC5B4\uAC00\uC138\uC694."
 --- !u!4 &1275746823

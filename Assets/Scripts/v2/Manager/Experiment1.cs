@@ -5,6 +5,7 @@ using System.Linq;
 using System.IO;
 using Valve.VR;
 using System.Text;
+using System;
 
 public class Experiment1 : Manager
 {
@@ -17,14 +18,14 @@ public class Experiment1 : Manager
     public GameObject portalPrefab;
     public GameObject centerPortalPrefab;
     public int totalTrial;
-    [Range(1, 20)]
-    public int experimentID;
+    public string experimentID;
     [TextArea]
     public string initialText, watchAroundText, targetText, viewDoorText, turnBehindText, selectionText, goToCenterText, endText;
     private Room currentRoom;
     private GameObject targetObj;
     private GameObject centerObj;
-    private float[] wallTranslateGain;
+    // private float[] wallTranslateGain;
+    private Dictionary<DistanceType, List<float>> wallTranslateGain2;
     private Vector2[] direction;
     private float grid;
     private Dictionary<DistanceType, List<List<bool>>> answer; // T - yes, F - no
@@ -44,12 +45,34 @@ public class Experiment1 : Manager
 
         currentRoom = virtualEnvironment.CurrentRoom;
 
-        wallTranslateGain = new float[5];
-        wallTranslateGain[0] = 0.8f;
-        wallTranslateGain[1] = 0.9f;
-        wallTranslateGain[2] = 1.0f;
-        wallTranslateGain[3] = 1.1f;
-        wallTranslateGain[4] = 1.2f;
+        // wallTranslateGain = new float[5];
+        // wallTranslateGain[0] = 0.9f;
+        // wallTranslateGain[1] = 0.95f;
+        // wallTranslateGain[2] = 1.0f;
+        // wallTranslateGain[3] = 1.05f;
+        // wallTranslateGain[4] = 1.1f;
+
+        wallTranslateGain2 = new Dictionary<DistanceType, List<float>>();
+        wallTranslateGain2[DistanceType.Short] = new List<float>();
+        wallTranslateGain2[DistanceType.Short].Add(0.985f);
+        wallTranslateGain2[DistanceType.Short].Add(0.9925f);
+        wallTranslateGain2[DistanceType.Short].Add(1.0f);
+        wallTranslateGain2[DistanceType.Short].Add(1.0075f);
+        wallTranslateGain2[DistanceType.Short].Add(1.015f);
+
+        wallTranslateGain2[DistanceType.Middle] = new List<float>();
+        wallTranslateGain2[DistanceType.Middle].Add(0.95f);
+        wallTranslateGain2[DistanceType.Middle].Add(0.975f);
+        wallTranslateGain2[DistanceType.Middle].Add(1.0f);
+        wallTranslateGain2[DistanceType.Middle].Add(1.025f);
+        wallTranslateGain2[DistanceType.Middle].Add(1.05f);
+
+        wallTranslateGain2[DistanceType.Long] = new List<float>();
+        wallTranslateGain2[DistanceType.Long].Add(0.9f);
+        wallTranslateGain2[DistanceType.Long].Add(0.95f);
+        wallTranslateGain2[DistanceType.Long].Add(1.0f);
+        wallTranslateGain2[DistanceType.Long].Add(1.05f);
+        wallTranslateGain2[DistanceType.Long].Add(1.1f);
 
         direction = new Vector2[4];
         direction[0] = Vector2.up;
@@ -92,8 +115,8 @@ public class Experiment1 : Manager
         task.AddStateStart("Initial", () => EnableOKUI(initialText))
         .AddTransition("Initial", "Around", "onClickOK", DisableUIandPointer)
 
-        .AddStateStart("Around", () => EnableOKUI(watchAroundText))
-        .AddTransition("Around", "onClickOK", DisableUIandPointer, () => WakeAfterSeconds(10.0f))
+        .AddStateStart("Around", () => EnableOKUI(watchAroundText), PrintCurrentExperiment)
+        .AddTransition("Around", "onClickOK", DisableUIandPointer, () => WakeAfterSeconds(7.0f))
         .AddTransition("Around", "Target", "onAfterSeconds")
 
         .AddStateStart("Target", () => EnableOKUI(targetText), InitializeTarget)
@@ -109,7 +132,7 @@ public class Experiment1 : Manager
         .AddTransition("Door_Step3", "Behind", "onAfterSeconds")
 
         .AddStateStart("Behind", () => EnableOKUI(turnBehindText), CleanDoors, MoveOppositeWall)
-        .AddTransition("Behind", "onClickOK", DisableUIandPointer, () => WakeAfterSeconds(5.0f))
+        .AddTransition("Behind", "onClickOK", DisableUIandPointer, () => WakeAfterSeconds(4.0f))
         .AddTransition("Behind", "Selection", "onAfterSeconds")
 
         .AddStateStart("Selection", () => EnableSelectionUI(selectionText))
@@ -126,16 +149,23 @@ public class Experiment1 : Manager
         .AddStateStart("End", () => EnableEndUI(endText), PrintResult);
 
         // Debug for task process
-        task.OnEachInput((newInput) => { Debug.Log($"{newInput} call"); } );
-        task.OnChange((fromState, toState) => { Debug.Log($"State {fromState} -> {toState}"); });
-        task.OnEnter((fromState) => { Debug.Log($"State {fromState} begin"); });
-        task.OnExit((fromState) => { Debug.Log($"State {fromState} ended"); });
+        // task.OnEachInput((newInput) => { Debug.Log($"{newInput} call"); } );
+        // task.OnChange((fromState, toState) => { Debug.Log($"State {fromState} -> {toState}"); });
+        // task.OnEnter((fromState) => { Debug.Log($"State {fromState} begin"); });
+        // task.OnExit((fromState) => { Debug.Log($"State {fromState} ended"); });
 
         task.Begin("Initial");
     }
 
     public void WakeAfterSeconds(float time) {
         CoroutineManager.Instance.CallWaitForSeconds(time, () => task.Processing("onAfterSeconds"));
+    }
+
+    private int count = 0;
+
+    public void PrintCurrentExperiment() {
+        count++;
+        Debug.Log($"Event Time: {DateTime.Now.ToString()}\ncurrent count: {count}\ntotal count: {totalTrial * 3 * wallTranslateGain2[DistanceType.Short].Count}");
     }
 
     public void InitializeTarget() {
@@ -162,8 +192,6 @@ public class Experiment1 : Manager
     public void EnableOKUI(string paragraphText) {
         User user = users.GetActiveUser();
 
-        Debug.Log(user.gameObject);
-
         user.ui.PopUpParagraph(paragraphText); 
         user.ui.PopUpOkButton();
         if(user.pointer != null) user.pointer.ShowPointer(); 
@@ -173,8 +201,18 @@ public class Experiment1 : Manager
         User user = users.GetActiveUser();
 
         user.ui.PopUpParagraph(paragraphText);
-        user.ui.PopUpYesButton();
-        user.ui.PopUpNoButton();
+
+        float prob = UnityEngine.Random.Range(0f, 1.0f);
+
+        if(prob < 0.5f) {
+            user.ui.PopUpYes2Button();
+            user.ui.PopUpNo2Button();
+        }
+        else {
+            user.ui.PopUpYesButton();
+            user.ui.PopUpNoButton();
+        }
+
         if(user.pointer != null) user.pointer.ShowPointer();
     }
 
@@ -196,23 +234,23 @@ public class Experiment1 : Manager
             user._camera.GetComponent<CameraFade>().FadeIn();
     }
 
-    public void QuitGame()
-    {
-        // save any game data here
-        #if UNITY_EDITOR
-            // Application.Quit() does not work in the editor so
-            // UnityEditor.EditorApplication.isPlaying need to be set to false to end the game
-            UnityEditor.EditorApplication.isPlaying = false;
-        #else
-            Application.Quit();
-        #endif
-    }
+    // public void QuitGame()
+    // {
+    //     // save any game data here
+    //     #if UNITY_EDITOR
+    //         // Application.Quit() does not work in the editor so
+    //         // UnityEditor.EditorApplication.isPlaying need to be set to false to end the game
+    //         UnityEditor.EditorApplication.isPlaying = false;
+    //     #else
+    //         Application.Quit();
+    //     #endif
+    // }
 
     public void WriteResultInFile(DistanceType distType, int trial, int gainIdx, char character) {
         string directoryPath = "Assets/Resources/Experiment1_Result";
         string fileName = $"answer_{distType}_{experimentID}.txt";
         string filePath = directoryPath + "/" + fileName;
-        int gainCount = wallTranslateGain.Length;
+        int gainCount = wallTranslateGain2[DistanceType.Short].Count;
 
         if(!Directory.Exists(directoryPath)) 
             Directory.CreateDirectory(directoryPath);
@@ -228,9 +266,6 @@ public class Experiment1 : Manager
 
                 lines.Add(line);
             }
-
-            foreach(var myLine in lines)
-                Debug.Log(myLine);
 
             File.WriteAllLines(filePath, lines);
         }
@@ -296,8 +331,6 @@ public class Experiment1 : Manager
     }
 
     public void GenerateTarget() {
-        Debug.Log("GenerateTarget");
-
         SelectNextTargetPosition();
 
         Vector2 denormalizedTargetPosition2D = virtualEnvironment.CurrentRoom.DenormalizePosition2D(targetPosition, Space.World);
@@ -306,33 +339,24 @@ public class Experiment1 : Manager
     }
 
     public void GenerateCenterPoint() {
-        Debug.Log("GenerateCenterPoint");
-
         Vector3 targetInitPosition = Vector3.zero;
         centerObj = Instantiate(centerPortalPrefab, targetInitPosition, Quaternion.identity);
     }
 
     public void DestroyCenterPoint() {
-        Debug.Log("DestroyCenterPoint");
-
         if(centerObj != null) Destroy(centerObj);
     }
 
     public void DestroyTarget() {
-        Debug.Log("DestroyTarget");
-
         if(targetObj != null) Destroy(targetObj);
     }
 
     public void MoveOppositeWall() {
-        Debug.Log("MoveOppositeWall");
-
         SelectWallTranslate();
         virtualEnvironment.MoveWall(currentRoom, (facingWall + 2) % 4, translate);
     }
 
     public void RestoreOriginWall() {
-        Debug.Log("RestoreOriginWall");
         virtualEnvironment.MoveWall(currentRoom, (facingWall + 2) % 4, -translate);
     }
 
@@ -366,7 +390,6 @@ public class Experiment1 : Manager
     }
 
     public void ColoringFacingDoor() {
-        Debug.Log("ColoringFacingDoor");
         List<Door> doors = virtualEnvironment.GetConnectedDoors(virtualEnvironment.CurrentRoom);
 
         foreach(var door in doors) {
@@ -379,8 +402,6 @@ public class Experiment1 : Manager
     }
 
     public void CleanDoors() {
-        Debug.Log("CleanDoors");
-
         List<Door> doors = virtualEnvironment.GetConnectedDoors(virtualEnvironment.CurrentRoom);
 
         foreach(var door in doors) {
@@ -390,6 +411,7 @@ public class Experiment1 : Manager
     }
 
     public void SelectWallTranslate() {
+        Debug.Log($"{distType} {gainIndex} {wallTranslateGain2[distType][gainIndex]}");
         User user = users.GetActiveUser();
         
         float[] DistWalltoUser = new float[4];
@@ -399,10 +421,14 @@ public class Experiment1 : Manager
         DistWalltoUser[3] = (user.Position.x + 0.4f) - currentRoom.GetEdge2D(3, Space.World).x;
 
         float[] DistgainApplied = new float[4];
-        DistgainApplied[0] = (direction[0] * (wallTranslateGain[gainIndex] - 1) * currentRoom.Size).y;
-        DistgainApplied[1] = (direction[1] * (wallTranslateGain[gainIndex] - 1) * currentRoom.Size).x;
-        DistgainApplied[2] = (direction[2] * (wallTranslateGain[gainIndex] - 1) * currentRoom.Size).y;
-        DistgainApplied[3] = (direction[3] * (wallTranslateGain[gainIndex] - 1) * currentRoom.Size).x;
+        // DistgainApplied[0] = (direction[0] * (wallTranslateGain[gainIndex] - 1) * currentRoom.Size).y;
+        // DistgainApplied[1] = (direction[1] * (wallTranslateGain[gainIndex] - 1) * currentRoom.Size).x;
+        // DistgainApplied[2] = (direction[2] * (wallTranslateGain[gainIndex] - 1) * currentRoom.Size).y;
+        // DistgainApplied[3] = (direction[3] * (wallTranslateGain[gainIndex] - 1) * currentRoom.Size).x;
+        DistgainApplied[0] = (direction[0] * (wallTranslateGain2[distType][gainIndex] - 1) * currentRoom.Size).y;
+        DistgainApplied[1] = (direction[1] * (wallTranslateGain2[distType][gainIndex] - 1) * currentRoom.Size).x;
+        DistgainApplied[2] = (direction[2] * (wallTranslateGain2[distType][gainIndex] - 1) * currentRoom.Size).y;
+        DistgainApplied[3] = (direction[3] * (wallTranslateGain2[distType][gainIndex] - 1) * currentRoom.Size).x;
 
         int oppositeWall = (facingWall + 2) % 4;
 
@@ -417,10 +443,26 @@ public class Experiment1 : Manager
     public void WriteAnswer(bool userAnswer) {
         answer[distType][currentTrial-1][gainIndex] = userAnswer;
 
-        if(userAnswer)
+        string correctAnswer = null;
+        if(gainIndex < 2) {
+            correctAnswer = "N";
+        }
+        else if(gainIndex == 2) {
+            correctAnswer = "Not Move";
+        }
+        else {
+            correctAnswer = "Y";
+        }
+
+        if(userAnswer) {
+            Debug.Log($"correct answer: {correctAnswer}, user answer: Y");
             WriteResultInFile(distType, currentTrial-1, gainIndex, 'Y');
-        else
+
+        }
+        else {
+            Debug.Log($"correct answer: {correctAnswer}, user answer: N");
             WriteResultInFile(distType, currentTrial-1, gainIndex, 'N');
+        }
     }
 
     public Vector2 CalculateTargetPosition(int facingWall, DistanceType distanceFromBehindWall) {
