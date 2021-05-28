@@ -27,6 +27,7 @@ public class Experiment1 : Manager
     // private float[] wallTranslateGain;
     private Dictionary<DistanceType, List<float>> wallTranslateGain2;
     private Vector2[] direction;
+    private float[] wallDirection;
     private float grid;
     private Dictionary<DistanceType, List<List<bool>>> answer; // T - yes, F - no
     private int currentTrial = 0;
@@ -54,31 +55,52 @@ public class Experiment1 : Manager
 
         wallTranslateGain2 = new Dictionary<DistanceType, List<float>>();
         wallTranslateGain2[DistanceType.Short] = new List<float>();
-        wallTranslateGain2[DistanceType.Short].Add(0.985f);
-        wallTranslateGain2[DistanceType.Short].Add(0.9925f);
+        wallTranslateGain2[DistanceType.Short].Add(0.9f);
+        wallTranslateGain2[DistanceType.Short].Add(0.95f);
         wallTranslateGain2[DistanceType.Short].Add(1.0f);
-        wallTranslateGain2[DistanceType.Short].Add(1.0075f);
-        wallTranslateGain2[DistanceType.Short].Add(1.015f);
+        wallTranslateGain2[DistanceType.Short].Add(1.05f);
+        wallTranslateGain2[DistanceType.Short].Add(1.1f);
+        // wallTranslateGain2[DistanceType.Short].Add(0.98f);
+        // wallTranslateGain2[DistanceType.Short].Add(0.99f);
+        // wallTranslateGain2[DistanceType.Short].Add(1.0f);
+        // wallTranslateGain2[DistanceType.Short].Add(1.01f);
+        // wallTranslateGain2[DistanceType.Short].Add(1.02f);
 
         wallTranslateGain2[DistanceType.Middle] = new List<float>();
-        wallTranslateGain2[DistanceType.Middle].Add(0.95f);
-        wallTranslateGain2[DistanceType.Middle].Add(0.975f);
+        wallTranslateGain2[DistanceType.Middle].Add(0.8f);
+        wallTranslateGain2[DistanceType.Middle].Add(0.9f);
         wallTranslateGain2[DistanceType.Middle].Add(1.0f);
-        wallTranslateGain2[DistanceType.Middle].Add(1.025f);
-        wallTranslateGain2[DistanceType.Middle].Add(1.05f);
+        wallTranslateGain2[DistanceType.Middle].Add(1.1f);
+        wallTranslateGain2[DistanceType.Middle].Add(1.2f);
+        // wallTranslateGain2[DistanceType.Middle].Add(0.95f);
+        // wallTranslateGain2[DistanceType.Middle].Add(0.975f);
+        // wallTranslateGain2[DistanceType.Middle].Add(1.0f);
+        // wallTranslateGain2[DistanceType.Middle].Add(1.025f);
+        // wallTranslateGain2[DistanceType.Middle].Add(1.05f);
 
         wallTranslateGain2[DistanceType.Long] = new List<float>();
+        wallTranslateGain2[DistanceType.Long].Add(0.8f);
         wallTranslateGain2[DistanceType.Long].Add(0.9f);
-        wallTranslateGain2[DistanceType.Long].Add(0.95f);
         wallTranslateGain2[DistanceType.Long].Add(1.0f);
-        wallTranslateGain2[DistanceType.Long].Add(1.05f);
         wallTranslateGain2[DistanceType.Long].Add(1.1f);
+        wallTranslateGain2[DistanceType.Long].Add(1.2f);
+        // wallTranslateGain2[DistanceType.Long].Add(0.9f);
+        // wallTranslateGain2[DistanceType.Long].Add(0.95f);
+        // wallTranslateGain2[DistanceType.Long].Add(1.0f);
+        // wallTranslateGain2[DistanceType.Long].Add(1.05f);
+        // wallTranslateGain2[DistanceType.Long].Add(1.1f);
 
         direction = new Vector2[4];
         direction[0] = Vector2.up;
         direction[1] = Vector2.left;
         direction[2] = Vector2.down;
         direction[3] = Vector2.right;
+
+        wallDirection = new float[4];
+        wallDirection[0] = 1;
+        wallDirection[1] = -1;
+        wallDirection[2] = -1;
+        wallDirection[3] = 1;
 
         grid = 0.5f;
 
@@ -411,33 +433,33 @@ public class Experiment1 : Manager
     }
 
     public void SelectWallTranslate() {
-        Debug.Log($"{distType} {gainIndex} {wallTranslateGain2[distType][gainIndex]}");
+        int oppositeWall = (facingWall + 2) % 4;
+        Debug.Log($"{oppositeWall} {distType} {gainIndex} {wallTranslateGain2[distType][gainIndex]}");
         User user = users.GetActiveUser();
         
         float[] DistWalltoUser = new float[4];
-        DistWalltoUser[0] = (user.Position.y + 0.4f) - currentRoom.GetEdge2D(0, Space.World).y;
-        DistWalltoUser[1] = (user.Position.x - 0.4f) - currentRoom.GetEdge2D(1, Space.World).x;
-        DistWalltoUser[2] = (user.Position.y - 0.4f) - currentRoom.GetEdge2D(2, Space.World).y;
-        DistWalltoUser[3] = (user.Position.x + 0.4f) - currentRoom.GetEdge2D(3, Space.World).x;
+        // DistWalltoUser[0] = (user.Position.y + 0.4f) - currentRoom.GetEdge2D(0, Space.World).y;
+        // DistWalltoUser[1] = (user.Position.x - 0.4f) - currentRoom.GetEdge2D(1, Space.World).x;
+        // DistWalltoUser[2] = (user.Position.y - 0.4f) - currentRoom.GetEdge2D(2, Space.World).y;
+        // DistWalltoUser[3] = (user.Position.x + 0.4f) - currentRoom.GetEdge2D(3, Space.World).x;
+        DistWalltoUser[0] = Mathf.Abs(currentRoom.GetEdge2D(0, Space.World).y - user.Position.y);
+        DistWalltoUser[1] = Mathf.Abs(currentRoom.GetEdge2D(1, Space.World).x - user.Position.x);
+        DistWalltoUser[2] = Mathf.Abs(currentRoom.GetEdge2D(2, Space.World).y - user.Position.y);
+        DistWalltoUser[3] = Mathf.Abs(currentRoom.GetEdge2D(3, Space.World).x - user.Position.x);
 
-        float[] DistgainApplied = new float[4];
+        // float[] DistgainApplied = new float[4];
         // DistgainApplied[0] = (direction[0] * (wallTranslateGain[gainIndex] - 1) * currentRoom.Size).y;
         // DistgainApplied[1] = (direction[1] * (wallTranslateGain[gainIndex] - 1) * currentRoom.Size).x;
         // DistgainApplied[2] = (direction[2] * (wallTranslateGain[gainIndex] - 1) * currentRoom.Size).y;
         // DistgainApplied[3] = (direction[3] * (wallTranslateGain[gainIndex] - 1) * currentRoom.Size).x;
-        DistgainApplied[0] = (direction[0] * (wallTranslateGain2[distType][gainIndex] - 1) * currentRoom.Size).y;
-        DistgainApplied[1] = (direction[1] * (wallTranslateGain2[distType][gainIndex] - 1) * currentRoom.Size).x;
-        DistgainApplied[2] = (direction[2] * (wallTranslateGain2[distType][gainIndex] - 1) * currentRoom.Size).y;
-        DistgainApplied[3] = (direction[3] * (wallTranslateGain2[distType][gainIndex] - 1) * currentRoom.Size).x;
 
-        int oppositeWall = (facingWall + 2) % 4;
-
-        if(DistWalltoUser[oppositeWall] * DistgainApplied[oppositeWall] > 0) {
-            translate = Mathf.Sign(DistgainApplied[oppositeWall]) * Mathf.Min(Mathf.Abs(DistWalltoUser[oppositeWall]), Mathf.Abs(DistgainApplied[oppositeWall]));
-        }
-        else {
-            translate = DistgainApplied[oppositeWall];
-        }
+        translate = wallDirection[oppositeWall] * (wallTranslateGain2[distType][gainIndex] - 1) * DistWalltoUser[oppositeWall];
+        // if(DistWalltoUser[oppositeWall] * DistgainApplied[oppositeWall] > 0) {
+        //     translate = Mathf.Sign(DistgainApplied[oppositeWall]) * Mathf.Min(Mathf.Abs(DistWalltoUser[oppositeWall]), Mathf.Abs(DistgainApplied[oppositeWall]));
+        // }
+        // else {
+        //     translate = DistgainApplied[oppositeWall];
+        // }
     }
 
     public void WriteAnswer(bool userAnswer) {

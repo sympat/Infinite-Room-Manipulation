@@ -690,8 +690,8 @@ MonoBehaviour:
     type: 3}
   centerPortalPrefab: {fileID: 2378513342725396498, guid: d8b867cd20d2b4f4e80c6343505f52a4,
     type: 3}
-  totalTrial: 1
-  experimentID: Hwang
+  totalTrial: 3
+  experimentID: A106
   initialText: "\uD655\uC778 \uBC84\uD2BC\uC744 \uB204\uB974\uACE0 \uC2E4\uD5D8\uC744
     \uC2DC\uC791\uD558\uC138\uC694.\n"
   watchAroundText: "\uD655\uC778 \uBC84\uD2BC\uC744 \uB204\uB974\uACE0 \uBC29\uC744
@@ -2643,6 +2643,21 @@ PrefabInstance:
         type: 3}
       propertyPath: m_text
       value: "\uB113\uC5B4\uC84C\uB2E4"
+      objectReference: {fileID: 0}
+    - target: {fileID: 6910533018129551893, guid: 9698eea9e8a96b848bb183026511d547,
+        type: 3}
+      propertyPath: m_fontSize
+      value: 2.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 6910533018129551893, guid: 9698eea9e8a96b848bb183026511d547,
+        type: 3}
+      propertyPath: m_fontSizeBase
+      value: 2.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 6910533019664256213, guid: 9698eea9e8a96b848bb183026511d547,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0.6
       objectReference: {fileID: 0}
     - target: {fileID: 7710530837360027778, guid: 9698eea9e8a96b848bb183026511d547,
         type: 3}
