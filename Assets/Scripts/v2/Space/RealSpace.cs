@@ -4,6 +4,12 @@ using UnityEngine;
 
 public class RealSpace : Bound2D
 {
+    private RealUser _realUser;
+
+    public RealUser realUser {
+        get { return _realUser; }
+    }
+
     public override void Initializing()
     {
         base.Initializing();
@@ -12,12 +18,12 @@ public class RealSpace : Bound2D
             Transform2D tf = child.GetComponent<Transform2D>();
 
             if(tf is RealUser)  {
-                tf.Initializing();
+                _realUser = tf as RealUser;
+                _realUser.Initializing();
             }
         }
 
-        this.gameObject.layer = LayerMask.NameToLayer("Real Space");
-        this.gameObject.tag = "Real Space";
+        this.gameObject.layer = LayerMask.NameToLayer("RealSpace");
+        // this.gameObject.tag = "Real Space";
     }
-
 }

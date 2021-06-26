@@ -42,6 +42,8 @@ namespace Valve.VR.InteractionSystem
 		//-------------------------------------------------
 		public void HoverBegin( GameObject gameObject )
 		{
+			Debug.Log($"HoverBegin {gameObject} {LayerMask.LayerToName(gameObject.layer)}");
+
 			PointerEventData pointerEventData = new PointerEventData( eventSystem );
 			ExecuteEvents.Execute( gameObject, pointerEventData, ExecuteEvents.pointerEnterHandler );
 		}
@@ -50,6 +52,8 @@ namespace Valve.VR.InteractionSystem
 		//-------------------------------------------------
 		public void HoverEnd( GameObject gameObject )
 		{
+			Debug.Log($"HoverEnd {gameObject} {LayerMask.LayerToName(gameObject.layer)}");
+
 			PointerEventData pointerEventData = new PointerEventData( eventSystem );
 			pointerEventData.selectedObject = null;
 			ExecuteEvents.Execute( gameObject, pointerEventData, ExecuteEvents.pointerExitHandler );
@@ -59,6 +63,8 @@ namespace Valve.VR.InteractionSystem
 		//-------------------------------------------------
 		public void Submit( GameObject gameObject )
 		{
+			Debug.Log($"Submit {gameObject} {LayerMask.LayerToName(gameObject.layer)}");
+
 			submitObject = gameObject;
 		}
 
@@ -66,6 +72,8 @@ namespace Valve.VR.InteractionSystem
 		//-------------------------------------------------
 		public override void Process()
 		{
+			// Debug.Log("Process");
+			
 			if ( submitObject )
 			{
 				BaseEventData data = GetBaseEventData();

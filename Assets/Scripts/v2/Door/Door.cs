@@ -13,6 +13,11 @@ public class Door : Bound2D
     public int attachedWall;
     private RoomWrapper source, target;
     private bool isOpened = false;
+    private VirtualEnvironment virtualEnvironment;
+
+    public bool IsOpen {
+        get { return isOpened; }
+    }
 
     public override void Initializing()
     {
@@ -27,6 +32,11 @@ public class Door : Bound2D
         target = new RoomWrapper(room2, (wall + 2) % 4, this.Position);
 
         this.gameObject.layer = LayerMask.NameToLayer("Door");
+    }
+
+    public void Initializing(VirtualEnvironment parentVE) {
+        virtualEnvironment = parentVE;
+        Initializing();
     }
 
     public int GetContactWall(Room room) {
@@ -80,7 +90,9 @@ public class Door : Bound2D
 
     public void OpenDoor()
     {
-        Debug.Log("OpenDoor");
+        Debug.Log($"{this.gameObject} OpenDoor");
+        // Debug.Log("OpenDoor");
+        // virtualEnvironment.ReadyToMoveNextRoom(this);
 
         GameObject doorMain = Utility.GetChildWithLayer(this.gameObject, "Door Main");
         doorMain.GetComponent<BoxCollider>().enabled = true;
@@ -99,22 +111,32 @@ public class Door : Bound2D
 
             room1.GetComponent<MeshRenderer>().material.SetVector("DigonalPos1", new Vector4(doorMin.x, doorMin.y, doorMin.z, 0));
             room1.GetComponent<MeshRenderer>().material.SetVector("DigonalPos2", new Vector4(doorMax.x, doorMax.y, doorMax.z, 0));
+
+            Debug.Log($"room1: {room1.gameObject}, doorMIn: {doorMin}");
+            Debug.Log($"room1: {room1.gameObject}, doorMax: {doorMax}");
         }
 
         if(room2 != null) {
             Vector3 doorMin = room2.transform.InverseTransformPoint(doorMain.transform.TransformPoint(box.center - box.size / 2));
             Vector3 doorMax = room2.transform.InverseTransformPoint(doorMain.transform.TransformPoint(box.center + box.size / 2));
 
+            Debug.Log($"room2: {room2.gameObject}, doorMIn: {doorMin}");
+            Debug.Log($"room2: {room2.gameObject}, doorMax: {doorMax}");
+
             room2.GetComponent<MeshRenderer>().material.SetVector("DigonalPos1", new Vector4(doorMin.x, doorMin.y, doorMin.z, 0));
             room2.GetComponent<MeshRenderer>().material.SetVector("DigonalPos2", new Vector4(doorMax.x, doorMax.y, doorMax.z, 0));
         }
 
         isOpened = true;
+
+        User user = virtualEnvironment.users.GetActiveUser();
+        UserEventArgs caller = new UserEventArgs(Behaviour.Open, this.gameObject);
+        user.ProcessingEvent(caller);
     }
 
     public void CloseDoor()
     {
-        Debug.Log("CloseDoor");
+        Debug.Log($"{this.gameObject} CloseDoor");
 
         GameObject doorMain = Utility.GetChildWithLayer(this.gameObject, "Door Main");
 
@@ -132,14 +154,17 @@ public class Door : Bound2D
             List<GameObject> knob = Utility.GetChildrenWithLayer(doorMain, "Knob");
             knob.ForEach(x => x.GetComponent<MeshCollider>().enabled = true);
 
-            if(room1 != null) {
-                room1.GetComponent<MeshRenderer>().material.SetVector("_DoorMin", new Vector4(0, 0, 0, 0));
-                room1.GetComponent<MeshRenderer>().material.SetVector("_DoorMax", new Vector4(0, 0, 0, 0));
+            if(room1 != null && room1.gameObject.layer != LayerMask.NameToLayer("CurrentRoom")) {
+                Debug.Log($"Reset DigonalPos room1: {room1}");
+                room1.GetComponent<MeshRenderer>().material.SetVector("DigonalPos1", new Vector4(0, 0, 0, 0));
+                room1.GetComponent<MeshRenderer>().material.SetVector("DigonalPos2", new Vector4(0, 0, 0, 0));
             }
 
-            if(room2 != null) {
-                room2.GetComponent<MeshRenderer>().material.SetVector("_DoorMin", new Vector4(0, 0, 0, 0));
-                room2.GetComponent<MeshRenderer>().material.SetVector("_DoorMax", new Vector4(0, 0, 0, 0));
+            if(room2 != null && room2.gameObject.layer != LayerMask.NameToLayer("CurrentRoom")) {
+                Debug.Log($"Reset DigonalPos room2: {room2}");
+
+                room2.GetComponent<MeshRenderer>().material.SetVector("DigonalPos1", new Vector4(0, 0, 0, 0));
+                room2.GetComponent<MeshRenderer>().material.SetVector("DigonalPos2", new Vector4(0, 0, 0, 0));
             }
         }
 
@@ -251,7 +276,7 @@ public class Door : Bound2D
         u.Position = new Vector2(roomXPos, roomYPos);
     }
 
-    public void UpdateDoorWeight(Vector2 currentDoorPos, Room currentRoom) 
+    public void FixDoor(Vector2 currentDoorPos, Room currentRoom) 
     {
         Room v = GetThisRoomWrapper(currentRoom).room;
         int vWall = GetThisRoomWrapper(currentRoom).wall;

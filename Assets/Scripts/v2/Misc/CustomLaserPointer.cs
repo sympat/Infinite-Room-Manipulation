@@ -27,19 +27,19 @@ public class CustomLaserPointer : MonoBehaviour
 
     Transform previousContact = null;
 
-    private bool visibleFlag = true;
+    // private bool visibleFlag = true;
 
     public User parentUser {
         get { return transform.parent.GetComponent<User>(); }
     }
 
-    public void ShowPointer() {
-        visibleFlag = true;
-    }
+    // public void ShowPointer() {
+    //     visibleFlag = true;
+    // }
 
-    public void HidePointer() {
-        visibleFlag = false;
-    }
+    // public void HidePointer() {
+    //     visibleFlag = false;
+    // }
 
     private void Start()
     {
@@ -96,9 +96,9 @@ public class CustomLaserPointer : MonoBehaviour
         lineRenderer.startWidth = 0.01f;
         lineRenderer.endWidth = 0.01f;
 
-        if(!active) {
-            HidePointer();
-        }
+        // if(!active) {
+        //     HidePointer();
+        // }
     }
 
     // public virtual void OnPointerIn(PointerEventArgs e)
@@ -121,7 +121,7 @@ public class CustomLaserPointer : MonoBehaviour
 
     private void Update()
     {        
-        if(visibleFlag) {
+        if(active) {
             pointer.SetActive(true);
         }
         else {
@@ -134,8 +134,11 @@ public class CustomLaserPointer : MonoBehaviour
         Vector3 startPosition = transform.position;
         Vector3 endPosition = startPosition + (transform.forward * defaultPointerLength);
 
-        bool bHit = Physics.Raycast(raycast, out hit, Mathf.Infinity);
+        int layerMask = 1 << LayerMask.NameToLayer("UI");
+        bool bHit = Physics.Raycast(raycast, out hit, Mathf.Infinity, layerMask);
 
+        // Debug.DrawRay(transform.position, transform.forward, Color.yellow);
+        // Debug.Log(bHit);
         // if(bHit) Debug.Log(hit.transform.gameObject);
 
         // bool bHit = CreateRaycast(defaultPointerLength);
@@ -152,7 +155,7 @@ public class CustomLaserPointer : MonoBehaviour
             // OnPointerOut(args);
             // parentUser.CallEvent(caller, UserEventType)
 
-            InputModule.instance.HoverEnd( previousContact.gameObject );
+            CustomVRInputModule.instance.HoverEnd( previousContact.gameObject );
 
             previousContact = null;
         }
@@ -166,7 +169,7 @@ public class CustomLaserPointer : MonoBehaviour
             // argsIn.target = hit.transform;
             // OnPointerIn(argsIn);
 
-            InputModule.instance.HoverBegin( hit.transform.gameObject );
+            CustomVRInputModule.instance.HoverBegin( hit.transform.gameObject );
 
             previousContact = hit.transform;
 
@@ -193,7 +196,7 @@ public class CustomLaserPointer : MonoBehaviour
             // argsClick.target = hit.transform;
             // OnPointerClick(argsClick);
 
-            InputModule.instance.Submit( hit.transform.gameObject );
+            CustomVRInputModule.instance.Click( hit.transform.gameObject );
         }
 
         if (interactWithUI != null && interactWithUI.GetState(pose.inputSource))

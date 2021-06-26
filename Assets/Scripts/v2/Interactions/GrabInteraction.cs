@@ -8,12 +8,12 @@ public class GrabInteraction : MonoBehaviour
 {
     private Hand.AttachmentFlags attachmentFlags = Hand.defaultAttachmentFlags & (~Hand.AttachmentFlags.SnapOnAttach) & (~Hand.AttachmentFlags.DetachOthers) & (~Hand.AttachmentFlags.VelocityMovement);
     private Interactable interactable;
-    private Users users;
+    // private Users users;
 
     private void Start()
     {
         interactable = this.GetComponent<Interactable>();
-        users = GameObject.FindGameObjectWithTag("Users").GetComponent<Users>();
+        // users = GameObject.FindGameObjectWithTag("Users").GetComponent<Users>();
     }
 
     private void HandHoverUpdate(Hand hand)
@@ -42,11 +42,18 @@ public class GrabInteraction : MonoBehaviour
         }
     }
 
+    private void OnAttachedToHand(Hand hand) {
+        // Debug.Log("OnAttachedToHand");
+        User user =  hand.transform.parent.GetComponent<User>();
+        UserEventArgs caller = new UserEventArgs(Behaviour.Grab, this.gameObject);
+        user.ProcessingEvent(caller);
+    }
+
     private void OnDetachedFromHand(Hand hand)
     {
-        User user = users.GetActiveUser();
-        UserEventArgs caller = new UserEventArgs(this.transform);
-
-        user.CallEvent(caller, UserEventType.onRelease);
+        // Debug.Log("OnDetachedFromHand");
+        User user = hand.transform.parent.GetComponent<User>();
+        UserEventArgs caller = new UserEventArgs(Behaviour.Release, this.gameObject);
+        user.ProcessingEvent(caller);
     }
 }

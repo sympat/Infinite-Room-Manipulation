@@ -1,21 +1,23 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class VirtualEnvironment : Transform2D
 {
-    public Users users;
     public Room startRoom;
     public bool useCenterStart;
     public bool useFullVisualization;
+    private Manager manager;
     private Dictionary<Room, List<Door>> adjList;
-    private Room currentRoom;
+    private Users _users;
+    private Room currentRoom, candidateRoom;
     private static int totalID = 1;
     private int id;
 
-    // public User activeUser {
-    //     get { return users.GetActiveUser(); }
-    // }
+    public Users users {
+        get { return _users; }
+    }
 
     public Room CurrentRoom {
         get {
@@ -23,23 +25,30 @@ public class VirtualEnvironment : Transform2D
         }
         set {
             if(currentRoom == value) return;
-            if(currentRoom != null) {
-                currentRoom.gameObject.tag = "Untagged";
-                GetDoor(currentRoom, value).CloseDoor();
-            }
+
+            if(value == null) return;
+
+            if(currentRoom != null) currentRoom.gameObject.layer = LayerMask.NameToLayer("Room");
+
             currentRoom = value;
-            currentRoom.gameObject.tag = "CurrentRoom";
-            
+            currentRoom.gameObject.layer = LayerMask.NameToLayer("CurrentRoom");
+
             if(!useFullVisualization) {
                 SwitchAllVisualization(false);
                 SwtichRoomsVisualization(currentRoom, true);
             }
+
+            List<Door> connectedDoors = GetConnectedDoors(currentRoom);
+
+            foreach(var door in connectedDoors) 
+                door.CloseDoor();
 
             Debug.Log("Current Room is changed " + currentRoom);
         }
     }
 
     public override void Initializing() {
+        manager = this.transform.parent.GetComponent<Manager>();
         id = totalID++;
         adjList = new Dictionary<Room, List<Door>>();
 
@@ -65,14 +74,17 @@ public class VirtualEnvironment : Transform2D
             AddDoor(door);
         }
 
-        // users.AddEnterNewRoomEvent(ChangeCurrentRoom);
+        _users = manager.users;
+
+        User user = _users.GetActiveUser();
+        user.AddEvent(Behaviour.CompletelyEnter, "NextRoom", ChangeCurrentRoom);
+        user.AddEvent(Behaviour.Open, "Door", InitializeNextRoom);
 
         CurrentRoom = startRoom;
 
-        if(useCenterStart) users.Position = CurrentRoom.Position;
+        if(useCenterStart) _users.Position = CurrentRoom.Position;
 
         this.gameObject.layer = LayerMask.NameToLayer("VirtualEnvironment");
-        this.gameObject.tag = "VirtualEnvironment";
     }
 
     public void AddRoom(Room room) {
@@ -86,7 +98,7 @@ public class VirtualEnvironment : Transform2D
     public void AddDoor(Door door) {
         if(door == null) return;
 
-        door.Initializing();
+        door.Initializing(this);
         
         Room room1 = door.GetThisRoom();
         Room room2 = door.GetConnectedRoom();
@@ -95,10 +107,11 @@ public class VirtualEnvironment : Transform2D
         if(room2 != null) adjList[room2].Add(door);
     }
 
-    public void SwitchRoomVisualization(Room room, bool isShow) {
+    public void SwitchRoomVisualization(Room room, bool isShow, bool toggleTeleportArea) {
         if(GetRoom(room) == null) return;
 
         room.gameObject.SetActive(isShow);
+        room.ToggleTeleportArea(toggleTeleportArea);
 
         foreach(var door in GetConnectedDoors(room)) {
             door.gameObject.SetActive(isShow);
@@ -106,21 +119,21 @@ public class VirtualEnvironment : Transform2D
     }
 
     public void SwtichRoomsVisualization(Room room, bool isShow) {
-        SwitchRoomVisualization(room, isShow);
+        SwitchRoomVisualization(room, isShow, true);
 
         List<Room> connectedRooms = GetConnectedRooms(room);
 
         if(connectedRooms == null) return;
 
         foreach(var connectedRoom in connectedRooms) {
-            SwitchRoomVisualization(connectedRoom, isShow);
+            SwitchRoomVisualization(connectedRoom, isShow, false);
         }
     }
 
     public void SwitchAllVisualization(bool isShow) {
         foreach(Transform child in this.transform) {
-            if(child.gameObject.layer == LayerMask.NameToLayer("Player"))
-                continue;
+            // if(child.gameObject.layer == LayerMask.NameToLayer("Player"))
+            //     continue;
                 
             child.gameObject.SetActive(isShow);
         }
@@ -147,8 +160,8 @@ public class VirtualEnvironment : Transform2D
                 w2 = minDoor.GetThisRoomWrapper(room).weight;
 
                 // Debug.Log(room);
-                // Debug.Log(maxDoor);
-                // Debug.Log(minDoor);
+                // Debug.Log($"maxDoor {maxDoor}");
+                // Debug.Log($"minDoor {minDoor}");
                 // Debug.Log($"l {l}");
                 // Debug.Log($"e {e}");
                 // Debug.Log($"max {max}");
@@ -157,6 +170,8 @@ public class VirtualEnvironment : Transform2D
                 // Debug.Log($"w2 {w2}");
                 // Debug.Log(o + w1/2 * l + e);
                 // Debug.Log(maxDoor.Max.x);
+                // Debug.Log(o + w2/2 * l - e);
+                // Debug.Log(minDoor.Min.x);
 
                 if(wall == 3) {
                     translate1 = (o + w1 / 2 * l + e - max) / ((1 - w1) / 2);
@@ -167,9 +182,41 @@ public class VirtualEnvironment : Transform2D
                     translate2 = (o + w2 / 2 * l - e - min) / ((1 + w2) / 2);
                 }
 
-                finalTranslate = (Mathf.Abs(translate1) < Mathf.Abs(translate2)) ? translate1 : translate2;
-                if(finalTranslate * translate < 0) finalTranslate = translate;
-                else if(Mathf.Abs(translate) < Mathf.Abs(finalTranslate)) finalTranslate = translate;
+                // Debug.Log($"translate {translate}");
+                // Debug.Log($"fit to MaxDoor {translate1}");
+                // Debug.Log($"fit to MinDoor {translate2}");
+
+                float shrinkDirection = 0;
+                if(wall == 1) shrinkDirection = 1.0f;
+                else if(wall == 3) shrinkDirection = -1.0f;
+
+                if(translate * shrinkDirection < 0) {
+                     finalTranslate = translate;
+                }
+                else {
+                    if(Mathf.Abs(translate1) < 0.01f) translate1 = 0;
+                    if(Mathf.Abs(translate2) < 0.01f) translate2 = 0;
+
+                    float minLimitTranslate = Mathf.Min(Mathf.Abs(translate1), Mathf.Abs(translate2));
+                    minLimitTranslate *= shrinkDirection;
+
+                    if(Mathf.Abs(translate) < Mathf.Abs(minLimitTranslate)) {
+                        finalTranslate = translate;
+                    }
+                    else {
+                        finalTranslate = minLimitTranslate;
+                    }
+                }
+
+
+                // finalTranslate = (Mathf.Abs(translate1) < Mathf.Abs(translate2)) ? translate1 : translate2;
+                // if(finalTranslate * translate < 0)
+                
+                //  finalTranslate = translate; // translate이 translate1,2 와 다른 방향일 경우 그냥 translate을 적용
+                // else if(Mathf.Abs(translate) < Mathf.Abs(finalTranslate)) finalTranslate = translate; // 같은 방향
+
+                // Debug.Log($"finalTranslate {finalTranslate}");
+
             }
             else {
                 finalTranslate = translate;
@@ -197,9 +244,31 @@ public class VirtualEnvironment : Transform2D
                     translate2 = (o + w2 / 2 * l - e - min) / ((1 + w2) / 2);
                 }
 
-                finalTranslate = (Mathf.Abs(translate1) < Mathf.Abs(translate2)) ? translate1 : translate2;
-                if(finalTranslate * translate < 0) finalTranslate = translate;
-                else if(Mathf.Abs(translate) < Mathf.Abs(finalTranslate)) finalTranslate = translate;
+                // finalTranslate = (Mathf.Abs(translate1) < Mathf.Abs(translate2)) ? translate1 : translate2;
+                // if(finalTranslate * translate < 0) finalTranslate = translate;
+                // else if(Mathf.Abs(translate) < Mathf.Abs(finalTranslate)) finalTranslate = translate;
+
+                float shrinkDirection = 0;
+                if(wall == 2) shrinkDirection = 1.0f;
+                else if(wall == 0) shrinkDirection = -1.0f;
+
+                if(translate * shrinkDirection < 0) {
+                     finalTranslate = translate;
+                }
+                else {
+                    if(Mathf.Abs(translate1) < 0.01f) translate1 = 0;
+                    if(Mathf.Abs(translate2) < 0.01f) translate2 = 0;
+
+                    float minLimitTranslate = Mathf.Min(Mathf.Abs(translate1), Mathf.Abs(translate2));
+                    minLimitTranslate *= shrinkDirection;
+
+                    if(Mathf.Abs(translate) < Mathf.Abs(minLimitTranslate)) {
+                        finalTranslate = translate;
+                    }
+                    else {
+                        finalTranslate = minLimitTranslate;
+                    }
+                }
             }
             else {
                 finalTranslate = translate;
@@ -223,14 +292,14 @@ public class VirtualEnvironment : Transform2D
         PlaceAllDoorAndRoom(room, rootRoom); 
     }
 
-    public void MoveWall(Room room, int wall, Vector2 translate, Room rootRoom = null) {
-        if (GetRoom(room) == null) return;
+    // public void MoveWall(Room room, int wall, Vector2 translate, Room rootRoom = null) {
+    //     if (GetRoom(room) == null) return;
 
-        if(wall % 2 == 0)
-            MoveWall(room, wall, translate.y, rootRoom);
-        else
-            MoveWall(room, wall, translate.x, rootRoom);
-    }
+    //     if(wall % 2 == 0)
+    //         MoveWall(room, wall, translate.y, rootRoom);
+    //     else
+    //         MoveWall(room, wall, translate.x, rootRoom);
+    // }
 
     public void MoveDoor(Room room, Door door, float translate, Room rootRoom = null)
     {
@@ -243,6 +312,7 @@ public class VirtualEnvironment : Transform2D
     public void PlaceAllDoorAndRoom(Room room, Room rootRoom = null) { // 현재 프로그램은 acyclic graph(tree) 로 가정. rootRoom은 이를 위한 변수. TODO: Cycle을 형성하는 graph에서의 정상 동작하게끔 구현
         if (GetRoom(room) == null) return;
 
+        User user = _users.GetActiveUser();
         Dictionary<Room, bool> visited = new Dictionary<Room, bool>();
         foreach (var kv in adjList)
         {
@@ -266,15 +336,13 @@ public class VirtualEnvironment : Transform2D
             {
                 Room w = door.GetConnectedRoom(u); // nextRoom
 
-                // door.PlaceDoorAndConnectedRoom(u);
-
                 door.PlaceDoor(u);
 
-                // if(u == currentRoom && userBody.IsTargetInUserFov(door.Position)) {
-                //     door.UpdateDoorWeight(door.Position, u);
+                // if(u == currentRoom && user.IsTargetInUserFov(door.Position)) {
+                //     door.FixDoor(door.Position, u);
                 // }
                 // else {
-                //     door.PlaceDoorAndConnectedRoom(u);
+                //     door.PlaceDoor(u);
                 // }
 
                 if(w == null) continue;
@@ -414,7 +482,33 @@ public class VirtualEnvironment : Transform2D
         return null;
     }
 
-    private void ChangeCurrentRoom(Room targetRoom) {
+    public void InitializeNextRoom(GameObject target) {
+
+        Door openedDoor = target.GetComponent<Door>();
+        if(openedDoor == null) throw new System.Exception("target object does not have Door Component");
+
+        List<Room> neighborRooms = GetConnectedRooms(CurrentRoom);
+        List<Door> connectedDoors = GetConnectedDoors(CurrentRoom);
+
+        foreach(var door in connectedDoors)
+            if(door != openedDoor)
+                door.CloseDoor();
+
+        foreach(var room in neighborRooms) {
+            room.gameObject.layer = LayerMask.NameToLayer("Room");
+            room.ToggleTeleportArea(false);
+        }
+        
+        Room nextRoom = openedDoor.GetConnectedRoom(CurrentRoom);
+        nextRoom.gameObject.layer = LayerMask.NameToLayer("NextRoom");
+        nextRoom.ToggleTeleportArea(true);
+    }
+
+    private void ChangeCurrentRoom(GameObject target) {
+        Room targetRoom = target.GetComponent<Room>();
+
+        if(targetRoom == null) throw new System.Exception("target object does not have Room Component");
+
         CurrentRoom = targetRoom;
     }
 }

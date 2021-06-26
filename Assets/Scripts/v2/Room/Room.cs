@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Valve.VR.InteractionSystem;
 using System.Linq;
 
 public class Room : Bound2D
@@ -31,6 +32,13 @@ public class Room : Bound2D
 
         // update mesh
         UpdateMesh();
+    }
+
+    public void ToggleTeleportArea(bool enabled) {
+        TeleportArea tArea = GetComponentInChildren<TeleportArea>();
+
+        if(tArea != null)
+            tArea.enabled = enabled;
     }
 
     private void UpdateFurnitures() {

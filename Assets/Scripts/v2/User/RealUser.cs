@@ -2,35 +2,69 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class RealUser : Transform2D
+public class RealUser : Circle2D
 {
-    public Users trackedUsers;
-
+    private Users trackedUsers;
     private Vector2 offsetPosition;
     private float offsetRotation;
-
+    private bool isFirstEnter;
+    
     public override void Initializing() {
-        UserBody trackedUserBody = trackedUsers.GetActiveUser().body;
+        base.Initializing();
 
-        offsetPosition = this.Position - trackedUserBody.Position;
-        offsetRotation = this.Rotation - trackedUserBody.Rotation;
+        // trackedUsers = this.transform.parent.parent.GetComponent<Manager>().users;
+        // User trackedUser = trackedUsers.GetActiveUser();
 
-        this.gameObject.layer = LayerMask.NameToLayer("Player");
+        // offsetPosition = this.Position - trackedUser.Body.Position;
+        // offsetRotation = this.Rotation - trackedUser.Body.Rotation;
+
+        this.gameObject.layer = LayerMask.NameToLayer("RealUser");
+    }
+
+    private void Start() {
+        trackedUsers = this.transform.parent.parent.GetComponent<Manager>().users;
+        User trackedUser = trackedUsers.GetActiveUser();
+
+        offsetPosition = this.Position - trackedUser.Body.Position;
+        offsetRotation = this.Rotation - trackedUser.Body.Rotation;
     }
 
     private void OnTriggerExit(Collider other) {
-        if(other.gameObject.layer == LayerMask.NameToLayer("Real Space")) {
-            User trackedUser = trackedUsers.GetActiveUser();
-            UserEventArgs caller = new UserEventArgs(other.transform);
-            trackedUser.CallEvent(caller, UserEventType.onExit);
+        if(other.gameObject.layer == LayerMask.NameToLayer("RealSpace")) {
+            User user = trackedUsers.GetActiveUser();
+            UserEventArgs caller = new UserEventArgs(Behaviour.Exit, other.gameObject);
+            user.ProcessingEvent(caller);
+            // trackedUser.CallEvent(caller, UserEventType.onExit);
+            isFirstEnter = true;
         }
     }
 
-    private void Update() {
-        UserBody trackedUserBody = trackedUsers.GetActiveUser().body;
+    private void OnTriggerStay(Collider other) {
+        if(other.gameObject.layer == LayerMask.NameToLayer("RealSpace")) {
+            if(other.GetComponent<Bound2D>().IsInSide(this)) {
+                User user = trackedUsers.GetActiveUser();
 
+                if(isFirstEnter) {
+                    UserEventArgs caller = new UserEventArgs(Behaviour.CompletelyEnter, other.gameObject);
+                    user.ProcessingEvent(caller);
+                    isFirstEnter = false;
+                }
+                else {
+                    UserEventArgs caller = new UserEventArgs(Behaviour.CompletelyStay, other.gameObject);
+                    user.ProcessingEvent(caller);
+                }
+                // User user = trackedUsers.GetActiveUser();
+                // UserEventArgs caller = new UserEventArgs(Behaviour.CompletelyStay, other.gameObject);
+                // user.ProcessingEvent(caller);
+                // trackedUser.CallEvent(caller, UserEventType.onCompletelyStay);
+            }
+        }
+    }
 
-        this.Position = trackedUserBody.Position + offsetPosition;
-        this.Rotation = trackedUserBody.Rotation + offsetRotation;
+    private void FixedUpdate() {
+        User trackedUser = trackedUsers.GetActiveUser();
+
+        this.Position = trackedUser.Body.Position + offsetPosition;
+        this.Rotation = trackedUser.Body.Rotation + offsetRotation;
     }
 }

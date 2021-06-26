@@ -18,6 +18,7 @@ TagManager:
   - Users
   - Button
   - FacingDoor
+  - NextRoom
   layers:
   - Default
   - TransparentFX
@@ -28,9 +29,9 @@ TagManager:
   - 
   - 
   - Door
-  - Player
+  - VirtualUserBody
   - Room
-  - Real Space
+  - RealSpace
   - Door Main
   - Portal
   - Coin
@@ -40,13 +41,13 @@ TagManager:
   - Grabble
   - Door Frame
   - CenterPortal
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
+  - RealUser
+  - VirtualUserHand
+  - VirtualUserFace
+  - FacingDoor
+  - NextRoom
+  - CurrentRoom
+  - TeleportArea
   - 
   - 
   - 
