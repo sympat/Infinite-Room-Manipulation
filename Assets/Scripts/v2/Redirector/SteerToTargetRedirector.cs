@@ -10,8 +10,9 @@ public class SteerToTargetRedirector : GainRedirector
 
     private float previousMagnitude = 0f;
 
-    public Bound2D realSpace;
-    protected Transform2D realUser;
+    // public Bound2D realSpace;
+    // protected Transform2D realUser;
+    protected RealUser realUser;
     protected Vector2 userPosition; // realUser position
     protected Vector2 userDirection; // realUser direction (realUser forward)
     protected Vector2 targetPosition; // steerting target localPosition
@@ -21,7 +22,7 @@ public class SteerToTargetRedirector : GainRedirector
     public override (GainType, float) ApplyRedirection()
     {        
         // define some variables for redirection
-        realUser = realSpace.GetComponentInChildren<Transform2D>();
+        realUser = realSpace.realUser;
         userPosition = realUser.Position;
         userDirection = realUser.Forward;
 
@@ -34,7 +35,7 @@ public class SteerToTargetRedirector : GainRedirector
 
         // control applied gains according to user and target
         float directionToTarget = Mathf.Sign(Vector2.SignedAngle(userDirection, userToTarget)); // if target is to the left of the user, directionToTarget > 0
-        float directionRotation = Mathf.Sign(user.body.deltaRotation); // If user is rotating to the left, directionRotation > 0
+        float directionRotation = Mathf.Sign(user.Body.deltaRotation); // If user is rotating to the left, directionRotation > 0
 
         if (directionToTarget > 0)  // If the target is to the left of the user,
             curvatureGain = HODGSON_MIN_CURVATURE_GAIN;
@@ -49,10 +50,10 @@ public class SteerToTargetRedirector : GainRedirector
         // select the largest magnitude
         float rotationMagnitude = 0, curvatureMagnitude = 0;
 
-        if (Mathf.Abs(user.body.deltaRotation) >= ROTATION_THRESHOLD)
-            rotationMagnitude = rotationGain * user.body.deltaRotation;
-        if (user.body.deltaPosition.magnitude > MOVEMENT_THRESHOLD)
-            curvatureMagnitude = Mathf.Rad2Deg * curvatureGain * user.body.deltaPosition.magnitude;
+        if (Mathf.Abs(user.Body.deltaRotation) >= ROTATION_THRESHOLD)
+            rotationMagnitude = rotationGain * user.Body.deltaRotation;
+        if (user.Body.deltaPosition.magnitude > MOVEMENT_THRESHOLD)
+            curvatureMagnitude = Mathf.Rad2Deg * curvatureGain * user.Body.deltaPosition.magnitude;
 
         float selectedMagnitude = Mathf.Max(Mathf.Abs(rotationMagnitude), Mathf.Abs(curvatureMagnitude)); // selectedMagnitude is ABS(절대값)
         bool isCurvatureSelected = Mathf.Abs(curvatureMagnitude) > Mathf.Abs(rotationMagnitude);
@@ -72,12 +73,14 @@ public class SteerToTargetRedirector : GainRedirector
         // apply final redirection
         if (!isCurvatureSelected)
         {
-            float direction = directionRotation;
+            // float direction = directionRotation;
+            float direction = Mathf.Sign(rotationGain);
             return (GainType.Rotation, finalRotation * direction);
         }
         else
         {
-            float direction = -Mathf.Sign(curvatureGain);
+            float direction = Mathf.Sign(curvatureGain);
+            if(Vector2.Angle(user.Body.deltaPosition, user.Body.Forward) > 5f) finalRotation = 0;
             return (GainType.Curvature, finalRotation * direction);
         }
     }

@@ -506,6 +506,8 @@ MonoBehaviour:
   buttonOK: {fileID: 2276955982195483325}
   buttonYes: {fileID: 2276955982424716286}
   buttonNo: {fileID: 2276955982243781835}
+  buttonYes2: {fileID: 0}
+  buttonNo2: {fileID: 0}
 --- !u!1 &2276955981867212797
 GameObject:
   m_ObjectHideFlags: 0
@@ -1566,6 +1568,36 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+--- !u!1 &4536133400922149926
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 9030509993615518976}
+  m_Layer: 0
+  m_Name: FixedUI
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &9030509993615518976
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4536133400922149926}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 5625050240459616241}
+  m_RootOrder: 1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &4724100483269447237
 GameObject:
   m_ObjectHideFlags: 0
@@ -1700,6 +1732,38 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+--- !u!1 &6644111334711474010
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 5625050240459616241}
+  m_Layer: 0
+  m_Name: FallbackUI
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &5625050240459616241
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6644111334711474010}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children:
+  - {fileID: 8789499333979278994}
+  - {fileID: 9030509993615518976}
+  m_Father: {fileID: 7710530837360072704}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &6910533018129551895
 GameObject:
   m_ObjectHideFlags: 0
@@ -2297,6 +2361,8 @@ MonoBehaviour:
   buttonOK: {fileID: 6910533018551908296}
   buttonYes: {fileID: 7996971294072201138}
   buttonNo: {fileID: 1560215845612936023}
+  buttonYes2: {fileID: 0}
+  buttonNo2: {fileID: 0}
 --- !u!1 &7710530837360216766
 GameObject:
   m_ObjectHideFlags: 0
@@ -2975,7 +3041,7 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
-  - {fileID: 8789499333979278994}
+  - {fileID: 5625050240459616241}
   - {fileID: 7710530837360147922}
   - {fileID: 6329407092342145466}
   - {fileID: 7710530837360109880}
@@ -4169,7 +4235,7 @@ GameObject:
   - component: {fileID: 8789499333979278994}
   - component: {fileID: 8789499333979278995}
   m_Layer: 0
-  m_Name: FallbackUI
+  m_Name: DynamicUI
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4187,7 +4253,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 2276955981750161453}
-  m_Father: {fileID: 7710530837360072704}
+  m_Father: {fileID: 5625050240459616241}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &8789499333979278995

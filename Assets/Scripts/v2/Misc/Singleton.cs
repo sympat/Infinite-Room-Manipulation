@@ -6,7 +6,8 @@ using UnityEngine;
 /// Inherit from this base class to create a singleton.
 /// e.g. public class MyClassName : Singleton<MyClassName> {}
 /// </summary>
-public class Singleton<T> : MonoBehaviour where T : MonoBehaviour
+public class Singleton<T> : MonoBehaviour 
+where T : MonoBehaviour
 {
     // Check to see if we're about to be destroyed
     private static bool m_ShuttingDown = false;
@@ -33,7 +34,7 @@ public class Singleton<T> : MonoBehaviour where T : MonoBehaviour
                 {
                     // Search for existing instance.
                     m_Instance = (T)FindObjectOfType(typeof(T));
- 
+
                     // Create new instance if one doesn't already exist.
                     if (m_Instance == null)
                     {
@@ -51,7 +52,8 @@ public class Singleton<T> : MonoBehaviour where T : MonoBehaviour
             }
         }
     }
- 
+
+
     private void OnApplicationQuit()
     {
         m_ShuttingDown = true;

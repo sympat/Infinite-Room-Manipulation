@@ -30,7 +30,7 @@ public class Transform2D : MonoBehaviour {
 
     public static float CastRotation3Dto2D(Quaternion rotation)
     {
-        return -rotation.eulerAngles.y;
+        return (360 - rotation.eulerAngles.y);
     }
 
     public virtual Vector2 Forward

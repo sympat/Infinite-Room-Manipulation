@@ -153,6 +153,22 @@ public class Bound2D : Transform2D
 
     }
 
+    public bool IsInSide(Circle2D other) {
+        float[] distToTarget = new float[4];
+
+        distToTarget[0] = other.Position.y - this.GetEdge2D(0, Space.World).y;
+        distToTarget[1] = other.Position.x - this.GetEdge2D(1, Space.World).x;
+        distToTarget[2] = other.Position.y - this.GetEdge2D(2, Space.World).y;
+        distToTarget[3] = other.Position.x - this.GetEdge2D(3, Space.World).x;
+
+        for(int i=0; i<4; i++) {
+            if(Mathf.Abs(distToTarget[i]) < other.Radius)
+                return false;
+        }
+
+        return true;
+    }
+
     public bool IsContain(Vector2 point) // this가 point를 포함하는지 판단하는 함수
     {
         if (this.Box.bounds.Contains(CastVector2Dto3D(point, this.Height / 2)))

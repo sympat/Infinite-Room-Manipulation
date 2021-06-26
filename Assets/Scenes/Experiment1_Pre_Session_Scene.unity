@@ -449,7 +449,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 05b41b442c6ab6c4bb2f224b296fd5a4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  trackedUsers: {fileID: 1092693242}
+  initRadius: 0
+  initHeight: 0
 --- !u!54 &725292353
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -728,22 +729,10 @@ PrefabInstance:
     - target: {fileID: 7710530837360240168, guid: 9698eea9e8a96b848bb183026511d547,
         type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 9698eea9e8a96b848bb183026511d547, type: 3}
---- !u!114 &1092693242 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 7710530837360236795, guid: 9698eea9e8a96b848bb183026511d547,
-    type: 3}
-  m_PrefabInstance: {fileID: 1092693241}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: be25704a80540ab4b92f7e1f92a64630, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!4 &1092693243 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 7710530837360027778, guid: 9698eea9e8a96b848bb183026511d547,
@@ -779,14 +768,25 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ef773a4e92e5cc1498cc40123f0b1557, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  initialText: "\uBCF8 \uC2E4\uD5D8 \uC804 VR \uC801\uC751\uC744 \uC704\uD55C \uC138\uC158\uC785\uB2C8\uB2E4.\n\uC67C\uCABD\uC758
-    \uAC80\uC740\uC0C9 \uD3EC\uC778\uD130\uB97C \uD655\uC778 \uBC84\uD2BC\uC5D0 \uAC00\uC838\uAC04
-    \uB4A4\uC5D0\n\uC67C\uCABD \uD2B8\uB9AC\uAC70 \uBC84\uD2BC\uC744 \uB20C\uB7EC\uC11C
-    \uC9C4\uD589\uD558\uC138\uC694."
-  step1Text: "\uB2E4\uC2DC \uD655\uC778 \uBC84\uD2BC\uC744 \uB204\uB978 \uB4A4\uC5D0\n\uBC29\uC744
-    \uC790\uC720\uB86D\uAC8C \uD0D0\uD5D8\uD558\uC138\uC694."
-  endText: "\uC138\uC158\uC774 \uBAA8\uB450 \uC644\uB8CC\uB418\uC5C8\uC2B5\uB2C8\uB2E4.\n\uC2E4\uD5D8\uC790\uC758
-    \uC9C0\uC2DC\uC5D0 \uB530\uB77C \uB2E4\uC74C \uB2E8\uACC4\uB85C \uB118\uC5B4\uAC00\uC138\uC694."
+  uiInfo:
+  - canvas: {fileID: -3386309994944828300, guid: 160b4a33be05e064fb30e36d7db2ac49,
+      type: 3}
+    initPosition: {x: 0, y: 0, z: 1.2}
+    initRotation: {x: 0, y: 0, z: 0}
+    isLocal: 1
+    parent: {fileID: 0}
+  - canvas: {fileID: 8633114480462167100, guid: f94b15d8da503044ba99c5cfeadf54b4,
+      type: 3}
+    initPosition: {x: 0, y: 0, z: 1.2}
+    initRotation: {x: 0, y: 0, z: 0}
+    isLocal: 1
+    parent: {fileID: 0}
+  - canvas: {fileID: 4766260914399514847, guid: 6fb3e6fb32c3925408d18938e1e04800,
+      type: 3}
+    initPosition: {x: 0, y: 0, z: 1.2}
+    initRotation: {x: 0, y: 0, z: 0}
+    isLocal: 1
+    parent: {fileID: 0}
 --- !u!4 &1275746823
 Transform:
   m_ObjectHideFlags: 0
@@ -852,7 +852,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7134cf222c693f840b06d3adbd664bca, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  users: {fileID: 1092693242}
   startRoom: {fileID: 1449290277}
   useCenterStart: 0
   useFullVisualization: 0

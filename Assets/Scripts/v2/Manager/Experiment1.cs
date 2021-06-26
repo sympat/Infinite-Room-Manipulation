@@ -7,20 +7,62 @@ using Valve.VR;
 using System.Text;
 using System;
 
-public class Experiment1 : Manager
-{
-    public enum DistanceType {
-        Short = 0,
-        Middle = 1,
-        Long = 2
-    }
+public enum DistanceType {
+    Short = 0,
+    Middle = 1,
+    Long = 2
+}
 
+public enum Exp1State {
+    Initial,
+    Around,
+    Target,
+    Door_Step1,
+    Door_Step2,
+    Door_Step3,
+    Behind,
+    Selection,
+    Center,
+    End,
+}
+
+// AddTaskEvent(UIBehaviour.Click, "Initial UI", "image_1", "button_0");
+// AddTaskEvent(UIBehaviour.Click, "Watch Around UI", "image_1", "button_0");
+// AddTaskEvent(UIBehaviour.Click, "Selection UI", "image_1", "button_0");
+// AddTaskEvent(UIBehaviour.Click, "Selection UI", "image_1", "button_1");
+// AddTaskEvent(Behaviour.Enter, "Portal");
+// AddTaskEvent(Behaviour.Enter, "CenterPortal");
+// AddTaskEvent(Behaviour.Watch, "FacingDoor");
+// AddTaskEvent(TaskBehaviour.Wait);
+
+public enum Exp1Input {
+    ClickButton1,
+    ClickButton2,
+    ClickButton3,
+    ClickButton4,
+    ClickButton5,
+    ClickButton6,
+    ClickButton7,
+    ClickButton8,
+    EnterPortal,
+    EnterCenterPortal,
+    WatchFacingDoor,
+    WaitAfterSeconds,
+    End,
+    NotEnd
+}
+
+
+public class Experiment1 : TaskBasedManager<Exp1State, Exp1Input>
+{
     public GameObject portalPrefab;
     public GameObject centerPortalPrefab;
+    // public BaseUI[] uiPrefabs;
     public int totalTrial;
     public string experimentID;
-    [TextArea]
-    public string initialText, watchAroundText, targetText, viewDoorText, turnBehindText, selectionText, goToCenterText, endText;
+    // [TextArea]
+    // public string initialText, watchAroundText, targetText, viewDoorText, turnBehindText, selectionText, goToCenterText, endText;
+
     private Room currentRoom;
     private GameObject targetObj;
     private GameObject centerObj;
@@ -28,6 +70,7 @@ public class Experiment1 : Manager
     private Dictionary<DistanceType, List<float>> wallTranslateGain2;
     private Vector2[] direction;
     private float[] wallDirection;
+    private int count = 0;
     private float grid;
     private Dictionary<DistanceType, List<List<bool>>> answer; // T - yes, F - no
     private int currentTrial = 0;
@@ -39,19 +82,8 @@ public class Experiment1 : Manager
     private Queue<DistanceType> distTypeQueue;
     private Dictionary<DistanceType, Queue<int>> gainQueue;
 
-    private FiniteStateMachine<string, string> task;
-
-    public override void Awake() {
-        base.Awake();
-
+    protected override void GenerateTask() {
         currentRoom = virtualEnvironment.CurrentRoom;
-
-        // wallTranslateGain = new float[5];
-        // wallTranslateGain[0] = 0.9f;
-        // wallTranslateGain[1] = 0.95f;
-        // wallTranslateGain[2] = 1.0f;
-        // wallTranslateGain[3] = 1.05f;
-        // wallTranslateGain[4] = 1.1f;
 
         wallTranslateGain2 = new Dictionary<DistanceType, List<float>>();
         wallTranslateGain2[DistanceType.Short] = new List<float>();
@@ -60,11 +92,6 @@ public class Experiment1 : Manager
         wallTranslateGain2[DistanceType.Short].Add(1.0f);
         wallTranslateGain2[DistanceType.Short].Add(1.05f);
         wallTranslateGain2[DistanceType.Short].Add(1.1f);
-        // wallTranslateGain2[DistanceType.Short].Add(0.98f);
-        // wallTranslateGain2[DistanceType.Short].Add(0.99f);
-        // wallTranslateGain2[DistanceType.Short].Add(1.0f);
-        // wallTranslateGain2[DistanceType.Short].Add(1.01f);
-        // wallTranslateGain2[DistanceType.Short].Add(1.02f);
 
         wallTranslateGain2[DistanceType.Middle] = new List<float>();
         wallTranslateGain2[DistanceType.Middle].Add(0.8f);
@@ -72,11 +99,6 @@ public class Experiment1 : Manager
         wallTranslateGain2[DistanceType.Middle].Add(1.0f);
         wallTranslateGain2[DistanceType.Middle].Add(1.1f);
         wallTranslateGain2[DistanceType.Middle].Add(1.2f);
-        // wallTranslateGain2[DistanceType.Middle].Add(0.95f);
-        // wallTranslateGain2[DistanceType.Middle].Add(0.975f);
-        // wallTranslateGain2[DistanceType.Middle].Add(1.0f);
-        // wallTranslateGain2[DistanceType.Middle].Add(1.025f);
-        // wallTranslateGain2[DistanceType.Middle].Add(1.05f);
 
         wallTranslateGain2[DistanceType.Long] = new List<float>();
         wallTranslateGain2[DistanceType.Long].Add(0.8f);
@@ -84,11 +106,6 @@ public class Experiment1 : Manager
         wallTranslateGain2[DistanceType.Long].Add(1.0f);
         wallTranslateGain2[DistanceType.Long].Add(1.1f);
         wallTranslateGain2[DistanceType.Long].Add(1.2f);
-        // wallTranslateGain2[DistanceType.Long].Add(0.9f);
-        // wallTranslateGain2[DistanceType.Long].Add(0.95f);
-        // wallTranslateGain2[DistanceType.Long].Add(1.0f);
-        // wallTranslateGain2[DistanceType.Long].Add(1.05f);
-        // wallTranslateGain2[DistanceType.Long].Add(1.1f);
 
         direction = new Vector2[4];
         direction[0] = Vector2.up;
@@ -124,51 +141,65 @@ public class Experiment1 : Manager
 
         targetPosition = Vector2.zero;
 
+        // Generate UI
+        GenerateUI("Initial UI", uiInfo[0]);
+        GenerateUI("Watch Around UI", uiInfo[1]);
+        GenerateUI("Target UI", uiInfo[2]);
+        GenerateUI("Watch Door UI", uiInfo[3]);
+        GenerateUI("Turn Behind UI", uiInfo[4]);
+        GenerateUI("Selection UI", uiInfo[5]);
+        GenerateUI("Goto Center UI", uiInfo[6]);
+        GenerateUI("End UI", uiInfo[7]);
+
         // Add User event as input for task
-        users.AddEnterEvent("Portal", "Untagged", () => task.Processing("onEnterPortal"));
-        users.AddViewEvent("Door", "FacingDoor", () => task.Processing("onViewFacingDoor"));
-        users.AddEnterEvent("CenterPortal", "Untagged", () => task.Processing("onEnterCenterPortal"));
-        users.AddClickEvent("UI", "OKButton", () => task.Processing("onClickOK"));
-        users.AddClickEvent("UI", "YesButton", () => task.Processing("onClickYes"));
-        users.AddClickEvent("UI", "NoButton", () => task.Processing("onClickNo"));
+        AddTaskEvent(Exp1Input.ClickButton1, UIBehaviour.Click, "Initial UI", "image_1", "button_0");
+        AddTaskEvent(Exp1Input.ClickButton2, UIBehaviour.Click, "Watch Around UI", "image_1", "button_0");
+        AddTaskEvent(Exp1Input.ClickButton3, UIBehaviour.Click, "Target UI", "image_1", "button_0");
+        AddTaskEvent(Exp1Input.ClickButton4, UIBehaviour.Click, "Watch Door UI", "image_1", "button_0");
+        AddTaskEvent(Exp1Input.ClickButton5, UIBehaviour.Click, "Turn Behind UI", "image_1", "button_0");
+        AddTaskEvent(Exp1Input.ClickButton6, UIBehaviour.Click, "Selection UI", "image_1", "button_0");
+        AddTaskEvent(Exp1Input.ClickButton7, UIBehaviour.Click, "Selection UI", "image_1", "button_1");
+        AddTaskEvent(Exp1Input.ClickButton8, UIBehaviour.Click, "Goto Center UI", "image_1", "button_0");
+        AddTaskEvent(Exp1Input.EnterPortal, Behaviour.Enter, "Portal");
+        AddTaskEvent(Exp1Input.EnterCenterPortal, Behaviour.Enter, "CenterPortal");
+        AddTaskEvent(Exp1Input.WatchFacingDoor, Behaviour.Watch, "FacingDoor");
 
         // Define task for experiment 1
-        task = new FiniteStateMachine<string, string>("Initial", "Around", "Target", "Door_Step1", "Door_Step2", "Door_Step3", "Behind", "Selection", "Center", "End");
-        task.AddStateStart("Initial", () => EnableOKUI(initialText))
-        .AddTransition("Initial", "Around", "onClickOK", DisableUIandPointer)
+        task.AddStateStart(Exp1State.Initial, () => EnableUI("Initial UI"))
+        .AddTransition(Exp1State.Initial, Exp1State.Around, Exp1Input.ClickButton1, () => DisableUI("Initial UI"))
 
-        .AddStateStart("Around", () => EnableOKUI(watchAroundText), PrintCurrentExperiment)
-        .AddTransition("Around", "onClickOK", DisableUIandPointer, () => WakeAfterSeconds(7.0f))
-        .AddTransition("Around", "Target", "onAfterSeconds")
+        .AddStateStart(Exp1State.Around, () => EnableUI("Watch Around UI"), PrintCurrentExperiment)
+        .AddTransition(Exp1State.Around, Exp1Input.ClickButton2, () => DisableUI("Watch Around UI"), () => WaitForSeconds(7.0f))
+        .AddTransition(Exp1State.Around, Exp1State.Target, Exp1Input.WaitAfterSeconds)
 
-        .AddStateStart("Target", () => EnableOKUI(targetText), InitializeTarget)
-        .AddTransition("Target", "onClickOK", DisableUIandPointer, GenerateTarget)
-        .AddTransition("Target", "Door_Step1", "onEnterPortal", DestroyTarget)
+        .AddStateStart(Exp1State.Target, () => EnableUI("Target UI"), InitializeTarget)
+        .AddTransition(Exp1State.Target, Exp1Input.ClickButton3, () => DisableUI("Target UI"), GenerateTarget)
+        .AddTransition(Exp1State.Target, Exp1State.Door_Step1, Exp1Input.EnterPortal, DestroyTarget)
 
-        .AddStateStart("Door_Step1", () => EnableOKUI(viewDoorText))
-        .AddTransition("Door_Step1", "Door_Step2", "onClickOK", DisableUIandPointer, ColoringFacingDoor)
+        .AddStateStart(Exp1State.Door_Step1, () => EnableUI("Watch Door UI"))
+        .AddTransition(Exp1State.Door_Step1, Exp1State.Door_Step2, Exp1Input.ClickButton4, () => DisableUI("Watch Door UI"), ColoringFacingDoor)
 
-        .AddTransition("Door_Step2", "Door_Step3", "onViewFacingDoor")
+        .AddTransition(Exp1State.Door_Step2, Exp1State.Door_Step3, Exp1Input.WatchFacingDoor)
 
-        .AddStateStart("Door_Step3", () => WakeAfterSeconds(3.0f))
-        .AddTransition("Door_Step3", "Behind", "onAfterSeconds")
+        .AddStateStart(Exp1State.Door_Step3, () => WaitForSeconds(3.0f))
+        .AddTransition(Exp1State.Door_Step3, Exp1State.Behind, Exp1Input.WaitAfterSeconds)
 
-        .AddStateStart("Behind", () => EnableOKUI(turnBehindText), CleanDoors, MoveOppositeWall)
-        .AddTransition("Behind", "onClickOK", DisableUIandPointer, () => WakeAfterSeconds(4.0f))
-        .AddTransition("Behind", "Selection", "onAfterSeconds")
+        .AddStateStart(Exp1State.Behind, () => EnableUI("Turn Behind UI"), CleanDoors, MoveOppositeWall)
+        .AddTransition(Exp1State.Behind, Exp1Input.ClickButton5, () => DisableUI("Turn Behind UI"), () => WaitForSeconds(4.0f))
+        .AddTransition(Exp1State.Behind, Exp1State.Selection, Exp1Input.WaitAfterSeconds)
 
-        .AddStateStart("Selection", () => EnableSelectionUI(selectionText))
-        .AddTransition("Selection", "Center", "onClickYes", DisableUIandPointer, () => WriteAnswer(true))
-        .AddTransition("Selection", "Center", "onClickNo", DisableUIandPointer, () => WriteAnswer(false))
+        .AddStateStart(Exp1State.Selection, () => EnableUI("Selection UI"))
+        .AddTransition(Exp1State.Selection, Exp1State.Center, Exp1Input.ClickButton6, () => DisableUI("Selection UI"), () => WriteAnswer(true))
+        .AddTransition(Exp1State.Selection, Exp1State.Center, Exp1Input.ClickButton7, () => DisableUI("Selection UI"), () => WriteAnswer(false))
 
-        .AddStateStart("Center", () => EnableOKUI(goToCenterText))
-        .AddTransition("Center", "onClickOK", DisableUIandPointer, GenerateCenterPoint)
-        .AddTransition("Center", "onEnterCenterPortal", DestroyCenterPoint, UserCameraFadeOut, () => WakeAfterSeconds(3.0f))
-        .AddTransition("Center", "onAfterSeconds", RestoreOriginWall, UserCameraFadeIn, RaiseEndCondition)
-        .AddTransition("Center", "End", "onEnd")
-        .AddTransition("Center", "Around", "onNotEnd")
+        .AddStateStart(Exp1State.Center, () => EnableUI("Goto Center UI"))
+        .AddTransition(Exp1State.Center, Exp1Input.ClickButton8, () => DisableUI("Goto Center UI"), GenerateCenterPoint)
+        .AddTransition(Exp1State.Center, Exp1Input.EnterCenterPortal, DestroyCenterPoint, UserCameraFadeOut, () => WaitForSeconds(3.0f))
+        .AddTransition(Exp1State.Center, Exp1Input.WaitAfterSeconds, RestoreOriginWall, UserCameraFadeIn, RaiseEndCondition)
+        .AddTransition(Exp1State.Center, Exp1State.End, Exp1Input.End)
+        .AddTransition(Exp1State.Center, Exp1State.Around, Exp1Input.NotEnd)
 
-        .AddStateStart("End", () => EnableEndUI(endText), PrintResult);
+        .AddStateStart(Exp1State.End, () => EnableUI("End UI"), PrintResult);
 
         // Debug for task process
         // task.OnEachInput((newInput) => { Debug.Log($"{newInput} call"); } );
@@ -176,14 +207,18 @@ public class Experiment1 : Manager
         // task.OnEnter((fromState) => { Debug.Log($"State {fromState} begin"); });
         // task.OnExit((fromState) => { Debug.Log($"State {fromState} ended"); });
 
-        task.Begin("Initial");
+        task.Begin(Exp1State.Initial);
     }
 
-    public void WakeAfterSeconds(float time) {
-        CoroutineManager.Instance.CallWaitForSeconds(time, () => task.Processing("onAfterSeconds"));
+    public void WaitForSeconds(float time) {
+        StartCoroutine(CallAfterSeconds(time));
     }
 
-    private int count = 0;
+    public IEnumerator CallAfterSeconds(float time) {
+        yield return new WaitForSeconds(time);
+
+        task.Processing(Exp1Input.WaitAfterSeconds);
+    }
 
     public void PrintCurrentExperiment() {
         count++;
@@ -198,62 +233,22 @@ public class Experiment1 : Manager
             InitializeDistance();
     }
 
-    public void DisableUIandPointer() {
-        User user = users.GetActiveUser();
-
-        user.ui.DisableUI();
-        if(user.pointer != null) user.pointer.HidePointer(); 
-    }
-
-    public void EnableEndUI(string paragraphText) {
-        User user = users.GetActiveUser();
-
-        user.ui.PopUpParagraph(paragraphText); 
-    }
-
-    public void EnableOKUI(string paragraphText) {
-        User user = users.GetActiveUser();
-
-        user.ui.PopUpParagraph(paragraphText); 
-        user.ui.PopUpOkButton();
-        if(user.pointer != null) user.pointer.ShowPointer(); 
-    }
-
-    public void EnableSelectionUI(string paragraphText) {
-        User user = users.GetActiveUser();
-
-        user.ui.PopUpParagraph(paragraphText);
-
-        float prob = UnityEngine.Random.Range(0f, 1.0f);
-
-        if(prob < 0.5f) {
-            user.ui.PopUpYes2Button();
-            user.ui.PopUpNo2Button();
-        }
-        else {
-            user.ui.PopUpYesButton();
-            user.ui.PopUpNoButton();
-        }
-
-        if(user.pointer != null) user.pointer.ShowPointer();
-    }
-
     public void UserCameraFadeOut() {
         User user = users.GetActiveUser();
 
-        if(user._camera.GetComponent<SteamVR_Fade>() != null)
-            user._camera.GetComponent<CameraFade>().FadeOutVR(1.0f);
+        if(user.Face.GetComponent<SteamVR_Fade>() != null)
+            user.Face.GetComponent<CameraFade>().FadeOutVR(1.0f);
         else
-            user._camera.GetComponent<CameraFade>().FadeOut();
+            user.Face.GetComponent<CameraFade>().FadeOut();
     }
 
     public void UserCameraFadeIn() {
         User user = users.GetActiveUser();
 
-        if(user._camera.GetComponent<SteamVR_Fade>() != null)
-            user._camera.GetComponent<CameraFade>().FadeInVR(1.0f);
+        if(user.Face.GetComponent<SteamVR_Fade>() != null)
+            user.Face.GetComponent<CameraFade>().FadeInVR(1.0f);
         else
-            user._camera.GetComponent<CameraFade>().FadeIn();
+            user.Face.GetComponent<CameraFade>().FadeIn();
     }
 
     // public void QuitGame()
@@ -345,10 +340,10 @@ public class Experiment1 : Manager
 
     public void RaiseEndCondition() {
         if(AreGainQueuesEmpty() && IsTrialEnded()) {
-            task.Processing("onEnd");
+            task.Processing(Exp1Input.End);
         }
         else {
-            task.Processing("onNotEnd");
+            task.Processing(Exp1Input.NotEnd);
         }
     }
 
@@ -416,7 +411,7 @@ public class Experiment1 : Manager
 
         foreach(var door in doors) {
             if(door.GetThisRoomWrapper(virtualEnvironment.CurrentRoom).wall == facingWall) {
-                door.gameObject.tag = "FacingDoor";
+                door.gameObject.layer = LayerMask.NameToLayer("FacingDoor");
                 door.GetComponent<Outline>().enabled = true;
                 
             }
@@ -427,7 +422,7 @@ public class Experiment1 : Manager
         List<Door> doors = virtualEnvironment.GetConnectedDoors(virtualEnvironment.CurrentRoom);
 
         foreach(var door in doors) {
-            door.gameObject.tag = "Untagged";
+            door.gameObject.layer = LayerMask.NameToLayer("Door");
             door.GetComponent<Outline>().enabled = false;
         }
     }

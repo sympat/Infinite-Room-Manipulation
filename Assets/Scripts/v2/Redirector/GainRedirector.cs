@@ -35,30 +35,46 @@ public class GainRedirector : MonoBehaviour
     protected float curvatureGain;
     protected User user;
 
-    public Users users;
-    public VirtualEnvironment virtualEnvironment;
+    protected Users users;
+    protected VirtualEnvironment virtualEnvironment;
+    protected RealSpace realSpace;
 
-    private void Start() {
-        StartCoroutine(ApplyGain());
+    protected Experiment2 experiment2;
+
+    private void Awake() {
+        foreach(Transform child in transform) {
+            Transform2D tf = child.GetComponent<Transform2D>();
+
+            if(tf is VirtualEnvironment)
+                virtualEnvironment = tf as VirtualEnvironment;
+            else if(tf is Users)
+                users = tf as Users;
+            else if(tf is RealSpace)
+                realSpace = tf as RealSpace;
+        }
+
+        experiment2 = GetComponent<Experiment2>();
     }
 
     public virtual (GainType, float) ApplyRedirection() {
         float degree = 0;
         GainType type = GainType.Undefined;
 
-        if (user.body.deltaPosition.magnitude > MOVEMENT_THRESHOLD && user.body.deltaPosition.magnitude >= Mathf.Abs(user.body.deltaRotation)) // Translation
-        {
-            degree = user.body.deltaPosition.magnitude * (MAX_TRANSLATION_GAIN);
-            type = GainType.Translation;
-        }
-        // if(user.body.deltaPosition.magnitude > 0.2f && user.body.deltaPosition.magnitude >= Mathf.Abs(user.body.deltaRotation)) // Curvature
+        // if (user.Body.deltaPosition.magnitude > MOVEMENT_THRESHOLD && user.Body.deltaPosition.magnitude >= Mathf.Abs(user.Body.deltaRotation)) // Translation
         // {
-        //     degree = Mathf.Rad2Deg * user.body.deltaPosition.magnitude * (HODGSON_MAX_CURVATURE_GAIN);
-        //     type = GainType.Curvature;
+        //     degree = user.Body.deltaPosition.magnitude * (MIN_TRANSLATION_GAIN);
+        //     if(Vector2.Angle(user.Body.deltaPosition, user.Body.Forward) > 5f) degree = 0;
+        //     type = GainType.Translation;
         // }
-        else if (Mathf.Abs(user.body.deltaRotation) > ROTATION_THRESHOLD && user.body.deltaPosition.magnitude < Mathf.Abs(user.body.deltaRotation)) // Rotation
+        if(user.Body.deltaPosition.magnitude > 0.2f && user.Body.deltaPosition.magnitude >= Mathf.Abs(user.Body.deltaRotation)) // Curvature
         {
-            degree = user.body.deltaRotation * (MIN_ROTATION_GAIN);
+            degree = Mathf.Rad2Deg * user.Body.deltaPosition.magnitude * (HODGSON_MAX_CURVATURE_GAIN);
+            if(Vector2.Angle(user.Body.deltaPosition, user.Body.Forward) > 5f) degree = 0;
+            type = GainType.Curvature;
+        }
+        else if (Mathf.Abs(user.Body.deltaRotation) > ROTATION_THRESHOLD && user.Body.deltaPosition.magnitude < Mathf.Abs(user.Body.deltaRotation)) // Rotation
+        {
+            degree = user.Body.deltaRotation * (MAX_ROTATION_GAIN);
             type = GainType.Rotation;
         }
         else
@@ -69,35 +85,35 @@ public class GainRedirector : MonoBehaviour
         return (type, degree);
     }
 
-    IEnumerator ApplyGain() {
-        yield return new WaitForSeconds(2.0f); // just for delay when initializing
+    private void FixedUpdate() {
+        experiment2.isLocomotionDone = true;
+        user = users.GetActiveUser();
 
-        while(true) {
-            user = users.GetActiveUser();
+        if (user.Body.deltaPosition.magnitude > MOVEMENT_THRESHOLD || Mathf.Abs(user.Body.deltaRotation) > ROTATION_THRESHOLD) {
+            var result = ApplyRedirection();
 
-            if (user.body.deltaPosition.magnitude > MOVEMENT_THRESHOLD || Mathf.Abs(user.body.deltaRotation) > ROTATION_THRESHOLD) {
-                var result = ApplyRedirection();
+            GainType gainType = result.Item1;
+            float degree = result.Item2;
 
-                GainType gainType = result.Item1;
-                float degree = result.Item2;
+            // Debug.Log($"gainType {gainType}");
+            // Debug.Log($"degree {degree}");
+            // Debug.Log($"user.Body.deltaRotation {user.Body.deltaRotation}");
+            // Debug.Log($"user.Body.deltaPosition {user.Body.deltaPosition}");
 
-                switch (gainType)
-                {
-                    case GainType.Translation:
-                        virtualEnvironment.Translate(-user.body.Forward * degree * Time.fixedDeltaTime, Space.World);
-                        break;
-                    case GainType.Rotation:
-                        virtualEnvironment.RotateAround(user.body.Position, degree * Time.fixedDeltaTime);
-                        break;
-                    case GainType.Curvature:
-                        virtualEnvironment.RotateAround(user.body.Position, degree * Time.fixedDeltaTime);
-                        break;
-                    default:
-                        break;
-                }
+            switch (gainType)
+            {
+                case GainType.Translation:
+                    virtualEnvironment.Translate(-user.Body.Forward * degree * Time.fixedDeltaTime, Space.World);
+                    break;
+                case GainType.Rotation:
+                    virtualEnvironment.RotateAround(user.Body.Position, degree * Time.fixedDeltaTime);
+                    break;
+                case GainType.Curvature:
+                    virtualEnvironment.RotateAround(user.Body.Position, degree * Time.fixedDeltaTime);
+                    break;
+                default:
+                    break;
             }
-        
-            yield return new WaitForFixedUpdate();
         }
     }
 }

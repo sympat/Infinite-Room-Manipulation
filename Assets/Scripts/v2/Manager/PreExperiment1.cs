@@ -1,42 +1,60 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using System;
 
-public class PreExperiment1 : Manager
+public enum PreExp1State {
+    Initial,
+    Step1,
+    Step2,
+    End
+}
+
+public enum PreExp1Input {
+    ClickButton0,
+    ClickButton1,
+    WaitForSeconds
+}
+
+public class PreExperiment1 : TaskBasedManager<PreExp1State, PreExp1Input>
 {
-    [TextArea]
-    public string initialText, step1Text, endText;
+    protected override void GenerateTask() {
+        // Gnerate UI
+        GenerateUI("Initial UI", uiInfo[0]);
+        GenerateUI("Step1 UI", uiInfo[1]);
+        GenerateUI("End UI", uiInfo[2]);
 
-    private FiniteStateMachine<string, string> task;
-
-    public override void Awake() {
-        base.Awake();
-
-        // Add User event as input for task
-        users.AddClickEvent("UI", "OKButton", () => task.Processing("onClickOK"));
+        // Add task event
+        AddTaskEvent(PreExp1Input.ClickButton0, UIBehaviour.Click, "Initial UI", "image_1", "button_0");
+        AddTaskEvent(PreExp1Input.ClickButton1, UIBehaviour.Click, "Step1 UI", "image_1", "button_0");
 
         // Define task for pre-experiment 1
-        task = new FiniteStateMachine<string, string>("Initial", "Step1", "Idle", "End");
-        task.AddStateStart("Initial", () => EnableOKUI(initialText))
-        .AddTransition("Initial", "Step1", "onClickOK", DisableUIandPointer)
-        .AddStateStart("Step1", () => EnableOKUI(step1Text), PrintStartTime)
-        .AddTransition("Step1", "Idle", "onClickOK", DisableUIandPointer, () => WakeAfterSeconds(30.0f))
-        .AddTransition("Idle", "End", "onAfterSeconds")
-        .AddStateStart("End", () => EnableEndUI(endText), PrintEndTime);
+        task.AddStateStart(PreExp1State.Initial, () => EnableUI("Initial UI"))
+        .AddTransition(PreExp1State.Initial, PreExp1State.Step1, PreExp1Input.ClickButton0, () => DisableUI("Initial UI"))
+        .AddStateStart(PreExp1State.Step1, () => EnableUI("Step1 UI"), PrintStartTime)
+        .AddTransition(PreExp1State.Step1, PreExp1State.Step2, PreExp1Input.ClickButton1, () => DisableUI("Step1 UI"), () => WaitForSeconds(10.0f))
+        .AddTransition(PreExp1State.Step2, PreExp1State.End, PreExp1Input.WaitForSeconds)
+        .AddStateStart(PreExp1State.End, () => EnableUI("End UI"), PrintEndTime);
 
         // Debug for task process
-        // task.OnEachInput((newInput) => { Debug.Log($"{newInput} call"); } );
-        // task.OnChange((fromState, toState) => { Debug.Log($"State {fromState} -> {toState}"); });
-        // task.OnEnter((fromState) => { Debug.Log($"State {fromState} begin"); });
-        // task.OnExit((fromState) => { Debug.Log($"State {fromState} ended"); });
+        task.OnEachInput((newInput) => { Debug.Log($"{newInput} call"); } );
+        task.OnChange((fromState, toState) => { Debug.Log($"State {fromState} -> {toState}"); });
+        task.OnEnter((fromState) => { Debug.Log($"State {fromState} begin"); });
+        task.OnExit((fromState) => { Debug.Log($"State {fromState} ended"); });
 
         // start task
-        task.Begin("Initial");
+        task.Begin(PreExp1State.Initial);
     }
 
-    public void WakeAfterSeconds(float time) {
-        CoroutineManager.Instance.CallWaitForSeconds(time, () => task.Processing("onAfterSeconds"));
+    public void WaitForSeconds(float time) {
+        StartCoroutine(CallAfterSeconds(time));
+    }
+
+    public IEnumerator CallAfterSeconds(float time) {
+        yield return new WaitForSeconds(time);
+
+        task.Processing(PreExp1Input.WaitForSeconds);
     }
 
     public void PrintStartTime() {
@@ -45,26 +63,5 @@ public class PreExperiment1 : Manager
 
     public void PrintEndTime() {
         Debug.Log($"End Time: {DateTime.Now.ToString()}");
-    }
-
-    public void DisableUIandPointer() {
-        User user = users.GetActiveUser();
-
-        user.ui.DisableUI();
-        if(user.pointer != null) user.pointer.HidePointer(); 
-    }
-
-    public void EnableEndUI(string paragraphText) {
-        User user = users.GetActiveUser();
-
-        user.ui.PopUpParagraph(paragraphText); 
-    }
-
-    public void EnableOKUI(string paragraphText) {
-        User user = users.GetActiveUser();
-
-        user.ui.PopUpParagraph(paragraphText); 
-        user.ui.PopUpOkButton();
-        if(user.pointer != null) user.pointer.ShowPointer(); 
     }
 }

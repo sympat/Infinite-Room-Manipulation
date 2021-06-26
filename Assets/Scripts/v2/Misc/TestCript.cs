@@ -3,20 +3,18 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
+
 public class TestCript : MonoBehaviour
 {
 
-    private void Start() {
-        Debug.Log(this.transform.FindObjectWithTag("OKButton"));
+    private void Awake() {
+        this.gameObject.GetComponent<Users>().Initializing();
     }
-    // public void OnPointerDown(PointerEventData eventData)
-    // {
-    //     Debug.Log("Clicked: " + eventData.pointerCurrentRaycast.gameObject.name);
-    // }
+    // private void Awake() {
+    //     foreach(var element in Enumeration.GetAll<TestEnum1>()) {
+    //         Debug.Log(element);
+    //     }
 
-    // public void OnPointerClick(PointerEventData pointerEventData)
-    // {
-    //     //Output to console the clicked GameObject's name and the following message. You can replace this with your own actions for when clicking the GameObject.
-    //     Debug.Log(name + " Game Object Clicked!");
+    //     TestEnum1 testEnum1 = new TestEnum1();
     // }
 }
