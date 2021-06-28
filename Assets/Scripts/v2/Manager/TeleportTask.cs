@@ -4,6 +4,7 @@ using UnityEngine;
 
 public enum TeleportTaskState {
     Initial,
+    Step0,
     Step1,
     End
 }
@@ -11,8 +12,10 @@ public enum TeleportTaskState {
 public enum TeleportTaskInput {
     ClickButton0,
     ClickButton1,
-    EnterPortal,
+    ClickButton2,
     CompleteTeleport,
+    EnterPortal,
+    CompletePortal,
     EnterRoom,
     CollectCoin
 }
@@ -28,21 +31,27 @@ public class TeleportTask : TaskBasedManager<TeleportTaskState, TeleportTaskInpu
         // Generate UI
         GenerateUI("Initial UI", uiInfo[0]);
         GenerateUI("Teleport UI", uiInfo[1]);
-        GenerateUI("End UI", uiInfo[2]);
+        GenerateUI("Portal UI", uiInfo[2]);
+        GenerateUI("End UI", uiInfo[3]);
 
         // Add task event
         AddTaskEvent(TeleportTaskInput.ClickButton0, UIBehaviour.Click, "Initial UI", "image_1", "button_0");
         AddTaskEvent(TeleportTaskInput.ClickButton1, UIBehaviour.Click, "Teleport UI", "image_1", "button_0");
+        AddTaskEvent(TeleportTaskInput.ClickButton2, UIBehaviour.Click, "Portal UI", "image_1", "button_0");
         AddTaskEvent(TeleportTaskInput.EnterPortal, Behaviour.Enter, "Portal");
 
         // Define task for pre-experiment 2
         task.AddStateStart(TeleportTaskState.Initial, () => EnableUI("Initial UI"))
-        .AddTransition(TeleportTaskState.Initial, TeleportTaskInput.ClickButton0, () => DisableUI("Initial UI"), () => EnableUI("Teleport UI"))
-        .AddTransition(TeleportTaskState.Initial, TeleportTaskState.Step1, TeleportTaskInput.ClickButton1, () => DisableUI("Teleport UI"), CheckPortalDone, GeneratePortal)
+        .AddTransition(TeleportTaskState.Initial, TeleportTaskState.Step0, TeleportTaskInput.ClickButton0, () => DisableUI("Initial UI"))
 
-        // .AddStateStart(TeleportTaskState.Step1, GeneratePortal)
+        .AddStateStart(TeleportTaskState.Step0, () => EnableUI("Teleport UI"))
+        .AddTransition(TeleportTaskState.Step0, TeleportTaskInput.ClickButton1, () => DisableUI("Teleport UI"), () => CallInputAfterSeconds(10.0f, TeleportTaskInput.CompleteTeleport))
+        .AddTransition(TeleportTaskState.Step0, TeleportTaskState.Step1, TeleportTaskInput.CompleteTeleport)
+
+        .AddStateStart(TeleportTaskState.Step1, () => EnableUI("Portal UI"))
+        .AddTransition(TeleportTaskState.Step1, TeleportTaskInput.ClickButton2, () => DisableUI("Portal UI"), CheckPortalDone, GeneratePortal)
         .AddTransition(TeleportTaskState.Step1, TeleportTaskInput.EnterPortal, DestroyPortal, GeneratePortal)
-        .AddTransition(TeleportTaskState.Step1, TeleportTaskState.End, TeleportTaskInput.CompleteTeleport, DestroyPortal)
+        .AddTransition(TeleportTaskState.Step1, TeleportTaskState.End, TeleportTaskInput.CompletePortal, DestroyPortal)
 
         .AddStateStart(TeleportTaskState.End, () => EnableUI("End UI"));
 
@@ -64,7 +73,7 @@ public class TeleportTask : TaskBasedManager<TeleportTaskState, TeleportTaskInpu
     public IEnumerator _CheckPortalDone() {
         yield return new WaitUntil(() => (portalCount >= 5));
         
-        task.Processing(TeleportTaskInput.CompleteTeleport);
+        task.Processing(TeleportTaskInput.CompletePortal);
     }
 
     public void GeneratePortal() {

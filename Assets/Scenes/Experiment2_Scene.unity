@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0, g: 0, b: 0, a: 1}
+  m_IndirectSpecularColor: {r: 0.12731749, g: 0.13414757, b: 0.1210787, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -97,7 +97,7 @@ LightmapSettings:
     m_ExportTrainingData: 0
     m_TrainingDataDestination: TrainingData
     m_LightProbeSampleCountMultiplier: 4
-  m_LightingDataAsset: {fileID: 112000000, guid: bee81c38a14356e4b9b9257853e0b6ca,
+  m_LightingDataAsset: {fileID: 112000000, guid: 72df0edd07b11624198dc35f308f252f,
     type: 2}
   m_UseShadowmask: 1
 --- !u!196 &4
@@ -1737,7 +1737,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &400031872
 Transform:
   m_ObjectHideFlags: 0
@@ -1787,6 +1787,12 @@ MonoBehaviour:
     attachToUser: 1
     parent: {fileID: 0}
   - canvas: {fileID: -5358952474557125198, guid: a03d1d7fab7d9f04eb91076976b99b5f,
+      type: 3}
+    initPosition: {x: 0, y: -0.1, z: 0.6}
+    initRotation: {x: 0, y: 0, z: 0}
+    attachToUser: 1
+    parent: {fileID: 0}
+  - canvas: {fileID: -5358952474557125198, guid: 65a6e1b4bbcf9ea45b593b0a44c0bf8b,
       type: 3}
     initPosition: {x: 0, y: -0.1, z: 0.6}
     initRotation: {x: 0, y: 0, z: 0}
@@ -4336,7 +4342,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &1024802512
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4352,19 +4358,19 @@ MonoBehaviour:
   uiInfo:
   - canvas: {fileID: 4517703968194278730, guid: 5757b76dfa4d9644bb9964b64678cbcc,
       type: 3}
-    initPosition: {x: 0, y: -0.1, z: 0.6}
+    initPosition: {x: 0, y: -0.1, z: 0.3}
     initRotation: {x: 0, y: 0, z: 0}
     attachToUser: 1
     parent: {fileID: 0}
   - canvas: {fileID: -1208508024869077074, guid: 086a26e1796483b438eae1017a8b4970,
       type: 3}
-    initPosition: {x: 0, y: -0.1, z: 0.6}
+    initPosition: {x: 0, y: -0.1, z: 0.3}
     initRotation: {x: 0, y: 0, z: 0}
     attachToUser: 1
     parent: {fileID: 0}
   - canvas: {fileID: 6406195637794150101, guid: b7118b2868240e04f8547a34b8351941,
       type: 3}
-    initPosition: {x: 0, y: -0.1, z: 0.3}
+    initPosition: {x: 0, y: 0, z: 0.2}
     initRotation: {x: 0, y: 0, z: 0}
     attachToUser: 1
     parent: {fileID: 0}
@@ -4406,6 +4412,12 @@ MonoBehaviour:
     initRotation: {x: 0, y: 0, z: 0}
     attachToUser: 1
     parent: {fileID: 0}
+  - canvas: {fileID: -5358952474557125198, guid: 65a6e1b4bbcf9ea45b593b0a44c0bf8b,
+      type: 3}
+    initPosition: {x: 0, y: -0.1, z: 0.6}
+    initRotation: {x: 0, y: 0, z: 0}
+    attachToUser: 1
+    parent: {fileID: 0}
   - canvas: {fileID: 2737834834904623606, guid: 8bfc114133c905243a498e25c927e9f8,
       type: 3}
     initPosition: {x: 0, y: -0.1, z: 0.6}
@@ -4413,8 +4425,8 @@ MonoBehaviour:
     attachToUser: 1
     parent: {fileID: 0}
   manager: {fileID: 0}
-  ExperimentTimeDuration: 240
-  totalCoin: 20
+  ExperimentTimeDuration: 60
+  totalCoin: 5
   coinObjPrefab: {fileID: 4939091665116276085, guid: 80c70a46beac86442b826f59b94860a0,
     type: 3}
   portalObjPrefab: {fileID: 2378513342725396498, guid: cd68c3c59ea5af244982367ce38319cf,
@@ -7358,6 +7370,12 @@ MonoBehaviour:
     attachToUser: 1
     parent: {fileID: 0}
   - canvas: {fileID: -5358952474557125198, guid: a03d1d7fab7d9f04eb91076976b99b5f,
+      type: 3}
+    initPosition: {x: 0, y: -0.1, z: 0.6}
+    initRotation: {x: 0, y: 0, z: 0}
+    attachToUser: 1
+    parent: {fileID: 0}
+  - canvas: {fileID: -5358952474557125198, guid: 65a6e1b4bbcf9ea45b593b0a44c0bf8b,
       type: 3}
     initPosition: {x: 0, y: -0.1, z: 0.6}
     initRotation: {x: 0, y: 0, z: 0}

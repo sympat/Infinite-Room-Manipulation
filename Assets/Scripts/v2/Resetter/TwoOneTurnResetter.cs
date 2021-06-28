@@ -45,10 +45,10 @@ public class TwoOneTurnResetter : TaskBasedManager<TTResetState, TTResetInput>
         .AddTransition(TTResetState.Translating, TTResetState.Idle, TTResetInput.StayRealSpace, StopTranslation, () => DisableUI("Translation UI"), () => DisableUI("Translation Guide UI", true), () => ToggleRedirector(true));
 
         // Debug for task process
-        task.OnEachInput((newInput) => { Debug.Log($"{newInput} call"); } );
-        task.OnChange((fromState, toState) => { Debug.Log($"State {fromState} -> {toState}"); });
-        task.OnEnter((fromState) => { Debug.Log($"State {fromState} begin"); });
-        task.OnExit((fromState) => { Debug.Log($"State {fromState} ended"); });
+        // task.OnEachInput((newInput) => { Debug.Log($"{newInput} call"); } );
+        // task.OnChange((fromState, toState) => { Debug.Log($"State {fromState} -> {toState}"); });
+        // task.OnEnter((fromState) => { Debug.Log($"State {fromState} begin"); });
+        // task.OnExit((fromState) => { Debug.Log($"State {fromState} ended"); });
 
         task.Begin(TTResetState.Idle); 
     }
