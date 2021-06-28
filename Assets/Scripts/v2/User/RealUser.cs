@@ -29,6 +29,15 @@ public class RealUser : Circle2D
         offsetRotation = this.Rotation - trackedUser.Body.Rotation;
     }
 
+    private void OnTriggerEnter(Collider other) {
+        if(other.gameObject.layer == LayerMask.NameToLayer("RealSpace")) {
+            User user = trackedUsers.GetActiveUser();
+            UserEventArgs caller = new UserEventArgs(Behaviour.Enter, other.gameObject);
+            user.ProcessingEvent(caller);
+            // trackedUser.CallEvent(caller, UserEventType.onExit);
+        }
+    }
+
     private void OnTriggerExit(Collider other) {
         if(other.gameObject.layer == LayerMask.NameToLayer("RealSpace")) {
             User user = trackedUsers.GetActiveUser();
@@ -41,9 +50,8 @@ public class RealUser : Circle2D
 
     private void OnTriggerStay(Collider other) {
         if(other.gameObject.layer == LayerMask.NameToLayer("RealSpace")) {
+            User user = trackedUsers.GetActiveUser();
             if(other.GetComponent<Bound2D>().IsInSide(this)) {
-                User user = trackedUsers.GetActiveUser();
-
                 if(isFirstEnter) {
                     UserEventArgs caller = new UserEventArgs(Behaviour.CompletelyEnter, other.gameObject);
                     user.ProcessingEvent(caller);
@@ -53,10 +61,10 @@ public class RealUser : Circle2D
                     UserEventArgs caller = new UserEventArgs(Behaviour.CompletelyStay, other.gameObject);
                     user.ProcessingEvent(caller);
                 }
-                // User user = trackedUsers.GetActiveUser();
-                // UserEventArgs caller = new UserEventArgs(Behaviour.CompletelyStay, other.gameObject);
-                // user.ProcessingEvent(caller);
-                // trackedUser.CallEvent(caller, UserEventType.onCompletelyStay);
+            }
+            else {
+                UserEventArgs caller = new UserEventArgs(Behaviour.Stay, other.gameObject);
+                user.ProcessingEvent(caller);
             }
         }
     }

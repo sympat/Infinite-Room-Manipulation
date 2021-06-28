@@ -237,21 +237,16 @@ public class CustomCircularDrive : MonoBehaviour
         handHoverLocked = null;
     }
 
-    // ---- This is for reset operation 
-    // private bool isReset = false;
-    // private void OnDetachedFromHand() {
-    // 	Debug.Log("OnDetachedFromHand");
-    // 	if(isReset)
-    // 		Reset();
-    // }
-    // public void SetResetFlag() {
-    // 	isReset = true;
+    // public void Freeze() {
+    //     freezeOnMin = true;
+    //     // freezeOnMax = true;
     // }
 
     public void ResetRotation() {
+        // freezeOnMin = false;
+        // freezeOnMax = false;
         outAngle = 0;
         UpdateAll();
-        // isReset = false;
     }
 
     private GrabTypes grabbedWithType;

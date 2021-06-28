@@ -59,12 +59,12 @@ public class SteerToTargetRedirector : GainRedirector
         bool isCurvatureSelected = Mathf.Abs(curvatureMagnitude) > Mathf.Abs(rotationMagnitude);
 
         // dampening 
-        //if (angleToTarget <= ANGLE_THRESHOLD_FOR_DAMPENING)
-        //    selectedMagnitude *= Mathf.Sin(Mathf.Deg2Rad * 90 * angleToTarget / ANGLE_THRESHOLD_FOR_DAMPENING);
-        // if (distanceToTarget <= DISTANCE_THRESHOLD_FOR_DAMPENING)
-        // {
-        //     selectedMagnitude *= distanceToTarget / DISTANCE_THRESHOLD_FOR_DAMPENING;
-        // }
+        if (angleToTarget <= ANGLE_THRESHOLD_FOR_DAMPENING)
+           selectedMagnitude *= Mathf.Sin(Mathf.Deg2Rad * 90 * angleToTarget / ANGLE_THRESHOLD_FOR_DAMPENING);
+        if (distanceToTarget <= DISTANCE_THRESHOLD_FOR_DAMPENING)
+        {
+            selectedMagnitude *= distanceToTarget / DISTANCE_THRESHOLD_FOR_DAMPENING;
+        }
 
         //smoothing
         float finalRotation = (1.0f - SMOOTHING_FACTOR) * previousMagnitude + SMOOTHING_FACTOR * selectedMagnitude;
@@ -80,7 +80,7 @@ public class SteerToTargetRedirector : GainRedirector
         else
         {
             float direction = Mathf.Sign(curvatureGain);
-            if(Vector2.Angle(user.Body.deltaPosition, user.Body.Forward) > 5f) finalRotation = 0;
+            // if(Vector2.Angle(user.Body.deltaPosition, user.Body.Forward) > 5f) finalRotation = 0;
             return (GainType.Curvature, finalRotation * direction);
         }
     }
