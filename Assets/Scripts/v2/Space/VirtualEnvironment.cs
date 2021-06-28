@@ -75,8 +75,8 @@ public class VirtualEnvironment : Transform2D
         }
 
         _users = manager.users;
-
         User user = _users.GetActiveUser();
+
         user.AddEvent(Behaviour.CompletelyEnter, "NextRoom", ChangeCurrentRoom);
         user.AddEvent(Behaviour.Open, "Door", InitializeNextRoom);
 
@@ -111,7 +111,7 @@ public class VirtualEnvironment : Transform2D
         if(GetRoom(room) == null) return;
 
         room.gameObject.SetActive(isShow);
-        room.ToggleTeleportArea(toggleTeleportArea);
+        // room.ToggleTeleportArea(toggleTeleportArea);
 
         foreach(var door in GetConnectedDoors(room)) {
             door.gameObject.SetActive(isShow);
@@ -483,6 +483,7 @@ public class VirtualEnvironment : Transform2D
     }
 
     public void InitializeNextRoom(GameObject target) {
+        Debug.Log("InitializeNextRoom");
 
         Door openedDoor = target.GetComponent<Door>();
         if(openedDoor == null) throw new System.Exception("target object does not have Door Component");
@@ -496,19 +497,29 @@ public class VirtualEnvironment : Transform2D
 
         foreach(var room in neighborRooms) {
             room.gameObject.layer = LayerMask.NameToLayer("Room");
-            room.ToggleTeleportArea(false);
+            // room.ToggleTeleportArea(false);
         }
         
         Room nextRoom = openedDoor.GetConnectedRoom(CurrentRoom);
         nextRoom.gameObject.layer = LayerMask.NameToLayer("NextRoom");
-        nextRoom.ToggleTeleportArea(true);
+        // nextRoom.ToggleTeleportArea(true);
     }
 
     private void ChangeCurrentRoom(GameObject target) {
+        Debug.Log("ChangeCurrentRoom");
+
         Room targetRoom = target.GetComponent<Room>();
 
         if(targetRoom == null) throw new System.Exception("target object does not have Room Component");
 
         CurrentRoom = targetRoom;
+    }
+
+    public void ToggleConnectedDoors(Room v, bool enabled) {
+        List<Door> doors = GetConnectedDoors(v);
+
+        foreach(Door door in doors) {
+            door.ToggleDoorInteraction(enabled);
+        }
     }
 }

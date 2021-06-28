@@ -3,6 +3,18 @@ using UnityEditor;
 using UnityEngine.UIElements;
 using UnityEditor.UIElements;
 
+[CustomEditor(typeof(OrderManager))]
+public class OrderInspector : Editor {
+    public override void OnInspectorGUI() {
+        base.OnInspectorGUI();
+        
+        if(GUILayout.Button("Get Order")) {
+            OrderManager bound = (OrderManager) target;
+            bound.ShowLocomotionOrder();
+        }
+    }
+}
+
 [CustomEditor(typeof(Bound2D))]
 public class BoundInspector : Editor {
     public override void OnInspectorGUI() {

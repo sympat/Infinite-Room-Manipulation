@@ -10,8 +10,8 @@ public enum TTResetState {
 
 public enum TTResetInput {
     ExitRealSpace,
-    EnterRealSpace,
-    UserRotationDone
+    StayRealSpace,
+    UserRotationDone,
 }
 
 public class TwoOneTurnResetter : TaskBasedManager<TTResetState, TTResetInput>
@@ -34,15 +34,15 @@ public class TwoOneTurnResetter : TaskBasedManager<TTResetState, TTResetInput>
         GenerateUI("Translation Guide UI", uiInfo[2]);
 
         AddTaskEvent(TTResetInput.ExitRealSpace, Behaviour.Exit, "RealSpace");
-        AddTaskEvent(TTResetInput.EnterRealSpace, Behaviour.CompletelyEnter, "RealSpace");
+        AddTaskEvent(TTResetInput.StayRealSpace, Behaviour.CompletelyStay, "RealSpace");
         AddTaskEvent(TTResetInput.UserRotationDone, Behaviour.Rotate, "Default");
 
         task.AddStateStart(TTResetState.Idle)
         .AddTransition(TTResetState.Idle, TTResetState.Rotating, TTResetInput.ExitRealSpace, () => ToggleRedirector(false))
-        .AddStateStart(TTResetState.Rotating, StartRotation, () => EnableUI("Rotation UI"), () => CallAfterRotation(180f))
+        .AddStateStart(TTResetState.Rotating, StartRotation, () => EnableUI("Rotation UI"), () => CallAfterRotation(targetAngle))
         .AddTransition(TTResetState.Rotating, TTResetState.Translating, TTResetInput.UserRotationDone, StopRotation, () => DisableUI("Rotation UI"))
         .AddStateStart(TTResetState.Translating, StartTranslation, () => EnableUI("Translation UI"), () => EnableUI("Translation Guide UI", true))
-        .AddTransition(TTResetState.Translating, TTResetState.Idle, TTResetInput.EnterRealSpace, StopTranslation, () => DisableUI("Translation UI"), () => DisableUI("Translation Guide UI", true), () => ToggleRedirector(true));
+        .AddTransition(TTResetState.Translating, TTResetState.Idle, TTResetInput.StayRealSpace, StopTranslation, () => DisableUI("Translation UI"), () => DisableUI("Translation Guide UI", true), () => ToggleRedirector(true));
 
         // Debug for task process
         task.OnEachInput((newInput) => { Debug.Log($"{newInput} call"); } );
@@ -50,7 +50,7 @@ public class TwoOneTurnResetter : TaskBasedManager<TTResetState, TTResetInput>
         task.OnEnter((fromState) => { Debug.Log($"State {fromState} begin"); });
         task.OnExit((fromState) => { Debug.Log($"State {fromState} ended"); });
 
-        task.Begin(TTResetState.Idle);
+        task.Begin(TTResetState.Idle); 
     }
 
     public void ToggleRedirector(bool enabled) {

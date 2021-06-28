@@ -6,8 +6,10 @@ using UnityEngine.UI;
 
 public enum Exp2State {
     Initial,
-    GotoNext,
-    Collecting,
+    NextRoom,
+    Portal,
+    Coin,
+    // Collecting,
     End
 }
 
@@ -15,12 +17,14 @@ public enum Exp2Input {
     ClickButton0,
     ClickButton1,
     ClickButton2,
-    ReleaseCoin,
+    EnterPortal,
+    CollectCoin,
     GenerateCoin,
     CollectionDone,
     EnterRoom,
-    End,
-    NotEnd
+    TaskEnd,
+    SubTaskEnd,
+    SubTaskNotEnd
 }
 
 public class Experiment2 : TaskBasedManager<Exp2State, Exp2Input>
@@ -28,12 +32,12 @@ public class Experiment2 : TaskBasedManager<Exp2State, Exp2Input>
     public float ExperimentTimeDuration;
     public int totalCoin;
     public GameObject coinObjPrefab;
-    private GameObject coinObj;
-
+    public GameObject portalObjPrefab;
     [HideInInspector]
     public bool isLocomotionDone = false;
-    private bool isExperimentDone = false;
-
+    
+    private GameObject coinObj, portalObj;
+    private bool isExperimentDone = false, isSubTaskDone = false;
     private int collectingCount = 0;
 
     // Start is called before the first frame update
@@ -47,22 +51,26 @@ public class Experiment2 : TaskBasedManager<Exp2State, Exp2Input>
         // Add events as task inputs
         AddTaskEvent(Exp2Input.ClickButton0, UIBehaviour.Click, "Initial UI", "image_1", "button_0");
         AddTaskEvent(Exp2Input.ClickButton1, UIBehaviour.Click, "Goto Next UI", "image_1", "button_0");
-        AddTaskEvent(Exp2Input.ReleaseCoin, Behaviour.Release, "Coin");
+        AddTaskEvent(Exp2Input.CollectCoin, Behaviour.Release, "Coin");
+        AddTaskEvent(Exp2Input.EnterPortal, Behaviour.Enter, "Portal");
         AddTaskEvent(Exp2Input.EnterRoom, Behaviour.CompletelyEnter, "NextRoom");
 
         // Define task
         task.AddStateStart(Exp2State.Initial, () => EnableUI("Initial UI"))
-        .AddTransition(Exp2State.Initial, Exp2State.GotoNext, Exp2Input.ClickButton0, () => DisableUI("Initial UI"), () => CallExperimentDone(ExperimentTimeDuration))
+        .AddTransition(Exp2State.Initial, Exp2State.NextRoom, Exp2Input.ClickButton0, () => DisableUI("Initial UI"), () => CallExperimentDone(ExperimentTimeDuration))
 
-        .AddStateStart(Exp2State.GotoNext, () => EnableUI("Goto Next UI"))
-        .AddTransition(Exp2State.GotoNext, Exp2Input.ClickButton1, () => DisableUI("Goto Next UI"))
-        .AddTransition(Exp2State.GotoNext, Exp2State.Collecting, Exp2Input.EnterRoom, GenerateCoin, CheckCollectDone)
+        .AddStateStart(Exp2State.NextRoom, () => EnableUI("Goto Next UI"))
+        .AddTransition(Exp2State.NextRoom, Exp2Input.ClickButton1, () => DisableUI("Goto Next UI"))
+        .AddTransition(Exp2State.NextRoom, Exp2State.Portal, Exp2Input.EnterRoom, CheckSubTaskDone, () => ToggleDoors(false))
 
-        .AddTransition(Exp2State.Collecting, Exp2Input.ReleaseCoin, DestroyCoin, () => CallInputAfterSeconds(2.0f, Exp2Input.GenerateCoin))
-        .AddTransition(Exp2State.Collecting, Exp2Input.GenerateCoin, GenerateCoin)
-        .AddTransition(Exp2State.Collecting, Exp2Input.CollectionDone, DestroyCoin, RaiseEndCondition)
-        .AddTransition(Exp2State.Collecting, Exp2State.End, Exp2Input.End)
-        .AddTransition(Exp2State.Collecting, Exp2State.GotoNext, Exp2Input.NotEnd)
+        .AddStateStart(Exp2State.Portal, GeneratePortal)
+        .AddTransition(Exp2State.Portal, Exp2State.Coin, Exp2Input.EnterPortal, DestroyPortal)
+
+        .AddStateStart(Exp2State.Coin, GenerateCoin)
+        .AddTransition(Exp2State.Coin, Exp2Input.CollectCoin, DestroyCoin, RaiseTaskEnd, RaiseSubTaskEnd)
+        .AddTransition(Exp2State.Coin, Exp2State.Portal, Exp2Input.SubTaskNotEnd)
+        .AddTransition(Exp2State.Coin, Exp2State.NextRoom, Exp2Input.SubTaskEnd, () => Destroy(coinObj), () => ToggleDoors(true))
+        .AddTransition(Exp2State.Coin, Exp2State.End, Exp2Input.TaskEnd)
 
         .AddStateStart(Exp2State.End, () => EnableUI("End UI"));
 
@@ -80,13 +88,34 @@ public class Experiment2 : TaskBasedManager<Exp2State, Exp2Input>
         CoroutineManager.Instance.CallWaitForSeconds(time, () => isExperimentDone = true);
     }
 
+    public void GeneratePortal() {
+        User user = users.GetActiveUser();
+        Vector2 portalPos = user.Body.Position;
+        do {
+            portalPos = virtualEnvironment.CurrentRoom.SamplingPosition(0.3f, Space.World);
+        } while ((portalPos - user.Body.Position).magnitude < 0.7f);
+
+        portalObj = Instantiate(portalObjPrefab, virtualEnvironment.transform);
+        portalObj.transform.position = Utility.CastVector2Dto3D(portalPos);
+    }
+
+    public void DestroyPortal() {
+        Destroy(portalObj);
+    }
+
     public void GenerateCoin() {
-        // Debug.Log("GenerateCoin");
-        Vector2 localPosition = virtualEnvironment.CurrentRoom.SamplingPosition(0.3f, Space.World);
-        // Debug.Log($"globalPosition {localPosition}");
-        // Debug.Log(Utility.CastVector2Dto3D(localPosition, 1.5f));
+        User user = users.GetActiveUser();
+        Vector2 coinPos = user.Body.Position;
+        do {
+            coinPos = virtualEnvironment.CurrentRoom.SamplingPosition(0.3f, Space.World);
+        } while ((coinPos - user.Body.Position).magnitude < 0.3f);
+
         coinObj = Instantiate(coinObjPrefab, virtualEnvironment.transform);
-        coinObj.transform.position = Utility.CastVector2Dto3D(localPosition, 1.2f);
+        coinObj.transform.position = Utility.CastVector2Dto3D(coinPos, 1.2f);
+    }
+
+    public void ToggleDoors(bool enabled) {
+        virtualEnvironment.ToggleConnectedDoors(virtualEnvironment.CurrentRoom, enabled);
     }
 
     public void DestroyCoin() {
@@ -95,24 +124,30 @@ public class Experiment2 : TaskBasedManager<Exp2State, Exp2Input>
         collectingCount++;
     }
 
-    public virtual void CheckCollectDone() {
+    public virtual void CheckSubTaskDone() {
+        isSubTaskDone = false;
         StartCoroutine(_CheckCollectDone());
     }
 
     public IEnumerator _CheckCollectDone() {
         yield return new WaitUntil(() => (collectingCount >= totalCoin && isLocomotionDone));
-        DestroyCoin();
         collectingCount = 0;
-
-        task.Processing(Exp2Input.CollectionDone);
+        isLocomotionDone = false;
+        isSubTaskDone = true;
     }
 
-    public void RaiseEndCondition() {
-        if(isExperimentDone) {
-            task.Processing(Exp2Input.End);
+    public void RaiseSubTaskEnd() {
+        if(isSubTaskDone) {
+            task.Processing(Exp2Input.SubTaskEnd);
         }
         else {
-            task.Processing(Exp2Input.NotEnd);
+            task.Processing(Exp2Input.SubTaskNotEnd);
+        }
+    }
+
+    public void RaiseTaskEnd() {
+        if(isExperimentDone) {
+            task.Processing(Exp2Input.TaskEnd);
         }
     }
 

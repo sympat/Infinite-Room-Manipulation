@@ -12,7 +12,6 @@ public class UIContainer {
     public Vector3 initPosition;
     public Vector3 initRotation;
     public bool attachToUser;
-    public bool applyFlexibleUI;
     [HideInInspector]
     public Transform parent;
 }
@@ -51,8 +50,6 @@ public class UIManager : Singleton<UIManager>
 
         // string nameWithID = name + "_" + instantiatedUI.GetInstanceID();
 
-        if(uiInfo.applyFlexibleUI) instantiatedUI.gameObject.AddComponent<FlexibleUI>();
-
         instantiatedUI.name = name;
         ui.Add(name, instantiatedUI);
         initInfo.Add(name, uiInfo);
@@ -81,7 +78,17 @@ public class UIManager : Singleton<UIManager>
     //     ui[name].transform.SetParent(this.transform);
     // }
 
-    public void ToggleUI(string name, bool enabled, User user, bool useLocal = false) {
+    public void ToggleUIBase(string name, bool enabled, params string[] childName) {
+        Transform target = ui[name].transform;
+
+        foreach(string targetName in childName) {
+            target = target.Find(targetName);
+        }
+
+        target.gameObject.SetActive(enabled);
+    }
+
+    public void ToggleUICanvas(string name, bool enabled, User user, bool useLocal = false) {
 
         if(enabled) {
             if(useLocal) {

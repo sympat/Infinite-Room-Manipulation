@@ -12,9 +12,9 @@ public class GainRedirector : MonoBehaviour
     // therefore, degree = (1 / r) * (180 / pi) and radius = 1 / g_c
     // if you want to detail, see "IEEE TRANSACTIONS ON VISUALIZATION AND COMPUTER GRAPHICS, VOL. 19, NO. 4, APRIL 2013 Comparing Four Approaches to Generalized Redirected Walking: Simulation and Live User Data"
     [HideInInspector]
-    public const float MIN_ROTATION_GAIN = -0.33f; // -0.33f
+    public const float MIN_ROTATION_GAIN = -0.14f; // -0.33f
     [HideInInspector]
-    public const float MAX_ROTATION_GAIN = 0.24f;
+    public const float MAX_ROTATION_GAIN = 0.14f; // 0.24f
     [HideInInspector]
     public const float MIN_CURVATURE_GAIN = -0.045f; // turn radius : 22m
     [HideInInspector]
@@ -66,17 +66,17 @@ public class GainRedirector : MonoBehaviour
         //     if(Vector2.Angle(user.Body.deltaPosition, user.Body.Forward) > 5f) degree = 0;
         //     type = GainType.Translation;
         // }
-        if(user.Body.deltaPosition.magnitude > 0.2f && user.Body.deltaPosition.magnitude >= Mathf.Abs(user.Body.deltaRotation)) // Curvature
+        if (user.Body.deltaPosition.magnitude > MOVEMENT_THRESHOLD && user.Body.deltaPosition.magnitude >= Mathf.Abs(user.Body.deltaRotation)) // Curvature
         {
             degree = Mathf.Rad2Deg * user.Body.deltaPosition.magnitude * (HODGSON_MAX_CURVATURE_GAIN);
-            if(Vector2.Angle(user.Body.deltaPosition, user.Body.Forward) > 5f) degree = 0;
+            // if(Vector2.Angle(user.Body.deltaPosition, user.Body.Forward) > 5f) degree = 0;
             type = GainType.Curvature;
         }
-        else if (Mathf.Abs(user.Body.deltaRotation) > ROTATION_THRESHOLD && user.Body.deltaPosition.magnitude < Mathf.Abs(user.Body.deltaRotation)) // Rotation
-        {
-            degree = user.Body.deltaRotation * (MAX_ROTATION_GAIN);
-            type = GainType.Rotation;
-        }
+        // else if (Mathf.Abs(user.Body.deltaRotation) > ROTATION_THRESHOLD && user.Body.deltaPosition.magnitude < Mathf.Abs(user.Body.deltaRotation)) // Rotation
+        // {
+        //     degree = user.Body.deltaRotation * (MAX_ROTATION_GAIN);
+        //     type = GainType.Rotation;
+        // }
         else
         {
             type = GainType.Undefined;

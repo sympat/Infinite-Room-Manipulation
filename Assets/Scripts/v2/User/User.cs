@@ -177,6 +177,7 @@ public class User : Transform2D
     }
 
     public void AddEvent(Behaviour behaviour, string layer, UnityAction<GameObject> call) {
+        // Debug.Log($"AddEvent {behaviour} {layer}");
         int layerToInt = LayerMask.NameToLayer(layer);
         if(layerToInt < 0) throw new System.Exception("InValid Layer index");
 
@@ -196,6 +197,10 @@ public class User : Transform2D
     }
 
     public void ProcessingEvent(UserEventArgs e) {
+        // if(e.behaviour == Behaviour.Open) { 
+        //     Debug.Log($"ProcessingEvent {e.behaviour} {LayerMask.LayerToName(e.target.layer)}"); 
+        // }
+
         InvokeEvent(e.behaviour, e.target);
     }
 

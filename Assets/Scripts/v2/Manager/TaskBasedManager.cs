@@ -53,14 +53,14 @@ where T2 : Enum
     protected void EnableUI(string name, bool useLocal = false) {
         User user = users.GetActiveUser();
 
-        UIManager.Instance.ToggleUI(name, true, user, useLocal);
+        UIManager.Instance.ToggleUICanvas(name, true, user, useLocal);
         user.ToggleHandPointer(true); 
     }
 
     protected void DisableUI(string name, bool useLocal = false) {
         User user = users.GetActiveUser();
 
-        UIManager.Instance.ToggleUI(name, false, user, useLocal); 
+        UIManager.Instance.ToggleUICanvas(name, false, user, useLocal); 
         user.ToggleHandPointer(false);
     }
 
