@@ -107,10 +107,12 @@ public class VirtualEnvironment : Transform2D
         if(room2 != null) adjList[room2].Add(door);
     }
 
-    public void SwitchRoomVisualization(Room room, bool isShow, bool toggleTeleportArea) {
+    public void SwitchRoomVisualization(Room room, bool isShow, bool toggleLight) {
         if(GetRoom(room) == null) return;
 
         room.gameObject.SetActive(isShow);
+        room.gameObject.GetComponentInChildren<Light>().enabled = toggleLight;
+
         // room.ToggleTeleportArea(toggleTeleportArea);
 
         foreach(var door in GetConnectedDoors(room)) {

@@ -6,7 +6,8 @@ using UnityEngine.UI;
 
 public enum Exp2State {
     Initial,
-    NextRoom,
+    GoToNextRoom,
+    EnterNextRoom,
     Portal,
     Coin,
     // Collecting,
@@ -46,30 +47,36 @@ public class Experiment2 : TaskBasedManager<Exp2State, Exp2Input>
         // Generate UI
         GenerateUI("Initial UI", uiInfo[0]);
         GenerateUI("Goto Next UI", uiInfo[1]);
-        GenerateUI("End UI", uiInfo[2]);
+        GenerateUI("Room Task UI", uiInfo[2]);
+        GenerateUI("End UI", uiInfo[3]);
+
 
         // Add events as task inputs
         AddTaskEvent(Exp2Input.ClickButton0, UIBehaviour.Click, "Initial UI", "image_1", "button_0");
         AddTaskEvent(Exp2Input.ClickButton1, UIBehaviour.Click, "Goto Next UI", "image_1", "button_0");
+        AddTaskEvent(Exp2Input.ClickButton2, UIBehaviour.Click, "Room Task UI", "image_1", "button_0");
         AddTaskEvent(Exp2Input.CollectCoin, Behaviour.Release, "Coin");
         AddTaskEvent(Exp2Input.EnterPortal, Behaviour.Enter, "Portal");
         AddTaskEvent(Exp2Input.EnterRoom, Behaviour.CompletelyEnter, "NextRoom");
 
         // Define task
         task.AddStateStart(Exp2State.Initial, () => EnableUI("Initial UI"))
-        .AddTransition(Exp2State.Initial, Exp2State.NextRoom, Exp2Input.ClickButton0, () => DisableUI("Initial UI"), () => CallExperimentDone(ExperimentTimeDuration))
+        .AddTransition(Exp2State.Initial, Exp2State.GoToNextRoom, Exp2Input.ClickButton0, () => DisableUI("Initial UI"), () => CallExperimentDone(ExperimentTimeDuration))
 
-        .AddStateStart(Exp2State.NextRoom, () => EnableUI("Goto Next UI"))
-        .AddTransition(Exp2State.NextRoom, Exp2Input.ClickButton1, () => DisableUI("Goto Next UI"))
-        .AddTransition(Exp2State.NextRoom, Exp2State.Portal, Exp2Input.EnterRoom, CheckSubTaskDone, () => ToggleDoors(false))
+        .AddStateStart(Exp2State.GoToNextRoom, () => EnableUI("Goto Next UI"))
+        .AddTransition(Exp2State.GoToNextRoom, Exp2Input.ClickButton1, () => DisableUI("Goto Next UI"))
+        .AddTransition(Exp2State.GoToNextRoom, Exp2State.EnterNextRoom, Exp2Input.EnterRoom)
+
+        .AddStateStart(Exp2State.EnterNextRoom, () => EnableUI("Room Task UI"))
+        .AddTransition(Exp2State.EnterNextRoom, Exp2State.Portal, Exp2Input.ClickButton2, () => DisableUI("Room Task UI"), CheckSubTaskDone, () => ToggleDoors(false))
 
         .AddStateStart(Exp2State.Portal, GeneratePortal)
         .AddTransition(Exp2State.Portal, Exp2State.Coin, Exp2Input.EnterPortal, DestroyPortal)
 
         .AddStateStart(Exp2State.Coin, GenerateCoin)
-        .AddTransition(Exp2State.Coin, Exp2Input.CollectCoin, DestroyCoin, RaiseTaskEnd, RaiseSubTaskEnd)
+        .AddTransition(Exp2State.Coin, Exp2Input.CollectCoin, DestroyCoin, CheckEndCondition)
         .AddTransition(Exp2State.Coin, Exp2State.Portal, Exp2Input.SubTaskNotEnd)
-        .AddTransition(Exp2State.Coin, Exp2State.NextRoom, Exp2Input.SubTaskEnd, () => Destroy(coinObj), () => ToggleDoors(true))
+        .AddTransition(Exp2State.Coin, Exp2State.GoToNextRoom, Exp2Input.SubTaskEnd, () => Destroy(coinObj), () => ToggleDoors(true))
         .AddTransition(Exp2State.Coin, Exp2State.End, Exp2Input.TaskEnd)
 
         .AddStateStart(Exp2State.End, () => EnableUI("End UI"));
@@ -136,19 +143,31 @@ public class Experiment2 : TaskBasedManager<Exp2State, Exp2Input>
         isSubTaskDone = true;
     }
 
-    public void RaiseSubTaskEnd() {
+    // public void RaiseSubTaskEnd() {
+    //     if(isSubTaskDone) {
+    //         task.Processing(Exp2Input.SubTaskEnd);
+    //     }
+    //     else {
+    //         task.Processing(Exp2Input.SubTaskNotEnd);
+    //     }
+    // }
+
+    public void CheckEndCondition() {
         if(isSubTaskDone) {
-            task.Processing(Exp2Input.SubTaskEnd);
+            if(isExperimentDone) 
+                task.Processing(Exp2Input.TaskEnd);
+            else 
+                task.Processing(Exp2Input.SubTaskEnd);
         }
         else {
             task.Processing(Exp2Input.SubTaskNotEnd);
         }
     }
 
-    public void RaiseTaskEnd() {
-        if(isExperimentDone) {
-            task.Processing(Exp2Input.TaskEnd);
-        }
-    }
+    // public void RaiseTaskEnd() {
+    //     if(isSubTaskDone && isExperimentDone) {
+    //         task.Processing(Exp2Input.TaskEnd);
+    //     }
+    // }
 
 }
