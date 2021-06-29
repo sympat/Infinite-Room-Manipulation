@@ -143,31 +143,43 @@ public class User : Transform2D
     }
 
     public IEnumerator CallAfterRotation(float degree) {
-        Vector2 startForward = Body.Forward;
-        Vector2 prevForward = startForward;
+
+        Vector2 prevForward = Body.Forward;
+        float sumAngle = 0;
 
         while(true) {
 
             Vector2 currentForward = Body.Forward;
 
-            float currentRotating = Vector2.SignedAngle(startForward, currentForward);
-            float currentDirection = (currentRotating == 0) ? 0 : Mathf.Sign(currentRotating);
+            // float currentRotating = Vector2.SignedAngle(startForward, currentForward);
+            // float currentDirection = (currentRotating == 0) ? 0 : Mathf.Sign(currentRotating);
 
-            float rotDirection = Mathf.Sign(degree);
+            // Debug.Log(currentRotating);
 
-            Debug.Log(currentRotating);
+            // float prevRotating = Vector2.SignedAngle(startForward, prevForward);
+            // float prevDirection = (prevRotating == 0) ? 0 : Mathf.Sign(prevRotating);
 
-            float prevRotating = Vector2.SignedAngle(startForward, prevForward);
-            float prevDirection = (prevRotating == 0) ? 0 : Mathf.Sign(prevRotating);
+            float deltaAngle = Vector2.SignedAngle(prevForward, currentForward);
+            sumAngle += deltaAngle;
 
-            if(prevDirection * currentDirection < 0 && Mathf.Abs(prevRotating) + Mathf.Abs(currentRotating) >= degree) {
-                break;
+            // Debug.Log(sumAngle);
+
+            if(degree < 0) {
+                if(sumAngle <= degree)
+                    break;
             }
+            else {
+                if(sumAngle >= degree)
+                    break;
+            }
+
+            // if(prevDirection * currentDirection < 0 && Mathf.Abs(prevRotating) + Mathf.Abs(currentRotating) >= degree) {
+            //     break;
+            // }
 
             // if(rotDirection * currentDirection > 0 && Mathf.Abs(currentRotating) >= Mathf.Abs(degree)) {
             //     break;
             // }
-
 
             prevForward = currentForward;
 
