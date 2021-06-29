@@ -25,8 +25,6 @@ public class TwoOneTurnResetter : TaskBasedManager<TTResetState, TTResetInput>
 
     protected override void GenerateTask()
     {
-        targetAngle = 180;
-        ratio = 2;
         redirector = this.GetComponent<GainRedirector>();
 
         GenerateUI("Rotation UI", uiInfo[0]);
@@ -34,12 +32,12 @@ public class TwoOneTurnResetter : TaskBasedManager<TTResetState, TTResetInput>
         GenerateUI("Translation Guide UI", uiInfo[2]);
 
         AddTaskEvent(TTResetInput.ExitRealSpace, Behaviour.Exit, "RealSpace");
-        AddTaskEvent(TTResetInput.StayRealSpace, Behaviour.CompletelyStay, "RealSpace");
+        AddTaskEvent(TTResetInput.StayRealSpace, Behaviour.Stay, "RealSpace");
         AddTaskEvent(TTResetInput.UserRotationDone, Behaviour.Rotate, "Default");
 
         task.AddStateStart(TTResetState.Idle)
         .AddTransition(TTResetState.Idle, TTResetState.Rotating, TTResetInput.ExitRealSpace, () => ToggleRedirector(false))
-        .AddStateStart(TTResetState.Rotating, StartRotation, () => EnableUI("Rotation UI"), () => CallAfterRotation(targetAngle))
+        .AddStateStart(TTResetState.Rotating, CalculateResetAngle, StartRotation, () => EnableUI("Rotation UI"), () => CallAfterRotation(targetAngle))
         .AddTransition(TTResetState.Rotating, TTResetState.Translating, TTResetInput.UserRotationDone, StopRotation, () => DisableUI("Rotation UI"))
         .AddStateStart(TTResetState.Translating, StartTranslation, () => EnableUI("Translation UI"), () => EnableUI("Translation Guide UI", true))
         .AddTransition(TTResetState.Translating, TTResetState.Idle, TTResetInput.StayRealSpace, StopTranslation, () => DisableUI("Translation UI"), () => DisableUI("Translation Guide UI", true), () => ToggleRedirector(true));
@@ -51,6 +49,22 @@ public class TwoOneTurnResetter : TaskBasedManager<TTResetState, TTResetInput>
         // task.OnExit((fromState) => { Debug.Log($"State {fromState} ended"); });
 
         task.Begin(TTResetState.Idle); 
+    }
+
+    public void CalculateResetAngle() {
+        targetAngle = 180;
+        ratio = 2;
+
+        if(targetAngle > 0) {
+            UIManager.Instance.ToggleUIBase("Rotation UI", false, "image_2");
+            UIManager.Instance.ToggleUIBase("Rotation UI", true, "image_3");
+
+        }
+        else {
+            UIManager.Instance.ToggleUIBase("Rotation UI", true, "image_2");
+            UIManager.Instance.ToggleUIBase("Rotation UI", false, "image_3");
+
+        }
     }
 
     public void ToggleRedirector(bool enabled) {
