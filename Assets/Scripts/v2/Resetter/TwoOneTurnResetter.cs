@@ -16,11 +16,11 @@ public enum TTResetInput {
 
 public class TwoOneTurnResetter : TaskBasedManager<TTResetState, TTResetInput>
 {
+    public AudioSource resetSound;
     protected float targetAngle;
     protected float ratio;
 
     private IEnumerator coroutine1, coroutine2;
-
     private GainRedirector redirector;
 
     protected override void GenerateTask()
@@ -77,9 +77,15 @@ public class TwoOneTurnResetter : TaskBasedManager<TTResetState, TTResetInput>
     }
 
     public void StartRotation() {
-        // User user = users.GetActiveUser();
-        // AudioSource.PlayClipAtPoint(SoundSetting.Instance.ResetSound, user.Body.transform.position);
+        StartCoroutine(PlayResetSound());
         StartCoroutine(coroutine1 = _ApplyRotation());
+    }
+
+    public IEnumerator PlayResetSound() {
+        AudioSource resetSound = Instantiate<AudioSource>(SoundSetting.Instance.resetSoundPrefab, virtualEnvironment.transform);
+        resetSound.Play();
+        yield return new WaitForSeconds(2.5f);
+        resetSound.Stop();
     }
 
     public void StopRotation() {

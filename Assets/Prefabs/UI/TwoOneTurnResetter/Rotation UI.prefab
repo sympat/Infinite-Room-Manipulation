@@ -471,7 +471,8 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   m_text: "\uD558\uB358 \uC77C\uC744 \uBA48\uCD94\uACE0\nUI\uAC00 \uC0AC\uB77C\uC9C0\uAE30
-    \uC804\uAE4C\uC9C0\n\uC81C\uC790\uB9AC\uC5D0\uC11C \uD68C\uC804\uD574\uC8FC\uC138\uC694.\n"
+    \uC804\uAE4C\uC9C0\n\uC81C\uC790\uB9AC\uC5D0\uC11C \uD654\uC0B4\uD45C \uBC29\uD5A5\uC73C\uB85C
+    \uD68C\uC804\uD558\uC138\uC694.\n"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 612d09bdcf6f77c4b89f70077fc98622, type: 2}
   m_sharedMaterial: {fileID: -7671593566332052551, guid: 612d09bdcf6f77c4b89f70077fc98622,

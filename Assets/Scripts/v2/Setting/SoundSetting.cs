@@ -8,5 +8,6 @@ public class SoundSetting : Singleton<SoundSetting>
     public AudioClip coinCollectSound;
     public AudioClip targetReachSound;
     public AudioClip ResetSound;
+    public AudioSource resetSoundPrefab;
 
 }

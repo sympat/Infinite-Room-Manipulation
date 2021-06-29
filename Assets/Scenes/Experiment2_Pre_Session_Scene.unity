@@ -146,13 +146,14 @@ GameObject:
   - component: {fileID: 30119159}
   - component: {fileID: 30119161}
   - component: {fileID: 30119158}
+  - component: {fileID: 30119162}
   m_Layer: 0
   m_Name: Reset Session
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &30119158
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -185,6 +186,7 @@ MonoBehaviour:
     attachToUser: 1
     parent: {fileID: 0}
   manager: {fileID: 0}
+  resetSound: {fileID: 0}
 --- !u!114 &30119159
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -248,6 +250,38 @@ MonoBehaviour:
   manager: {fileID: 0}
   portalObjPrefab: {fileID: 2378513342725396498, guid: cd68c3c59ea5af244982367ce38319cf,
     type: 3}
+--- !u!114 &30119162
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 30119157}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5628c6e821a2ae040958a0a0dd05a746, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  uiInfo:
+  - canvas: {fileID: 4517703968194278730, guid: 5757b76dfa4d9644bb9964b64678cbcc,
+      type: 3}
+    initPosition: {x: 0, y: -0.1, z: 0.3}
+    initRotation: {x: 0, y: 0, z: 0}
+    attachToUser: 1
+    parent: {fileID: 0}
+  - canvas: {fileID: -1208508024869077074, guid: 086a26e1796483b438eae1017a8b4970,
+      type: 3}
+    initPosition: {x: 0, y: -0.1, z: 0.3}
+    initRotation: {x: 0, y: 0, z: 0}
+    attachToUser: 1
+    parent: {fileID: 0}
+  - canvas: {fileID: 6406195637794150101, guid: b7118b2868240e04f8547a34b8351941,
+      type: 3}
+    initPosition: {x: 0, y: 0, z: 0.2}
+    initRotation: {x: 0, y: 0, z: 0}
+    attachToUser: 1
+    parent: {fileID: 0}
+  manager: {fileID: 0}
 --- !u!114 &33663914 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 5654483893411748061, guid: 495952893ccb94a48b6838c88065dcd8,
@@ -1815,7 +1849,9 @@ MonoBehaviour:
   doorCloseSound: {fileID: 8300000, guid: 99ec29c4dd9bc2246875de8be5eade89, type: 3}
   coinCollectSound: {fileID: 8300000, guid: 50c746b7d2217494385ec84e66113667, type: 3}
   targetReachSound: {fileID: 0}
-  ResetSound: {fileID: 0}
+  ResetSound: {fileID: 8300000, guid: fa3196d0471e736479f934ff8ea5e74a, type: 3}
+  resetSoundPrefab: {fileID: 3406252511157529502, guid: 4521654136884ad4b8596a9cf585e229,
+    type: 3}
 --- !u!1001 &1644131637
 PrefabInstance:
   m_ObjectHideFlags: 0
