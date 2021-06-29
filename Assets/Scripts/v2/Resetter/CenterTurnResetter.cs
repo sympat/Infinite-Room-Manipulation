@@ -98,7 +98,15 @@ public class CenterTurnResetter : TaskBasedManager<CTResetState, CTResetInput>
     }
 
     public void StartRotation() {
+        StartCoroutine(PlayResetSound());
         StartCoroutine(coroutine1 = _ApplyRotation());
+    }
+
+    public IEnumerator PlayResetSound() {
+        AudioSource resetSound = Instantiate<AudioSource>(SoundSetting.Instance.resetSoundPrefab, virtualEnvironment.transform);
+        resetSound.Play();
+        yield return new WaitForSeconds(2.5f);
+        resetSound.Stop();
     }
 
     public void StopRotation() {
