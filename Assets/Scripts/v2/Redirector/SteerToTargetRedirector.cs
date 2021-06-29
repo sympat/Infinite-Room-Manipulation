@@ -5,7 +5,7 @@ using UnityEngine;
 public class SteerToTargetRedirector : GainRedirector
 {
     private const float DISTANCE_THRESHOLD_FOR_DAMPENING = 1.25f; // Distance threshold to apply dampening (meters)
-    private const float ANGLE_THRESHOLD_FOR_DAMPENING = 45f; // Angle threshold to apply dampening (degrees)
+    private const float ANGLE_THRESHOLD_FOR_DAMPENING = 60f; // Angle threshold to apply dampening (degrees)
     private const float SMOOTHING_FACTOR = 0.125f; // Smoothing factor for redirection rotations
 
     private float previousMagnitude = 0f;

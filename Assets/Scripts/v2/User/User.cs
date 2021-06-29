@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using System;
 using UnityEngine;
@@ -153,6 +153,10 @@ public class User : Transform2D
             float currentRotating = Vector2.SignedAngle(startForward, currentForward);
             float currentDirection = (currentRotating == 0) ? 0 : Mathf.Sign(currentRotating);
 
+            float rotDirection = Mathf.Sign(degree);
+
+            Debug.Log(currentRotating);
+
             float prevRotating = Vector2.SignedAngle(startForward, prevForward);
             float prevDirection = (prevRotating == 0) ? 0 : Mathf.Sign(prevRotating);
 
@@ -160,10 +164,17 @@ public class User : Transform2D
                 break;
             }
 
+            // if(rotDirection * currentDirection > 0 && Mathf.Abs(currentRotating) >= Mathf.Abs(degree)) {
+            //     break;
+            // }
+
+
             prevForward = currentForward;
 
             yield return new WaitForFixedUpdate();
         }
+
+        // Debug.Log("Rotation Done!");
 
         UserEventArgs e = new UserEventArgs(Behaviour.Rotate);
         ProcessingEvent(e);

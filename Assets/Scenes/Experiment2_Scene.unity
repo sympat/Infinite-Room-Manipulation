@@ -1737,7 +1737,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &400031872
 Transform:
   m_ObjectHideFlags: 0
@@ -1746,7 +1746,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 400031871}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 40}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 6917189092715239298}
@@ -4229,7 +4229,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ee8ee4fa363629347addd9730613afe6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  experimentID: Hwnag
+  experimentID: SA202
 --- !u!4 &958973380
 Transform:
   m_ObjectHideFlags: 0
@@ -4336,13 +4336,14 @@ GameObject:
   - component: {fileID: 1024802513}
   - component: {fileID: 1024802512}
   - component: {fileID: 1024802516}
+  - component: {fileID: 1024802517}
   m_Layer: 0
   m_Name: S2C
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1024802512
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4425,8 +4426,8 @@ MonoBehaviour:
     attachToUser: 1
     parent: {fileID: 0}
   manager: {fileID: 0}
-  ExperimentTimeDuration: 60
-  totalCoin: 5
+  ExperimentTimeDuration: 240
+  totalCoin: 20
   coinObjPrefab: {fileID: 4939091665116276085, guid: 80c70a46beac86442b826f59b94860a0,
     type: 3}
   portalObjPrefab: {fileID: 2378513342725396498, guid: cd68c3c59ea5af244982367ce38319cf,
@@ -4461,6 +4462,38 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4386d656e10f5924ba75801ecf4e863b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &1024802517
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1024802511}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5628c6e821a2ae040958a0a0dd05a746, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  uiInfo:
+  - canvas: {fileID: 4517703968194278730, guid: 5757b76dfa4d9644bb9964b64678cbcc,
+      type: 3}
+    initPosition: {x: 0, y: -0.1, z: 0.3}
+    initRotation: {x: 0, y: 0, z: 0}
+    attachToUser: 1
+    parent: {fileID: 0}
+  - canvas: {fileID: -1208508024869077074, guid: 086a26e1796483b438eae1017a8b4970,
+      type: 3}
+    initPosition: {x: 0, y: -0.1, z: 0.3}
+    initRotation: {x: 0, y: 0, z: 0}
+    attachToUser: 1
+    parent: {fileID: 0}
+  - canvas: {fileID: 6406195637794150101, guid: b7118b2868240e04f8547a34b8351941,
+      type: 3}
+    initPosition: {x: 0, y: 0, z: 0.2}
+    initRotation: {x: 0, y: 0, z: 0}
+    attachToUser: 1
+    parent: {fileID: 0}
+  manager: {fileID: 0}
 --- !u!1001 &1037607941
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -6300,7 +6333,7 @@ MonoBehaviour:
   doorCloseSound: {fileID: 8300000, guid: 99ec29c4dd9bc2246875de8be5eade89, type: 3}
   coinCollectSound: {fileID: 8300000, guid: 50c746b7d2217494385ec84e66113667, type: 3}
   targetReachSound: {fileID: 0}
-  ResetSound: {fileID: 0}
+  ResetSound: {fileID: 8300000, guid: fa3196d0471e736479f934ff8ea5e74a, type: 3}
 --- !u!4 &1533321391 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4515736846528816453, guid: 2bafdc4b6355c7044997f898cc21878e,
@@ -6724,7 +6757,7 @@ PrefabInstance:
     - target: {fileID: 9142221434337372883, guid: fd0b577d4a40d58409f051d3f16d19ce,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: -20
+      value: -15
       objectReference: {fileID: 0}
     - target: {fileID: 9142221434337372883, guid: fd0b577d4a40d58409f051d3f16d19ce,
         type: 3}
@@ -7403,7 +7436,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1955482712}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 20}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 1755475980}

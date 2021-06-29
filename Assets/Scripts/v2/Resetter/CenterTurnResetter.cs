@@ -57,27 +57,35 @@ public class CenterTurnResetter : TaskBasedManager<CTResetState, CTResetInput>
 
         Debug.Log(user.gameObject);
 
-        Vector2 userToCenter = realSpace.Position - user.Body.Position;
+        Vector2 userToCenter = realSpace.Position - realSpace.realUser.Position;
 
         // float candidate1 = Vector2.SignedAngle(user.Body.Forward, userToCenter);
         // float candidate2 = Vector2.SignedAngle(userToCenter, user.Body.Forward);
         // rotateDir = (Mathf.Abs(candidate1) <= Mathf.Abs(candidate2)) ? candidate1 : candidate2;
 
-        rotateDir = Mathf.Sign(Vector2.SignedAngle(user.Body.Forward, userToCenter));
+        // rotateDir = Mathf.Sign(Vector2.SignedAngle(realSpace.realUser.Forward, userToCenter));
 
-        targetAngle = Vector2.Angle(user.Body.Forward, userToCenter);
-        ratio = 360 / targetAngle;
+        targetAngle = Vector2.SignedAngle(realSpace.realUser.Forward, userToCenter);
+        ratio = 360 / Mathf.Abs(targetAngle);
 
-        Debug.Log($"user.Body.Position {user.Body.Position}");
-        Debug.Log($"user.Body.Forward {user.Body.Forward}");
+        // Debug.Log($"user.Body.Position {user.Body.Position}");
+        // Debug.Log($"user.Body.Forward {user.Body.Forward}");
         Debug.Log($"targetAngle {targetAngle}");
         Debug.Log($"ratio {ratio}");
-        Debug.Log($"rotateDir {rotateDir}");
+        // Debug.Log($"rotateDir {rotateDir}");
 
-        if(rotateDir > 0)
-            UIManager.Instance.ToggleUIBase("Rotation UI", true, "image_2");
-        else 
+        if(targetAngle > 0) {
+            rotateDir = 1;
+            UIManager.Instance.ToggleUIBase("Rotation UI", false, "image_2");
             UIManager.Instance.ToggleUIBase("Rotation UI", true, "image_3");
+
+        }
+        else {
+            rotateDir = -1;
+            UIManager.Instance.ToggleUIBase("Rotation UI", true, "image_2");
+            UIManager.Instance.ToggleUIBase("Rotation UI", false, "image_3");
+
+        }
     }
 
     public void ToggleRedirector(bool enabled) {
