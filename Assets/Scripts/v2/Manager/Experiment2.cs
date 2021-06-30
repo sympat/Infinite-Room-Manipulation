@@ -91,11 +91,15 @@ public class Experiment2 : TaskBasedManager<Exp2State, Exp2Input>
         task.Begin(Exp2State.Initial);
     }
 
+    public void GeneratePortal() {
+        CoroutineManager.Instance.CallWaitForSeconds(2.0f, _GeneratePortal);
+    }
+
     public void CallExperimentDone(float time) {
         CoroutineManager.Instance.CallWaitForSeconds(time, () => isExperimentDone = true);
     }
 
-    public void GeneratePortal() {
+    private void _GeneratePortal() {
         User user = users.GetActiveUser();
         Vector2 portalPos = user.Body.Position;
         do {

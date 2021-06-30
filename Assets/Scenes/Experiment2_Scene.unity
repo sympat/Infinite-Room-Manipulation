@@ -2608,7 +2608,7 @@ PrefabInstance:
     - target: {fileID: 6917189092238707241, guid: d47255b89a317e24d9a3fe4868865dd7,
         type: 3}
       propertyPath: useVRMode
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6917189092239161936, guid: d47255b89a317e24d9a3fe4868865dd7,
         type: 3}
@@ -4376,6 +4376,7 @@ MonoBehaviour:
     attachToUser: 1
     parent: {fileID: 0}
   manager: {fileID: 0}
+  resetSound: {fileID: 0}
 --- !u!114 &1024802513
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6334,6 +6335,7 @@ MonoBehaviour:
   coinCollectSound: {fileID: 8300000, guid: 50c746b7d2217494385ec84e66113667, type: 3}
   targetReachSound: {fileID: 0}
   ResetSound: {fileID: 8300000, guid: fa3196d0471e736479f934ff8ea5e74a, type: 3}
+  resetSoundPrefab: {fileID: 0}
 --- !u!4 &1533321391 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4515736846528816453, guid: 2bafdc4b6355c7044997f898cc21878e,
