@@ -9,6 +9,7 @@ public enum Exp2State {
     GoToNextRoom,
     EnterNextRoom,
     Portal,
+    WatchDoor,
     Coin,
     // Collecting,
     End
@@ -20,8 +21,10 @@ public enum Exp2Input {
     ClickButton2,
     EnterPortal,
     CollectCoin,
-    GenerateCoin,
-    CollectionDone,
+    // GenerateCoin,
+    WatchColoringDoor,
+    EndWatchColoringDoor,
+    // CollectionDone,
     EnterRoom,
     TaskEnd,
     SubTaskEnd,
@@ -58,6 +61,7 @@ public class Experiment2 : TaskBasedManager<Exp2State, Exp2Input>
         AddTaskEvent(Exp2Input.CollectCoin, Behaviour.Release, "Coin");
         AddTaskEvent(Exp2Input.EnterPortal, Behaviour.Enter, "Portal");
         AddTaskEvent(Exp2Input.EnterRoom, Behaviour.CompletelyEnter, "NextRoom");
+        AddTaskEvent(Exp2Input.WatchColoringDoor, Behaviour.Watch, "FacingDoor");
 
         // Define task
         task.AddStateStart(Exp2State.Initial, () => EnableUI("Initial UI"))
@@ -71,7 +75,12 @@ public class Experiment2 : TaskBasedManager<Exp2State, Exp2Input>
         .AddTransition(Exp2State.EnterNextRoom, Exp2State.Portal, Exp2Input.ClickButton2, () => DisableUI("Room Task UI"), CheckSubTaskDone, () => ToggleDoors(false))
 
         .AddStateStart(Exp2State.Portal, GeneratePortal)
-        .AddTransition(Exp2State.Portal, Exp2State.Coin, Exp2Input.EnterPortal, DestroyPortal)
+        .AddTransition(Exp2State.Portal, Exp2State.WatchDoor, Exp2Input.EnterPortal, DestroyPortal)
+        // .AddTransition(Exp2State.Portal, Exp2State.Coin, Exp2Input.EnterPortal, DestroyPortal)
+
+        .AddStateStart(Exp2State.WatchDoor, ColoringDoor)
+        .AddTransition(Exp2State.WatchDoor, Exp2Input.WatchColoringDoor, () => CallInputAfterSeconds(1.0f, Exp2Input.EndWatchColoringDoor))
+        .AddTransition(Exp2State.WatchDoor, Exp2State.Coin, Exp2Input.EndWatchColoringDoor, DecoloringDoor)
 
         .AddStateStart(Exp2State.Coin, GenerateCoin)
         .AddTransition(Exp2State.Coin, Exp2Input.CollectCoin, DestroyCoin, CheckEndCondition)
@@ -91,8 +100,42 @@ public class Experiment2 : TaskBasedManager<Exp2State, Exp2Input>
         task.Begin(Exp2State.Initial);
     }
 
+    private Queue<int> locoQueue;
+    public void ColoringDoor() {
+        Debug.Log("ColoringDoor");
+        List<Door> doors = virtualEnvironment.GetConnectedDoors(virtualEnvironment.CurrentRoom);
+
+        // if(doors.Count <= 1) {
+        //     task.Processing(Exp2Input.WatchColoringDoor);
+        //     return;
+        // }
+
+        float prob = Utility.sampleUniform(0f, 1.0f);
+        if(prob < 0.5f) {
+            task.Processing(Exp2Input.WatchColoringDoor);
+            return;
+        }
+
+        if(locoQueue == null || locoQueue.Count == 0) locoQueue = new Queue<int>(Utility.sampleWithoutReplacement(doors.Count, 0, doors.Count)); // IV 1
+
+        int doorIndex = locoQueue.Dequeue();
+        doors[doorIndex].GetComponent<Outline>().enabled = true;
+        doors[doorIndex].gameObject.layer = LayerMask.NameToLayer("FacingDoor");
+ 
+    }
+
+    public void DecoloringDoor() {
+        List<Door> doors = virtualEnvironment.GetConnectedDoors(virtualEnvironment.CurrentRoom);
+
+        foreach(var door in doors) {
+            door.gameObject.layer = LayerMask.NameToLayer("Door");
+            door.GetComponent<Outline>().enabled = false;
+        }
+    }
+
+
     public void GeneratePortal() {
-        CoroutineManager.Instance.CallWaitForSeconds(2.0f, _GeneratePortal);
+        CoroutineManager.Instance.CallWaitForSeconds(0.0f, _GeneratePortal);
     }
 
     public void CallExperimentDone(float time) {
@@ -102,9 +145,13 @@ public class Experiment2 : TaskBasedManager<Exp2State, Exp2Input>
     private void _GeneratePortal() {
         User user = users.GetActiveUser();
         Vector2 portalPos = user.Body.Position;
+
+        portalPos = virtualEnvironment.CurrentRoom.SamplingPosition(0.3f, Space.World);
+        Debug.Log(portalPos);
         do {
             portalPos = virtualEnvironment.CurrentRoom.SamplingPosition(0.3f, Space.World);
-        } while ((portalPos - user.Body.Position).magnitude < 0.7f);
+            Debug.Log(portalPos);
+        } while ((portalPos - user.Body.Position).magnitude < 0.4f);
 
         portalObj = Instantiate(portalObjPrefab, virtualEnvironment.transform);
         portalObj.transform.position = Utility.CastVector2Dto3D(portalPos);
