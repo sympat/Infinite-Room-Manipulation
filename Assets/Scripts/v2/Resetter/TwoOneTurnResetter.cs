@@ -16,7 +16,6 @@ public enum TTResetInput {
 
 public class TwoOneTurnResetter : TaskBasedManager<TTResetState, TTResetInput>
 {
-    public AudioSource resetSound;
     protected float targetAngle;
     protected float ratio;
 
