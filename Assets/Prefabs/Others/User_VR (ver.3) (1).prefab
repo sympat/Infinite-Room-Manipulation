@@ -106,7 +106,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   AlwaysShowCollider: 1
   IncludeCollidersInChildren: 1
-  GizmoColor: {r: 0.6943884, g: 0, b: 1, a: 1}
+  GizmoColor: {r: 0, g: 0.32709217, b: 1, a: 1}
 --- !u!1 &6916763034621838968
 GameObject:
   m_ObjectHideFlags: 0
@@ -1095,7 +1095,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   AlwaysShowCollider: 1
   IncludeCollidersInChildren: 1
-  GizmoColor: {r: 0.6943884, g: 0, b: 1, a: 1}
+  GizmoColor: {r: 0, g: 0.32709217, b: 1, a: 1}
 --- !u!1 &6917189092238908364
 GameObject:
   m_ObjectHideFlags: 0

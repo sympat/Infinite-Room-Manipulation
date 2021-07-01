@@ -12,6 +12,10 @@ public enum WallMove {
 
 public class Manipulation : MonoBehaviour
 {
+    // private int loopCount = 0;
+    // private int totalCount = 2;
+
+    private bool temp = false;
     // private float DT = 1.2f;
     private Dictionary<DistanceType, Dictionary<WallMove, float>> Threshold;
     // private bool isManipulationDone = false;
@@ -395,19 +399,32 @@ public class Manipulation : MonoBehaviour
         Tuple<Vector2, Vector2> st = GetScaleTranlslate(currentRoom, realSpace); 
         Vector2 scale = st.Item1, translate = st.Item2;
 
+
         if ((scale - Vector2.one).magnitude > 0.01f || (translate - Vector2.zero).magnitude > 0.01f) // 복원 연산
         {
-            // Debug.Log("Restore");
+            Debug.Log("Restore");
             Restore(virtualEnvironment, currentRoom, user, scale, translate);
         }
         else if(NeedAdjust(virtualEnvironment, currentRoom)) // 조정 연산
         {
-            // Debug.Log("Adjust");
+            Debug.Log("Adjust");
             Adjust(virtualEnvironment, currentRoom, user);
         }
         else // 축소 연산
         {
-            // Debug.Log("Reduce");
+            Debug.Log("Reduce");
+            // if(!temp) {
+            //     List<Room> neighborRooms = virtualEnvironment.GetConnectedRooms(currentRoom);
+            //     foreach (var room in neighborRooms)
+            //     {
+            //         if(room == null) continue;
+            //         if (!room.IsInside(realSpace))
+            //             Reduce(virtualEnvironment, room, currentRoom, realSpace);
+            //     }
+
+            //     temp = true;
+            // }
+
             List<Room> neighborRooms = virtualEnvironment.GetConnectedRooms(currentRoom);
             foreach (var room in neighborRooms)
             {
