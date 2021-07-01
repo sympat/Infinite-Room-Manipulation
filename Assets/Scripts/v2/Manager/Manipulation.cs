@@ -18,7 +18,6 @@ public class Manipulation : MonoBehaviour
     private bool temp = false;
     // private float DT = 1.2f;
     private Dictionary<DistanceType, Dictionary<WallMove, float>> Threshold;
-    // private bool isManipulationDone = false;
     private VirtualEnvironment virtualEnvironment;
     private Users users;
     private RealSpace realSpace;
@@ -44,31 +43,20 @@ public class Manipulation : MonoBehaviour
         Threshold.Add(DistanceType.Long, new Dictionary<WallMove, float>());
 
         Threshold[DistanceType.Short].Add(WallMove.Shrink, 0.9f);
-        Threshold[DistanceType.Short].Add(WallMove.Expand, 1.1f);
-        Threshold[DistanceType.Middle].Add(WallMove.Shrink, 0.8f);
+        Threshold[DistanceType.Short].Add(WallMove.Expand, 1.15f);
+        Threshold[DistanceType.Middle].Add(WallMove.Shrink, 0.87f);
         Threshold[DistanceType.Middle].Add(WallMove.Expand, 1.2f);
-        Threshold[DistanceType.Long].Add(WallMove.Shrink, 0.8f);
-        Threshold[DistanceType.Long].Add(WallMove.Expand, 1.2f);
-
-        // virtualEnvironment.AddEnterNewRoomEvent(SwitchEnable);
-        // virtualEnvironment.AddEnterNewRoomEvent(OvertManipulate);
+        Threshold[DistanceType.Long].Add(WallMove.Shrink, 0.74f);
+        Threshold[DistanceType.Long].Add(WallMove.Expand, 1.21f);
     }
 
     private void Start() {
         User user = users.GetActiveUser();
-        // Debug.Log(user.gameObject);
-        // Debug.Log(users.gameObject);
 
         user.AddEvent(Behaviour.CompletelyEnter, "NextRoom", (_) => SwitchEnable());
         user.AddEvent(Behaviour.CompletelyEnter, "NextRoom", OvertManipulate);
     }
 
-    // public override bool CollectDoneCondition()
-    // {
-    //     Debug.Log("CollectDoneCondition");
-    //     Debug.Log($"isManipulationDone {isManipulationDone}");
-    //     return isManipulationDone;
-    // }
 
     public bool[] CheckWallVisibleToUser(Room currentRoom, User user) {
         bool[] isVisibleToUser = new bool[4];
@@ -188,11 +176,6 @@ public class Manipulation : MonoBehaviour
     public void Restore(VirtualEnvironment virtualEnvironment, Room currentRoom, User user, Vector2 scale, Vector2 translate)
     {
         float[] DistWalltoDest = new float[4]; // p,n
-        // DistWalltoDest[0] = (scale.y - 1) * currentRoom.Size.y / 2 + translate.y;
-        // DistWalltoDest[1] = (1 - scale.x) * currentRoom.Size.x / 2 + translate.x;
-        // DistWalltoDest[2] = (1 - scale.y) * currentRoom.Size.y / 2 + translate.y;
-        // DistWalltoDest[3] = (scale.x - 1) * currentRoom.Size.x / 2 + translate.x;
-
         for(int i=0; i<4; i++)
             DistWalltoDest[i] = GetDistanceFromWallToDestination(currentRoom, user, i, scale, translate);
 
@@ -200,35 +183,23 @@ public class Manipulation : MonoBehaviour
         float[] DistWalltoUser = new float[4]; // short, middle, long
         for(int i=0; i<4; i++) 
             DistWalltoUser[i] = GetDistanceFromWallToUser(currentRoom, user, i);
-        
 
-        // DistWalltoUser[0] = (user.body.Position.y + 0.4f) - currentRoom.GetEdge2D(0, Space.World).y;
-        // DistWalltoUser[1] = (user.body.Position.x - 0.4f) - currentRoom.GetEdge2D(1, Space.World).x;
-        // DistWalltoUser[2] = (user.body.Position.y - 0.4f) - currentRoom.GetEdge2D(2, Space.World).y;
-        // DistWalltoUser[3] = (user.body.Position.x + 0.4f) - currentRoom.GetEdge2D(3, Space.World).x;
-        // DistWalltoUser[0] = Mathf.Abs(currentRoom.GetEdge2D(0, Space.World).y - user.Position.y);
-        // DistWalltoUser[1] = Mathf.Abs(currentRoom.GetEdge2D(1, Space.World).x - user.Position.x);
-        // DistWalltoUser[2] = Mathf.Abs(currentRoom.GetEdge2D(2, Space.World).y - user.Position.y);
-        // DistWalltoUser[3] = Mathf.Abs(currentRoom.GetEdge2D(3, Space.World).x - user.Position.x);
-
-        float[] wallDirection = new float[4];
-        wallDirection[0] = 1;
-        wallDirection[1] = -1;
-        wallDirection[2] = -1;
-        wallDirection[3] = 1;
+        // float[] wallDirection = new float[4];
+        // wallDirection[0] = 1;
+        // wallDirection[1] = -1;
+        // wallDirection[2] = -1;
+        // wallDirection[3] = 1;
 
         bool[] isVisible = CheckWallVisibleToUser(currentRoom, user);
         bool[] isCenterVisible = CheckWallCenterVisibleToUser(currentRoom, user);
-
         float[] AppliedTranslate = new float[4];
 
         for(int i=0; i<4; i++) {
             WallMove moveType = CheckWallMove(i, DistWalltoDest[i]);
             DistanceType distanceType = CheckDistanceType(Mathf.Abs(DistWalltoUser[i]));
 
-            // Debug.Log($"{i}-th wall {moveType} {distanceType} {DistWalltoUser[i]}");
-
             float candidate1 = Mathf.Abs(DistWalltoUser[i]);
+
             float candidate2 = 0;
             if(candidate1 < 1.0f) {
                 if(i % 2 == 0) candidate2 = Mathf.Abs((Threshold[distanceType][moveType]-1) * currentRoom.Size.y);
@@ -263,47 +234,6 @@ public class Manipulation : MonoBehaviour
                 isWallMoveDone[i] = false;
             }
         }
-        // Debug.Log("");
-
-        // float[] DistgainApplied = new float[4];
-        // DistgainApplied[0] = Mathf.Sign(DistWalltoDest[0]) * (DT - 1) * currentRoom.Size.y;
-        // DistgainApplied[1] = Mathf.Sign(DistWalltoDest[1]) * (DT - 1) * currentRoom.Size.x;
-        // DistgainApplied[2] = Mathf.Sign(DistWalltoDest[2]) * (DT - 1) * currentRoom.Size.y;
-        // DistgainApplied[3] = Mathf.Sign(DistWalltoDest[3]) * (DT - 1) * currentRoom.Size.x;
-        // DistgainApplied[0] = wallDirection[0] * (DT-1) * DistWalltoUser[0];
-        // DistgainApplied[1] = wallDirection[1] * (DT-1) * DistWalltoUser[1];
-        // DistgainApplied[2] = wallDirection[2] * (DT-1) * DistWalltoUser[2];
-        // DistgainApplied[3] = wallDirection[3] * (DT-1) * DistWalltoUser[3];
-
-        // for (int i = 0; i < 4; i++)
-        // {
-        //     // Debug.Log($"isWallMoveDone[{i}]: {isWallMoveDone[i]}");
-        //     // Debug.Log($"isVisible[{i}]: {isVisible[i]}");
-        //     // Debug.Log($"isCenterVisible[{i}]: {isCenterVisible[i]}");
-        //     // Debug.Log($"DistWalltoDest[{i}]: {DistWalltoDest[i]}");
-
-        //     if(!isVisible[i] && !isWallMoveDone[i]) {
-
-        //         float finalTranslate = 0;
-        //         if(DistWalltoDest[i] * DistWalltoUser[i] < 0) { 
-        //             finalTranslate = Mathf.Sign(DistWalltoDest[i]) * Mathf.Min(Mathf.Abs(DistgainApplied[i]), Mathf.Abs(DistWalltoDest[i]));
-        //         }
-        //         else {
-        //             finalTranslate = Mathf.Sign(DistWalltoDest[i]) * Mathf.Min(Mathf.Abs(DistgainApplied[i]), Mathf.Abs(DistWalltoDest[i]), Mathf.Abs(DistWalltoUser[i]));
-        //         }
-
-        //         // Debug.Log($"DistWalltoDest[{i}]: {DistWalltoDest[i]}");
-        //         // Debug.Log($"DistgainApplied[{i}]: {DistgainApplied[i]}");
-        //         // Debug.Log($"DistWalltoUser[{i}]: {DistWalltoUser[i]}");
-        //         // Debug.Log($"finalTranslate[{i}]: {finalTranslate}");
-
-        //         virtualEnvironment.MoveWall(currentRoom, i, finalTranslate);
-        //         isWallMoveDone[i] = true;
-        //     }
-        //     else if(isCenterVisible[i] && isWallMoveDone[i]) {
-        //         isWallMoveDone[i] = false;
-        //     }
-        // }
     }
 
     public void Reduce(VirtualEnvironment virtualEnvironment, Room targetRoom, Room currentRoom, Bound2D realSpace)
@@ -332,7 +262,6 @@ public class Manipulation : MonoBehaviour
     }
 
     public void OvertManipulate(GameObject target) {
-        // Debug.Log("OvertManipulate");
         Room targetRoom = target.GetComponent<Room>();
         
         float xMinDist = realSpace.Min.x - targetRoom.Min.x;
