@@ -220,10 +220,7 @@ public class User : Transform2D
     }
 
     public void ProcessingEvent(UserEventArgs e) {
-        // if(e.behaviour == Behaviour.Open) { 
-        //     Debug.Log($"ProcessingEvent {e.behaviour} {LayerMask.LayerToName(e.target.layer)}"); 
-        // }
-
+        // Debug.Log($"ProcessingEvent {e.behaviour} {LayerMask.LayerToName(e.target.layer)} {e.target}"); 
         InvokeEvent(e.behaviour, e.target);
     }
 

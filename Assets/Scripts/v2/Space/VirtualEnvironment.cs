@@ -365,7 +365,9 @@ public class VirtualEnvironment : Transform2D
         List<Room> result = new List<Room>();
         foreach(var door in adjList[v])
         {
-            result.Add(door.GetConnectedRoom(v));
+            Room targetRoom = door.GetConnectedRoom(v);
+            if(targetRoom != null)
+                result.Add(targetRoom);
         }
 
         if (containSelf)
@@ -485,7 +487,7 @@ public class VirtualEnvironment : Transform2D
     }
 
     public void InitializeNextRoom(GameObject target) {
-        Debug.Log("InitializeNextRoom");
+        // Debug.Log("InitializeNextRoom");
 
         Door openedDoor = target.GetComponent<Door>();
         if(openedDoor == null) throw new System.Exception("target object does not have Door Component");
@@ -498,6 +500,7 @@ public class VirtualEnvironment : Transform2D
                 door.CloseDoor();
 
         foreach(var room in neighborRooms) {
+            
             room.gameObject.layer = LayerMask.NameToLayer("Room");
             // room.ToggleTeleportArea(false);
         }
@@ -508,7 +511,7 @@ public class VirtualEnvironment : Transform2D
     }
 
     private void ChangeCurrentRoom(GameObject target) {
-        Debug.Log("ChangeCurrentRoom");
+        // Debug.Log("ChangeCurrentRoom");
 
         Room targetRoom = target.GetComponent<Room>();
 
@@ -521,7 +524,8 @@ public class VirtualEnvironment : Transform2D
         List<Door> doors = GetConnectedDoors(v);
 
         foreach(Door door in doors) {
-            door.ToggleDoorInteraction(enabled);
+            if(door.transform.childCount != 0)
+                door.ToggleDoorInteraction(enabled);
         }
     }
 }

@@ -56,7 +56,13 @@ public class DoorInspector : BoundInspector {
     public override void OnInspectorGUI()
     {
         base.OnInspectorGUI();
+
+        if(GUILayout.Button("Call Open Door")) {
+            Door door = (Door) target;
+            door.OpenDoor();
+        }
     }
+    
 }
 
 // [CustomPropertyDrawer(typeof(Ingredient))]

@@ -97,8 +97,6 @@ public class Door : Bound2D
 
     public void OpenDoor()
     {
-        Debug.Log($"{this.gameObject} OpenDoor");
-
         GameObject doorMain = Utility.GetChildWithLayer(this.gameObject, "Door Main");
         doorMain.GetComponent<BoxCollider>().enabled = true;
         BoxCollider box = doorMain.GetComponent<BoxCollider>();
@@ -143,15 +141,15 @@ public class Door : Bound2D
             doorMain.transform.localRotation = Quaternion.identity;
             AudioSource.PlayClipAtPoint(SoundSetting.Instance.doorCloseSound, this.transform.position);
 
-            foreach(var drive in doorMain.GetComponentsInChildren<CustomCircularDrive>()) {
-                drive.ResetRotation();
-            }
-
             GameObject grabble = Utility.GetChildWithLayer(doorMain, "Grabble");
             grabble.GetComponent<SphereCollider>().enabled = false;
 
             List<GameObject> knob = Utility.GetChildrenWithLayer(doorMain, "Knob");
             knob.ForEach(x => x.GetComponent<MeshCollider>().enabled = true);
+
+            foreach(var drive in doorMain.GetComponentsInChildren<CustomCircularDrive>()) {
+                drive.ResetRotation();
+            }
 
             if(room1 != null && room1.gameObject.layer != LayerMask.NameToLayer("CurrentRoom")) {
                 // Debug.Log($"Reset DigonalPos room1: {room1}");

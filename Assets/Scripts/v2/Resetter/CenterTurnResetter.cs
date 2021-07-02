@@ -55,14 +55,11 @@ public class CenterTurnResetter : TaskBasedManager<CTResetState, CTResetInput>
     public void CalculateResetAngle() {
         User user = users.GetActiveUser();
 
-        Debug.Log(user.gameObject);
-
         Vector2 userToCenter = realSpace.Position - realSpace.realUser.Position;
 
         // float candidate1 = Vector2.SignedAngle(user.Body.Forward, userToCenter);
         // float candidate2 = Vector2.SignedAngle(userToCenter, user.Body.Forward);
         // rotateDir = (Mathf.Abs(candidate1) <= Mathf.Abs(candidate2)) ? candidate1 : candidate2;
-
         // rotateDir = Mathf.Sign(Vector2.SignedAngle(realSpace.realUser.Forward, userToCenter));
 
         targetAngle = Vector2.SignedAngle(realSpace.realUser.Forward, userToCenter);
@@ -70,8 +67,8 @@ public class CenterTurnResetter : TaskBasedManager<CTResetState, CTResetInput>
 
         // Debug.Log($"user.Body.Position {user.Body.Position}");
         // Debug.Log($"user.Body.Forward {user.Body.Forward}");
-        Debug.Log($"targetAngle {targetAngle}");
-        Debug.Log($"ratio {ratio}");
+        // Debug.Log($"targetAngle {targetAngle}");
+        // Debug.Log($"ratio {ratio}");
         // Debug.Log($"rotateDir {rotateDir}");
 
         if(targetAngle > 0) {

@@ -53,7 +53,6 @@ public class Experiment2 : TaskBasedManager<Exp2State, Exp2Input>
         GenerateUI("Room Task UI", uiInfo[2]);
         GenerateUI("End UI", uiInfo[3]);
 
-
         // Add events as task inputs
         AddTaskEvent(Exp2Input.ClickButton0, UIBehaviour.Click, "Initial UI", "image_1", "button_0");
         AddTaskEvent(Exp2Input.ClickButton1, UIBehaviour.Click, "Goto Next UI", "image_1", "button_0");
@@ -76,7 +75,7 @@ public class Experiment2 : TaskBasedManager<Exp2State, Exp2Input>
 
         .AddStateStart(Exp2State.Portal, GeneratePortal)
         .AddTransition(Exp2State.Portal, Exp2State.WatchDoor, Exp2Input.EnterPortal, DestroyPortal)
-        // .AddTransition(Exp2State.Portal, Exp2State.Coin, Exp2Input.EnterPortal, DestroyPortal)
+         //.AddTransition(Exp2State.Portal, Exp2State.Coin, Exp2Input.EnterPortal, DestroyPortal)
 
         .AddStateStart(Exp2State.WatchDoor, ColoringDoor)
         .AddTransition(Exp2State.WatchDoor, Exp2Input.WatchColoringDoor, () => CallInputAfterSeconds(1.0f, Exp2Input.EndWatchColoringDoor))
@@ -102,13 +101,7 @@ public class Experiment2 : TaskBasedManager<Exp2State, Exp2Input>
 
     private Queue<int> locoQueue;
     public void ColoringDoor() {
-        Debug.Log("ColoringDoor");
         List<Door> doors = virtualEnvironment.GetConnectedDoors(virtualEnvironment.CurrentRoom);
-
-        // if(doors.Count <= 1) {
-        //     task.Processing(Exp2Input.WatchColoringDoor);
-        //     return;
-        // }
 
         float prob = Utility.sampleUniform(0f, 1.0f);
         if(prob < 0.5f) {
@@ -117,11 +110,17 @@ public class Experiment2 : TaskBasedManager<Exp2State, Exp2Input>
         }
 
         if(locoQueue == null || locoQueue.Count == 0) locoQueue = new Queue<int>(Utility.sampleWithoutReplacement(doors.Count, 0, doors.Count)); // IV 1
-
+          
         int doorIndex = locoQueue.Dequeue();
-        doors[doorIndex].GetComponent<Outline>().enabled = true;
+
+        if(doorIndex < 0 || doorIndex >= doors.Count) {
+            Debug.Log($"Invalid Door index: {doorIndex}");
+            task.Processing(Exp2Input.WatchColoringDoor);
+            return;
+        }
+
+        // doors[doorIndex].GetComponent<Outline>().enabled = true;
         doors[doorIndex].gameObject.layer = LayerMask.NameToLayer("FacingDoor");
- 
     }
 
     public void DecoloringDoor() {
@@ -129,7 +128,7 @@ public class Experiment2 : TaskBasedManager<Exp2State, Exp2Input>
 
         foreach(var door in doors) {
             door.gameObject.layer = LayerMask.NameToLayer("Door");
-            door.GetComponent<Outline>().enabled = false;
+            // door.GetComponent<Outline>().enabled = false;
         }
     }
 
@@ -147,10 +146,9 @@ public class Experiment2 : TaskBasedManager<Exp2State, Exp2Input>
         Vector2 portalPos = user.Body.Position;
 
         portalPos = virtualEnvironment.CurrentRoom.SamplingPosition(0.3f, Space.World);
-        Debug.Log(portalPos);
         do {
             portalPos = virtualEnvironment.CurrentRoom.SamplingPosition(0.3f, Space.World);
-            Debug.Log(portalPos);
+            // Debug.Log(portalPos);
         } while ((portalPos - user.Body.Position).magnitude < 0.4f);
 
         portalObj = Instantiate(portalObjPrefab, virtualEnvironment.transform);
