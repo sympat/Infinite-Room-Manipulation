@@ -112,7 +112,7 @@ public class User : Transform2D
         body = GetComponentInChildren<UserBody>();
         hands = GetComponentsInChildren<Hand>();
         // pointer = GetComponentInChildren<CustomLaserPointer>();
-
+        
         if(body == null) throw new System.Exception("User body(Collider) is required.");
         if(face == null) throw new System.Exception("User face(Camera) is required.");
         if(hands == null) throw new System.Exception("User hand(Hand) is required.");

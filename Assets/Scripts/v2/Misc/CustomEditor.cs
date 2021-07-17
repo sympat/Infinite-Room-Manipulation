@@ -9,8 +9,9 @@ public class OrderInspector : Editor {
         base.OnInspectorGUI();
         
         if(GUILayout.Button("Get Order")) {
-            OrderManager bound = (OrderManager) target;
-            bound.ShowLocomotionOrder();
+            OrderManager orderManager = (OrderManager) target;
+            // bound.ShowLocomotionOrder();
+            orderManager.GetOrder();
         }
     }
 }

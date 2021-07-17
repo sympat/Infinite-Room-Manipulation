@@ -202,15 +202,25 @@ public class Experiment2 : TaskBasedManager<Exp2State, Exp2Input>
     // }
 
     public void CheckEndCondition() {
-        if(isSubTaskDone) {
-            if(isExperimentDone) 
-                task.Processing(Exp2Input.TaskEnd);
-            else 
-                task.Processing(Exp2Input.SubTaskEnd);
-        }
+        if(isExperimentDone) 
+            task.Processing(Exp2Input.TaskEnd);
         else {
-            task.Processing(Exp2Input.SubTaskNotEnd);
+            if(isSubTaskDone) 
+                task.Processing(Exp2Input.SubTaskEnd);
+            
+            else
+                task.Processing(Exp2Input.SubTaskNotEnd);
         }
+
+        // if(isSubTaskDone) {
+        //     if(isExperimentDone) 
+        //         task.Processing(Exp2Input.TaskEnd);
+        //     else 
+        //         task.Processing(Exp2Input.SubTaskEnd);
+        // }
+        // else {
+        //     task.Processing(Exp2Input.SubTaskNotEnd);
+        // }
     }
 
     // public void RaiseTaskEnd() {

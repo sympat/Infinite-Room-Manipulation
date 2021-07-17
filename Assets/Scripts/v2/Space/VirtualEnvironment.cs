@@ -25,9 +25,7 @@ public class VirtualEnvironment : Transform2D
         }
         set {
             if(currentRoom == value) return;
-
             if(value == null) return;
-
             if(currentRoom != null) currentRoom.gameObject.layer = LayerMask.NameToLayer("Room");
 
             currentRoom = value;

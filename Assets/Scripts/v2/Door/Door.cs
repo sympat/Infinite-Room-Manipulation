@@ -81,32 +81,34 @@ public class Door : Bound2D
         else return null;
     }
 
-    public Vector2 GetDoorSize() {
-        GameObject doorFrame = Utility.GetChildWithLayer(this.gameObject, "Door Frame");
-        BoxCollider box = doorFrame.GetComponent<BoxCollider>();
+    // public Vector2 GetDoorSize() {
+    //     GameObject doorFrame = Utility.GetChildWithLayer(this.gameObject, "Door Frame");
+    //     BoxCollider box = doorFrame.GetComponent<BoxCollider>();
 
-        return CastVector3Dto2D(box.size);
-    }
+    //     return CastVector3Dto2D(box.size);
+    // }
 
     public void ToggleDoorInteraction(bool enabled) {
         GameObject doorMain = Utility.GetChildWithLayer(this.gameObject, "Door Main");
 
         List<GameObject> knob = Utility.GetChildrenWithLayer(doorMain, "Knob");
-        knob.ForEach(x => x.GetComponent<MeshCollider>().enabled = enabled);
+        knob.ForEach(x => x.GetComponent<Collider>().enabled = enabled);
     }
 
     public void OpenDoor()
     {
+        Debug.Log($"{this.gameObject} OpenDoor");
+
         GameObject doorMain = Utility.GetChildWithLayer(this.gameObject, "Door Main");
         doorMain.GetComponent<BoxCollider>().enabled = true;
         BoxCollider box = doorMain.GetComponent<BoxCollider>();
         doorMain.GetComponent<BoxCollider>().enabled = false;
 
         GameObject grabble = Utility.GetChildWithLayer(doorMain, "Grabble");
-        grabble.GetComponent<SphereCollider>().enabled = true;
+        grabble.GetComponent<Collider>().enabled = true;
 
         List<GameObject> knob = Utility.GetChildrenWithLayer(doorMain, "Knob");
-        knob.ForEach(x => x.GetComponent<MeshCollider>().enabled = false);
+        knob.ForEach(x => x.GetComponent<Collider>().enabled = false);
 
         if(room1 != null) {
             Vector3 doorMin = room1.transform.InverseTransformPoint(doorMain.transform.TransformPoint(box.center - (box.size / 2)));
@@ -133,7 +135,7 @@ public class Door : Bound2D
 
     public void CloseDoor()
     {
-        // Debug.Log($"{this.gameObject} CloseDoor");
+        Debug.Log($"{this.gameObject} CloseDoor");
 
         GameObject doorMain = Utility.GetChildWithLayer(this.gameObject, "Door Main");
 
@@ -142,17 +144,22 @@ public class Door : Bound2D
             AudioSource.PlayClipAtPoint(SoundSetting.Instance.doorCloseSound, this.transform.position);
 
             GameObject grabble = Utility.GetChildWithLayer(doorMain, "Grabble");
-            grabble.GetComponent<SphereCollider>().enabled = false;
+            grabble.GetComponent<Collider>().enabled = false;
 
             List<GameObject> knob = Utility.GetChildrenWithLayer(doorMain, "Knob");
-            knob.ForEach(x => x.GetComponent<MeshCollider>().enabled = true);
+            knob.ForEach(x => x.GetComponent<Collider>().enabled = true);
 
             foreach(var drive in doorMain.GetComponentsInChildren<CustomCircularDrive>()) {
                 drive.ResetRotation();
             }
 
+            knob.ForEach(x => x.transform.localRotation = Quaternion.identity);
+
+            // this.transform.Rotate(new Vector3(0, 0, -45), Space.Self);
+
             if(room1 != null && room1.gameObject.layer != LayerMask.NameToLayer("CurrentRoom")) {
                 // Debug.Log($"Reset DigonalPos room1: {room1}");
+
                 room1.GetComponent<MeshRenderer>().material.SetVector("DigonalPos1", new Vector4(0, 0, 0, 0));
                 room1.GetComponent<MeshRenderer>().material.SetVector("DigonalPos2", new Vector4(0, 0, 0, 0));
             }
