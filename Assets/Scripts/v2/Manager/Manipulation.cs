@@ -193,9 +193,10 @@ public class Manipulation : MonoBehaviour
             WallMove moveType = CheckWallMove(i, DistWalltoDest[i]);
             DistanceType distanceType = CheckDistanceType(Mathf.Abs(DistWalltoUser[i]));
 
-            float candidate1 = (Mathf.Abs(DistWalltoUser[i]) > 0.3f) ? Mathf.Abs(DistWalltoUser[i]) : 0;
-
+            float candidate1 = (Mathf.Abs(DistWalltoUser[i]) > 0.4f) ? Mathf.Abs(DistWalltoUser[i]) : 0;
             float candidate2 = 0;
+            float candidate3 = Mathf.Abs(DistWalltoDest[i]);
+
             if(candidate1 < 1.0f) {
                 if(i % 2 == 0) candidate2 = Mathf.Abs((Threshold[distanceType][moveType]-1) * currentRoom.Size.y);
                 else if(i % 2 != 0) candidate2 = Mathf.Abs((Threshold[distanceType][moveType]-1) * currentRoom.Size.x);
@@ -203,8 +204,6 @@ public class Manipulation : MonoBehaviour
             else {
                 candidate2 = Mathf.Abs((Threshold[distanceType][moveType]-1) * DistWalltoUser[i]);
             }
-
-            float candidate3 = Mathf.Abs(DistWalltoDest[i]);
 
             float destDir = Mathf.Sign(DistWalltoDest[i]);
             float userDir = Mathf.Sign(DistWalltoUser[i]);

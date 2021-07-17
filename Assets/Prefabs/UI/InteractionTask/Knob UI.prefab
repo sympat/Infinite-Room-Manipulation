@@ -595,7 +595,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   m_text: "\uBB38 \uC55E\uAE4C\uC9C0 \uC774\uB3D9\uD55C \uD6C4\uC5D0\n\uBB38\uC758
-    \uC190\uC7A1\uC774\uB97C \uC7A1\uC740 \uCC44\uB85C \uC544\uB798\uB85C \uB2F9\uACA8\uC8FC\uC138\uC694."
+    \uC190\uC7A1\uC774\uB97C \uC7A1\uC544\uC11C \uC544\uB798\uB85C \uB2F9\uACA8\uC8FC\uC138\uC694."
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 612d09bdcf6f77c4b89f70077fc98622, type: 2}
   m_sharedMaterial: {fileID: -7671593566332052551, guid: 612d09bdcf6f77c4b89f70077fc98622,

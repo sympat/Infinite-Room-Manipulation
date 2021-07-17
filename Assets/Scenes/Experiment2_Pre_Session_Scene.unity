@@ -737,6 +737,11 @@ PrefabInstance:
       propertyPath: markerActive
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 8311861435439233170, guid: b9a7498dd070b92498324a7bacfe9c6a,
+        type: 3}
+      propertyPath: m_Intensity
+      value: 1.2
+      objectReference: {fileID: 0}
     - target: {fileID: 8646642211702203077, guid: b9a7498dd070b92498324a7bacfe9c6a,
         type: 3}
       propertyPath: m_Mesh
@@ -951,7 +956,7 @@ Light:
   m_Type: 2
   m_Shape: 0
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_Intensity: 1.5
+  m_Intensity: 1.2
   m_Range: 5
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208
@@ -1158,6 +1163,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalPosition.y
       value: 2.16
+      objectReference: {fileID: 0}
+    - target: {fileID: 8311861435439233170, guid: 495952893ccb94a48b6838c88065dcd8,
+        type: 3}
+      propertyPath: m_Intensity
+      value: 1.2
       objectReference: {fileID: 0}
     - target: {fileID: 8646642211702203077, guid: 495952893ccb94a48b6838c88065dcd8,
         type: 3}
@@ -1533,6 +1543,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalPosition.y
       value: 2.16
+      objectReference: {fileID: 0}
+    - target: {fileID: 8311861435439233170, guid: 495952893ccb94a48b6838c88065dcd8,
+        type: 3}
+      propertyPath: m_Intensity
+      value: 1.2
       objectReference: {fileID: 0}
     - target: {fileID: 8646642211702203077, guid: 495952893ccb94a48b6838c88065dcd8,
         type: 3}
@@ -1967,6 +1982,11 @@ PrefabInstance:
       propertyPath: m_LocalPosition.z
       value: -3.00003
       objectReference: {fileID: 0}
+    - target: {fileID: 8311861435439233170, guid: 495952893ccb94a48b6838c88065dcd8,
+        type: 3}
+      propertyPath: m_Intensity
+      value: 1.2
+      objectReference: {fileID: 0}
     - target: {fileID: 8646642211702203077, guid: 495952893ccb94a48b6838c88065dcd8,
         type: 3}
       propertyPath: m_Mesh
@@ -2102,6 +2122,16 @@ PrefabInstance:
       propertyPath: useVRMode
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 6917189092238908364, guid: d47255b89a317e24d9a3fe4868865dd7,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6917189092238914412, guid: d47255b89a317e24d9a3fe4868865dd7,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 6917189092239161936, guid: d47255b89a317e24d9a3fe4868865dd7,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -2187,7 +2217,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &1821222130
 MonoBehaviour:
   m_ObjectHideFlags: 0

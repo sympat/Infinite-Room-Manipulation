@@ -3,46 +3,53 @@ using System.Linq;
 using UnityEngine;
 using System.Collections.Generic;
 
-[Serializable]
-public class SerializeDicString : SerializeDictionary<string, string> { }
+// [Serializable]
+// public class SerializeDicString : SerializeDictionary<string, string> { }
 
-[Serializable]
-public class SerializeDictionary<K, V> : Dictionary<K,V>, ISerializationCallbackReceiver
-{
-	[SerializeField]
-	List<K> keys = new List<K>();
+// [Serializable]
+// public class SerializeDictionary<K, V> : Dictionary<K,V>, ISerializationCallbackReceiver
+// {
+// 	[SerializeField]
+// 	List<K> keys = new List<K>();
 
-	[SerializeField]
-	List<V> values = new List<V>();
+// 	[SerializeField]
+// 	List<V> values = new List<V>();
 
-	public void OnBeforeSerialize()
-	{
-		keys.Clear();
-		values.Clear();
+// 	public void OnBeforeSerialize()
+// 	{
+// 		keys.Clear();
+// 		values.Clear();
 
-		foreach( KeyValuePair<K, V> pair in this )
-		{
-			keys.Add( pair.Key );
-			values.Add( pair.Value );
-		}
-	}
+// 		foreach( KeyValuePair<K, V> pair in this )
+// 		{
+// 			keys.Add( pair.Key );
+// 			values.Add( pair.Value );
+// 		}
+// 	}
 
-	public void OnAfterDeserialize()
-	{
-		this.Clear();
+// 	public void OnAfterDeserialize()
+// 	{
+// 		this.Clear();
 
-        Debug.Log(keys.Count);
-        Debug.Log(values.Count);
+//         Debug.Log(keys.Count);
+//         Debug.Log(values.Count);
 
-		for( int i = 0; i < keys.Count; i++ )
-		{
-			this.Add( keys[i], values[i] );
-		}
-	}
-}
+// 		for( int i = 0; i < keys.Count; i++ )
+// 		{
+// 			this.Add( keys[i], values[i] );
+// 		}
+// 	}
+// }
 
 public static class Utility
 {
+    public static void SwapValues<T>(this T[] source, long index1, long index2)
+    {
+        T temp = source[index1];
+        source[index1] = source[index2];
+        source[index2] = temp;
+    }
+
     public static GameObject GetChildWithLayer(this GameObject parent, string layer) {
            Transform t = parent.transform;
            foreach(Transform tr in t)
@@ -177,6 +184,39 @@ public static class Utility
         float randNormal = mu + randStdNormal * sigma;
         return Mathf.Max(Mathf.Min(randNormal, max), min);
     }
+    private static void permutation(List<int[]> result, int[] array, int currentIndex) 
+    {
+        if (currentIndex == array.Length)
+        {
+            string output = "";
+            foreach(var temp in array) {
+                output += temp;
+            }
+
+            result.Add((int[])array.Clone());
+            Debug.Log(output);
+        }
+        else
+        {
+            for (int i = currentIndex; i < array.Length; ++i)
+            {
+                array.SwapValues<int>(currentIndex, i);
+                permutation(result, array, currentIndex + 1);
+                array.SwapValues<int>(currentIndex, i);
+            }
+        }
+    }
+
+    public static List<int[]> getPermutations(int size)
+    {
+        List<int[]> result = new List<int[]>();
+        int[] array = Enumerable.Range(0, size).ToArray();
+
+        permutation(result, array, 0);
+
+        int temp = 0;
+        return result;
+    }
 
     public static int[] sampleWithoutReplacement(int sampleSize, int min, int max) {  // TODO: O(n^2) 보다 최적화 작업 진행 [min, max)
         if(min > max) { // if min and max is changed, swap these
@@ -213,3 +253,4 @@ public static class Utility
         return Mathf.Sign(Vector3.Cross(prevDir, currDir).y) * Vector3.Angle(prevDir, currDir);
     }
 }
+
