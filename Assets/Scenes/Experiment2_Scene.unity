@@ -1226,7 +1226,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &400031872
 Transform:
   m_ObjectHideFlags: 0
@@ -1294,7 +1294,7 @@ MonoBehaviour:
     attachToUser: 1
     parent: {fileID: 0}
   manager: {fileID: 0}
-  ExperimentTimeDuration: 300
+  ExperimentTimeDuration: 240
   totalCoin: 12
   coinObjPrefab: {fileID: 4939091665116276085, guid: 80c70a46beac86442b826f59b94860a0,
     type: 3}
@@ -2434,7 +2434,7 @@ PrefabInstance:
     - target: {fileID: 6917189092238707241, guid: d47255b89a317e24d9a3fe4868865dd7,
         type: 3}
       propertyPath: useVRMode
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6917189092239161936, guid: d47255b89a317e24d9a3fe4868865dd7,
         type: 3}
@@ -4045,7 +4045,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &1024802513
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4096,7 +4096,7 @@ MonoBehaviour:
     attachToUser: 1
     parent: {fileID: 0}
   manager: {fileID: 0}
-  ExperimentTimeDuration: 300
+  ExperimentTimeDuration: 240
   totalCoin: 12
   coinObjPrefab: {fileID: 4939091665116276085, guid: 80c70a46beac86442b826f59b94860a0,
     type: 3}
@@ -7533,7 +7533,7 @@ MonoBehaviour:
     attachToUser: 1
     parent: {fileID: 0}
   manager: {fileID: 0}
-  ExperimentTimeDuration: 300
+  ExperimentTimeDuration: 240
   totalCoin: 12
   coinObjPrefab: {fileID: 4939091665116276085, guid: 80c70a46beac86442b826f59b94860a0,
     type: 3}
