@@ -12,7 +12,7 @@ public class GainRedirector : MonoBehaviour
     // therefore, degree = (1 / r) * (180 / pi) and radius = 1 / g_c
     // if you want to detail, see "IEEE TRANSACTIONS ON VISUALIZATION AND COMPUTER GRAPHICS, VOL. 19, NO. 4, APRIL 2013 Comparing Four Approaches to Generalized Redirected Walking: Simulation and Live User Data"
     [HideInInspector]
-    public const float MIN_ROTATION_GAIN = -0.14f; // -0.33f
+    public const float MIN_ROTATION_GAIN = -0.24f; // -0.33f
     [HideInInspector]
     public const float MAX_ROTATION_GAIN = 0.14f; // 0.24f
     [HideInInspector]

@@ -149,6 +149,10 @@ public class FiniteStateMachine<TState, TInput>
         }
     }
 
+    public TState GetCurrentState() {
+        return currentState;
+    }
+
     public FiniteStateMachine<TState, TInput> AddStates(IEnumerable<TState> states) {
         foreach (var value in states)
         {

@@ -170,9 +170,25 @@ public class Door : Bound2D
                 room2.GetComponent<MeshRenderer>().material.SetVector("DigonalPos1", new Vector4(0, 0, 0, 0));
                 room2.GetComponent<MeshRenderer>().material.SetVector("DigonalPos2", new Vector4(0, 0, 0, 0));
             }
+
+            isOpened = false;
+        }
+        else {
+            if(doorMain != null) {
+                doorMain.transform.localRotation = Quaternion.identity;
+                AudioSource.PlayClipAtPoint(SoundSetting.Instance.doorCloseSound, this.transform.position);
+
+                GameObject grabble = Utility.GetChildWithLayer(doorMain, "Grabble");
+                grabble.GetComponent<Collider>().enabled = false;
+
+                List<GameObject> knob = Utility.GetChildrenWithLayer(doorMain, "Knob");
+                knob.ForEach(x => x.GetComponent<Collider>().enabled = true);
+
+                knob.ForEach(x => x.transform.localRotation = Quaternion.identity);
+            }
         }
 
-        isOpened = false;
+        // isOpened = false;
     }
 
     // public void UpdateWall(Room currentRoom, int wall) {

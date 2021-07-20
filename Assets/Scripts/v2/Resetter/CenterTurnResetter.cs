@@ -23,10 +23,12 @@ public class CenterTurnResetter : TaskBasedManager<CTResetState, CTResetInput>
     private float rotateDir;
 
     private GainRedirector redirector;
+    private Experiment2 exp2;
 
     protected override void GenerateTask()
     {
         redirector = this.GetComponent<GainRedirector>();
+        exp2 = this.GetComponent<Experiment2>();
 
         GenerateUI("Rotation UI", uiInfo[0]);
         GenerateUI("Translation UI", uiInfo[1]);
@@ -41,7 +43,8 @@ public class CenterTurnResetter : TaskBasedManager<CTResetState, CTResetInput>
         .AddStateStart(CTResetState.Rotating, CalculateResetAngle, StartRotation, () => EnableUI("Rotation UI"), () => CallAfterRotation(targetAngle))
         .AddTransition(CTResetState.Rotating, CTResetState.Translating, CTResetInput.UserRotationDone, StopRotation, () => DisableUI("Rotation UI"))
         .AddStateStart(CTResetState.Translating, StartTranslation, () => EnableUI("Translation UI"), () => EnableUI("Translation Guide UI", true))
-        .AddTransition(CTResetState.Translating, CTResetState.Idle, CTResetInput.StayRealSpace, StopTranslation, () => DisableUI("Translation UI"), () => DisableUI("Translation Guide UI", true), () => ToggleRedirector(true));
+        .AddTransition(CTResetState.Translating, CTResetState.Idle, CTResetInput.StayRealSpace, StopTranslation, DisableUIs);
+        // .AddTransition(CTResetState.Translating, CTResetState.Idle, CTResetInput.StayRealSpace, StopTranslation, () => DisableUI("Translation UI"), () => DisableUI("Translation Guide UI", true), () => ToggleRedirector(true));
 
         // Debug for task process
         // task.OnEachInput((newInput) => { Debug.Log($"{newInput} call"); } );
@@ -50,6 +53,18 @@ public class CenterTurnResetter : TaskBasedManager<CTResetState, CTResetInput>
         // task.OnExit((fromState) => { Debug.Log($"State {fromState} ended"); });
 
         task.Begin(CTResetState.Idle); 
+    }
+
+    public void DisableUIs() {
+        bool disableHandPointer = true;
+        if(exp2 != null) {
+            if(exp2.Task.GetCurrentState() == Exp2State.Initial || exp2.Task.GetCurrentState() == Exp2State.GoToNextRoom || exp2.Task.GetCurrentState() == Exp2State.EnterNextRoom)
+                disableHandPointer = false;
+        }
+
+        DisableUI("Translation UI", false, disableHandPointer);
+        DisableUI("Translation Guide UI", true, disableHandPointer);
+        ToggleRedirector(true);
     }
 
     public void CalculateResetAngle() {

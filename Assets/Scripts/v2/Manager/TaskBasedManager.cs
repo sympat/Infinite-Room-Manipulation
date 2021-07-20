@@ -57,11 +57,11 @@ where T2 : Enum
         user.ToggleHandPointer(true); 
     }
 
-    protected void DisableUI(string name, bool useLocal = false) {
+    protected void DisableUI(string name, bool useLocal = false, bool disableHandPointer = true) {
         User user = users.GetActiveUser();
 
         UIManager.Instance.ToggleUICanvas(name, false, user, useLocal); 
-        user.ToggleHandPointer(false);
+        if(disableHandPointer) user.ToggleHandPointer(false);
     }
 
     protected void AddTaskEvent(T2 input, UIBehaviour behaviour, string name, params string[] childName) {

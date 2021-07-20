@@ -66,7 +66,7 @@ public class Experiment2 : TaskBasedManager<Exp2State, Exp2Input>
         task.AddStateStart(Exp2State.Initial, () => EnableUI("Initial UI"))
         .AddTransition(Exp2State.Initial, Exp2State.GoToNextRoom, Exp2Input.ClickButton0, () => DisableUI("Initial UI"), () => CallExperimentDone(ExperimentTimeDuration))
 
-        .AddStateStart(Exp2State.GoToNextRoom, () => EnableUI("Goto Next UI"))
+        .AddStateStart(Exp2State.GoToNextRoom, () => EnableUI("Goto Next UI"), CloseConnectedDoorsinCurrentRoom)
         .AddTransition(Exp2State.GoToNextRoom, Exp2Input.ClickButton1, () => DisableUI("Goto Next UI"))
         .AddTransition(Exp2State.GoToNextRoom, Exp2State.EnterNextRoom, Exp2Input.EnterRoom)
 
@@ -97,6 +97,10 @@ public class Experiment2 : TaskBasedManager<Exp2State, Exp2Input>
 
         // Start task 
         task.Begin(Exp2State.Initial);
+    }
+
+    public void CloseConnectedDoorsinCurrentRoom() {
+        virtualEnvironment.CloseConnectedDoors(virtualEnvironment.CurrentRoom);
     }
 
     private Queue<int> locoQueue;

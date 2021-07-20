@@ -36,10 +36,12 @@ public class VirtualEnvironment : Transform2D
                 SwtichRoomsVisualization(currentRoom, true);
             }
 
-            List<Door> connectedDoors = GetConnectedDoors(currentRoom);
+            CloseConnectedDoors(currentRoom);
 
-            foreach(var door in connectedDoors) 
-                door.CloseDoor();
+            // List<Door> connectedDoors = GetConnectedDoors(currentRoom);
+
+            // foreach(var door in connectedDoors) 
+            //     door.CloseDoor();
 
             Debug.Log("Current Room is changed " + currentRoom);
         }
@@ -525,5 +527,12 @@ public class VirtualEnvironment : Transform2D
             if(door.transform.childCount != 0)
                 door.ToggleDoorInteraction(enabled);
         }
+    }
+
+    public void CloseConnectedDoors(Room v) {
+        List<Door> connectedDoors = GetConnectedDoors(v);
+
+        foreach(var door in connectedDoors) 
+            door.CloseDoor();
     }
 }
