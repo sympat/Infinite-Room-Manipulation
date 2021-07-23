@@ -20,9 +20,9 @@ public class GainRedirector : MonoBehaviour
     [HideInInspector]
     public const float MAX_CURVATURE_GAIN = 0.045f;
     [HideInInspector]
-    public const float HODGSON_MIN_CURVATURE_GAIN = -0.133f; // turn radius : 7.5m
+    public const float HODGSON_MIN_CURVATURE_GAIN = -0.2f; // turn radius : 7.5m, -0.133f
     [HideInInspector]
-    public const float HODGSON_MAX_CURVATURE_GAIN = 0.133f;
+    public const float HODGSON_MAX_CURVATURE_GAIN = 0.2f; // 0.133f
     [HideInInspector]
     public const float MIN_TRANSLATION_GAIN = -0.14f;
     [HideInInspector]
