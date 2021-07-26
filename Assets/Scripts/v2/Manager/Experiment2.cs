@@ -107,11 +107,11 @@ public class Experiment2 : TaskBasedManager<Exp2State, Exp2Input>
     public void ColoringDoor() {
         List<Door> doors = virtualEnvironment.GetConnectedDoors(virtualEnvironment.CurrentRoom);
 
-        float prob = Utility.sampleUniform(0f, 1.0f);
-        if(prob < 0.5f) {
-            task.Processing(Exp2Input.WatchColoringDoor);
-            return;
-        }
+        // float prob = Utility.sampleUniform(0f, 1.0f);
+        // if(prob < 0.5f) {
+        //     task.Processing(Exp2Input.WatchColoringDoor);
+        //     return;
+        // }
 
         if(locoQueue == null || locoQueue.Count == 0) locoQueue = new Queue<int>(Utility.sampleWithoutReplacement(doors.Count, 0, doors.Count)); // IV 1
           

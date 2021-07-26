@@ -97,7 +97,7 @@ public class Door : Bound2D
 
     public void OpenDoor()
     {
-        Debug.Log($"{this.gameObject} OpenDoor");
+        // Debug.Log($"{this.gameObject} OpenDoor");
 
         GameObject doorMain = Utility.GetChildWithLayer(this.gameObject, "Door Main");
         doorMain.GetComponent<BoxCollider>().enabled = true;
@@ -135,7 +135,7 @@ public class Door : Bound2D
 
     public void CloseDoor()
     {
-        Debug.Log($"{this.gameObject} CloseDoor");
+        // Debug.Log($"{this.gameObject} CloseDoor");
 
         GameObject doorMain = Utility.GetChildWithLayer(this.gameObject, "Door Main");
 
