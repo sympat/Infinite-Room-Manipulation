@@ -4,3 +4,4 @@ We present a change-blindness based redirected walking algorithm that allows a u
 ![Alt text](/teaser_thumbnail.png)
 
 # Demo
+https://www.youtube.com/watch?v=qC14Agw4A0M
