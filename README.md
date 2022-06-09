@@ -9,6 +9,7 @@ We present a change-blindness based redirected walking algorithm that allows a u
 </p>
 
 # Method
+In this study, we propose a novel approach to space manipulation in RDW by moving the wall outside the user's field of view wherever the user is located in an arbitrary room in virtual indoor environments. Typically, an indoor environment is composed of rooms and corridors connecting them. Furthermore, if we consider the corridors are just another type of room, the general indoor environment can be represented as a set of the infinite number of adjacent rooms. Hence, we can assume the virtual indoor environment and the real space as Figure \ref{fig:env}. We assume the real space $R$ is a rectangle, and the virtual space $V$ consists of $n$ rooms, each of which is a rectangle with a size that can be contained entirely within the real space. Lastly, each room could be connected to another adjacent room by a door.
 
 <p align="center">
   <img 
