@@ -4,7 +4,7 @@ We present a change-blindness based redirected walking algorithm that allows a u
 <p align="center">
   <img 
     width="80%"
-    src="/teaser_thumnail.png"
+    src="/teaser_thumbnail.png"
   >
 </p>
 
