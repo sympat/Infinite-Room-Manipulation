@@ -8,5 +8,14 @@ We present a change-blindness based redirected walking algorithm that allows a u
   >
 </p>
 
+# Method
+
+<p align="center">
+  <img 
+    width="100%"
+    src="/method.png"
+  >
+</p>
+
 # Demo
 https://www.youtube.com/watch?v=qC14Agw4A0M
